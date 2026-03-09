@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/di/injection.dart';
-import '../../../../core/utils/result.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/usecases/login.dart';
 import '../../domain/usecases/signup.dart';
@@ -57,16 +55,16 @@ class LoginFormNotifier extends StateNotifier<LoginFormState> {
         ));
 
   void setEmail(String email) {
-    state = state.copyWith(email: email, error: null);
+    state = state.copyWith(email: email.trim(), error: null);
   }
 
   void setPassword(String password) {
-    state = state.copyWith(password: password, error: null);
+    state = state.copyWith(password: password.trim(), error: null);
   }
 
   Future<void> login() async {
     state = state.copyWith(isLoading: true, error: null);
-    final result = await _useCase(state.email, state.password);
+    final result = await _useCase(state.email.trim(), state.password.trim());
     result.fold(
       (failure) => state = state.copyWith(
         isLoading: false,
@@ -170,38 +168,39 @@ class SignupFormNotifier extends StateNotifier<SignupFormState> {
         ));
 
   void setEmail(String email) {
-    state = state.copyWith(email: email, error: null);
+    state = state.copyWith(email: email.trim(), error: null);
   }
 
   void setFirstName(String firstName) {
-    state = state.copyWith(firstName: firstName, error: null);
+    state = state.copyWith(firstName: firstName.trim(), error: null);
   }
 
   void setLastName(String lastName) {
-    state = state.copyWith(lastName: lastName, error: null);
+    state = state.copyWith(lastName: lastName.trim(), error: null);
   }
 
   void setNickname(String nickname) {
-    state = state.copyWith(nickname: nickname);
+    state = state.copyWith(nickname: nickname.trim());
   }
 
   void setPassword(String password) {
-    state = state.copyWith(password: password, error: null);
+    state = state.copyWith(password: password.trim(), error: null);
   }
 
   void setConfirmPassword(String confirmPassword) {
-    state = state.copyWith(confirmPassword: confirmPassword, error: null);
+    state =
+        state.copyWith(confirmPassword: confirmPassword.trim(), error: null);
   }
 
   Future<void> signup() async {
     state = state.copyWith(isLoading: true, error: null);
     final result = await _useCase(
-      email: state.email,
-      firstName: state.firstName,
-      lastName: state.lastName,
-      nickname: state.nickname.isEmpty ? null : state.nickname,
-      password: state.password,
-      confirmPassword: state.confirmPassword,
+      email: state.email.trim(),
+      firstName: state.firstName.trim(),
+      lastName: state.lastName.trim(),
+      nickname: state.nickname.trim().isEmpty ? null : state.nickname.trim(),
+      password: state.password.trim(),
+      confirmPassword: state.confirmPassword.trim(),
     );
     result.fold(
       (failure) => state = state.copyWith(

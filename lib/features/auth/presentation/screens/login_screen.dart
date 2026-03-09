@@ -16,10 +16,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   void dispose() {
     _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -98,12 +100,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
                 PasswordField(
+                  controller: _passwordController,
                   labelText: 'Password',
                   textInputAction: TextInputAction.done,
                   obscureText: !loginState.isPasswordVisible,
                   onToggleVisibility: ref
                       .read(loginFormProvider.notifier)
                       .togglePasswordVisibility,
+                  onChanged: (v) =>
+                      ref.read(loginFormProvider.notifier).setPassword(v),
                   validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                   onFieldSubmitted: (_) {
                     if (_formKey.currentState!.validate()) {

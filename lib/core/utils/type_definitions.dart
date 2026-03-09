@@ -1,7 +1,6 @@
 /// Common type definitions used throughout the application.
 
 import 'result.dart';
-import '../errors/failures.dart';
 
 /// JSON Map type alias for cleaner code.
 typedef JsonMap = Map<String, dynamic>;

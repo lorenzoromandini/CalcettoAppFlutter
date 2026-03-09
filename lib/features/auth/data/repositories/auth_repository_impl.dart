@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/utils/result.dart' show Result, Success, FailureResult;
 import '../../../../core/errors/failures.dart';
-import '../../../../core/services/cache_service.dart';
 import '../../../../core/services/auth_storage_service.dart';
 import '../../../../core/network/api_client.dart';
 import '../../domain/entities/user.dart';

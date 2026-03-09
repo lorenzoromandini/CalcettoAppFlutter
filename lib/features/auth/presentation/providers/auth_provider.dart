@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../../../core/utils/result.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/usecases/login.dart';
 import '../../data/repositories/auth_repository_impl.dart';

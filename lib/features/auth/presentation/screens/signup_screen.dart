@@ -97,7 +97,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 Text(
                   'Join Calcetto',
                   style: tt.bodyLarge?.copyWith(
-                    color: cs.onSurface.withOpacity(0.6),
+                    color: cs.onSurface.withValues(alpha: 0.6),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -117,7 +117,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   Text(
                     'Account created successfully',
                     style: tt.bodyMedium?.copyWith(
-                      color: cs.onSurface.withOpacity(0.6),
+                      color: cs.onSurface.withValues(alpha: 0.6),
                     ),
                     textAlign: TextAlign.center,
                   ),
