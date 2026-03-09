@@ -65,10 +65,16 @@ Football club members can easily manage their club activities, RSVP to matches, 
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Use existing Next.js backend | Faster development, single source of truth for data | — Pending |
-| Full feature parity for v1 | Users expect all web features on mobile | — Pending |
-| Full-featured FIFA cards | Key differentiator feature, visual wow factor | — Pending |
-| Flutter for cross-platform | Single codebase for iOS, Android, and web | — Pending |
+| Use Flutter for cross-platform | Single codebase for iOS, Android, and web | ✅ Implemented |
+| Use existing Next.js backend | Faster development, single source of truth for data | ✅ Integrated |
+| Riverpod + Dio + Hive stack | Research-validated, industry standard | ✅ Implemented |
+| Clean Architecture pattern | Proven separation of concerns | ✅ Implemented |
+| Result<T> over dartz Either | Simpler API, better Flutter integration | ✅ Implemented |
+| Full feature parity for v1 | Users expect all web features on mobile | ✅ Phase 1 complete |
+| Material 3 with seed color | Modern design, football identity | ✅ Implemented (green theme) |
+| IndexedStack for tab switching | Preserves screen state (scroll, form data) | ✅ Implemented |
+| Cache-based first launch detection | Non-sensitive UI preference | ✅ Implemented |
+| Biometric auth with local_auth | Native device security | ✅ Implemented (ready for testing) |
 
 ---
-*Last updated: 2026-03-09 after initialization*
+*Last updated: 2026-03-09 after Phase 1 completion*
