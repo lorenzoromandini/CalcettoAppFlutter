@@ -1,56 +1,75 @@
+import 'package:dio/dio.dart';
+
 import '../../../../core/utils/result.dart' show Result, Success, FailureResult;
 import '../../../../core/errors/failures.dart';
-import '../../../../core/errors/exceptions.dart';
 import '../../../../core/services/cache_service.dart';
 import '../../../../core/services/auth_storage_service.dart';
+import '../../../../core/network/api_client.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../datasources/auth_remote_datasource.dart';
+import '../models/user_model.dart';
 import '../datasources/auth_local_datasource.dart';
 
-/// Implementation of [AuthRepository] coordinating between data sources.
+/// Implementation of [AuthRepository] using HTTP API client.
 ///
-/// Handles the following flow:
-/// - login(): Remote API call -> Save tokens -> Cache user -> Return User entity
-/// - getCurrentUser(): Secure storage -> Cache fallback -> Return User entity
-/// - isAuthenticated(): Check if valid token exists
-/// - logout(): Clear all stored data
+/// Flow:
+/// - login(): Call Next.js API -> Save token -> Cache user data
+/// - logout(): Clear session and all stored data
+/// - getCurrentUser(): Get cached user data
+/// - isAuthenticated(): Check if token exists
 class AuthRepositoryImpl implements AuthRepository {
-  final AuthRemoteDataSource _remoteDataSource;
+  final ApiClient _apiClient;
   final AuthLocalDataSource _localDataSource;
   final AuthStorageService _authStorageService;
 
   AuthRepositoryImpl({
-    required AuthRemoteDataSource remoteDataSource,
+    required ApiClient apiClient,
     required AuthLocalDataSource localDataSource,
     required AuthStorageService authStorageService,
-    required CacheService cacheService,
-  })  : _remoteDataSource = remoteDataSource,
+  })  : _apiClient = apiClient,
         _localDataSource = localDataSource,
         _authStorageService = authStorageService;
 
   @override
   Future<Result<User>> login(String email, String password) async {
     try {
-      // Call remote API
-      final userModel = await _remoteDataSource.login(email, password);
+      // Call API
+      final responseData =
+          await _apiClient.login(email: email, password: password);
 
-      // On success: save token and cache user
-      if (userModel.token != null) {
-        await _authStorageService.saveToken(userModel.token!);
+      // Create user object from API response
+      // Next.js returns: {success: bool, token: String, user: Map}
+      final userData = Map<String, dynamic>.from(
+          responseData['user'] as Map<String, dynamic>);
+      final token = responseData['token'] as String?;
+
+      // Create UserModel
+      final user = UserModel(
+        id: userData['id']?.toString() ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
+        email: userData['email'] as String? ?? email,
+        name: userData['firstName'] as String? ?? 'User',
+        avatarUrl: userData['image'] as String?,
+        token: token,
+      );
+
+      // Store token if present
+      if (token != null) {
+        await _authStorageService.saveToken(token);
       }
-      await _authStorageService.saveUser(userModel);
-      await _localDataSource.cacheUser(userModel);
+
+      // Cache user data
+      await _localDataSource.cacheUser(user);
 
       // Store credentials for biometric authentication
       await _authStorageService.storeCredentials(email, password);
 
       // Return domain entity
-      return Success(userModel.toEntity());
-    } on AuthException catch (e) {
+      return Success(user.toEntity());
+    } on ApiException catch (e) {
       return FailureResult(AuthFailure(e.message));
-    } on ServerException catch (e) {
-      return FailureResult(ServerFailure(e.message));
+    } on DioException catch (e) {
+      return FailureResult(ServerFailure('Network error: ${e.message}'));
     } catch (e) {
       return FailureResult(ServerFailure('Unexpected error: $e'));
     }
@@ -61,29 +80,26 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await _authStorageService.clearAll();
       await _localDataSource.clearCache();
-      // Note: clearAll() also clears stored credentials
+      await _apiClient.logout();
       return const Success(null);
     } catch (e) {
-      return FailureResult(CacheFailure('Failed to clear session: $e'));
+      return FailureResult(CacheFailure('Failed to logout: $e'));
     }
   }
 
   @override
   Future<Result<User?>> getCurrentUser() async {
     try {
-      // First try secure storage
       final storedUser = await _authStorageService.getUser();
       if (storedUser != null) {
         return Success(storedUser.toEntity());
       }
 
-      // Fallback to cache
       final cachedUser = await _localDataSource.getCachedUser();
       if (cachedUser != null) {
         return Success(cachedUser.toEntity());
       }
 
-      // No user found
       return const Success(null);
     } catch (e) {
       return FailureResult(CacheFailure('Failed to retrieve user: $e'));

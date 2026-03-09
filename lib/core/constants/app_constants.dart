@@ -3,8 +3,9 @@ class AppConstants {
   AppConstants._();
 
   // API Configuration
-  static const String apiBaseUrl =
-      'https://api.calcetto.com'; // TODO: Replace with actual API URL
+  // Local development: http://localhost:3000/api
+  // Production: Update to your deployed backend URL
+  static const String apiBaseUrl = 'http://localhost:3000/api';
 
   // Storage Keys
   static const String jwtTokenKey = 'jwt_token';
