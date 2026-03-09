@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/welcome_screen.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
+import '../../features/auth/presentation/providers/first_launch_provider.dart';
 import '../../features/home/presentation/screens/main_layout.dart';
 import '../theme/app_theme.dart';
 import '../theme/theme_provider.dart';
@@ -31,28 +33,26 @@ class CalcettoApp extends ConsumerWidget {
   }
 }
 
-/// Wrapper that checks authentication status on app start.
-class AuthWrapper extends ConsumerStatefulWidget {
+/// Wrapper that handles app startup flow: first launch -> login -> home.
+///
+/// Flow:
+/// 1. First launch: Show welcome screen
+/// 2. Not authenticated: Show login screen
+/// 3. Authenticated: Show main layout with bottom navigation
+class AuthWrapper extends ConsumerWidget {
   const AuthWrapper({super.key});
 
   @override
-  ConsumerState<AuthWrapper> createState() => _AuthWrapperState();
-}
-
-class _AuthWrapperState extends ConsumerState<AuthWrapper> {
-  @override
-  void initState() {
-    super.initState();
-    // Check auth status on app start
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(authStateProvider.notifier).checkAuthStatus();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isFirstLaunch = ref.watch(firstLaunchProvider);
     final authState = ref.watch(authStateProvider);
 
+    // First launch: show welcome screen
+    if (isFirstLaunch) {
+      return const WelcomeScreen();
+    }
+
+    // Check authentication status
     return authState.maybeWhen(
       authenticated: (user) {
         // Navigate to main layout with bottom navigation
