@@ -10,7 +10,7 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | 1 - Foundation & Authentication |
-| **Plan** | ✓ Complete (4/4) |
+| **Plan** | ✓ Complete (5/5) |
 | **Status** | ✓ Complete - Ready for Phase 2 |
 | **Started** | 2026-03-09 |
 | **Target Completion** | TBD |
@@ -44,9 +44,10 @@ Phase 5: Live & Notifications    [░░░░░░░░░░] 0%
 ### Gap Summary
 
 **All gaps closed - Phase 1 complete!**
-- ✓ AUTH-04: Biometric authentication implemented (01-04-PLAN.md executed)
+- ✓ AUTH-04: Biometric authentication FULLY implemented (01-04-PLAN.md + 01-05-PLAN.md executed)
 - Files created: biometric_service.dart, biometric_provider.dart
 - Biometric toggle in settings_screen.dart, biometric login button in login_screen.dart
+- **CRITICAL BUG FIX (01-05):** Line 67 biometric flow now authenticates user (not logs out)
 
 ---
 
@@ -83,6 +84,7 @@ Phase 5: Live & Notifications    [░░░░░░░░░░] 0%
 | 2026-03-09 | Password reset deferred | Requires backend email integration (AUTH-06) |
 | 2026-03-09 | Biometric auth gap | AUTH-04 needs gap-closure plan |
 | 2026-03-09 | Biometric auth implemented | AUTH-04 CLOSED - local_auth with Hive preference in 01-04 |
+| 2026-03-09 | Biometric auth bug fix | AUTH-04 line 67 fix - credentials stored/retrieved for biometric flow |
 
 ### Open Questions
 
@@ -106,11 +108,11 @@ None - all Phase 1 gaps closed. Ready for Phase 2: Clubs & Offline.
 
 ### Last Action
 
-Completed Phase 1 Plan 04 - AUTH-04 gap closure. Biometric authentication fully implemented.
+Completed Phase 1 Plan 05 - Critical bug fix for biometric login. Line 67 now correctly authenticates user instead of logging out.
 
 ### Next Actions
 
-1. ✓ Verify Phase 1 complete (all 4 plans executed)
+1. ✓ Verify Phase 1 complete (all 5 plans executed)
 2. Begin Phase 2: Clubs & Offline planning
 3. Set up Hive offline caching infrastructure
 
@@ -168,4 +170,4 @@ flutter build web --release
 ---
 
 *State file: Tracks current position and accumulated context*  
-*Updated: 2026-03-09 after Phase 1 completion (Plans 01-01, 01-02, 01-03, 01-04 - ALL COMPLETE)*
+*Updated: 2026-03-09 after Phase 1 Plan 05 completion (line 67 biometric bug fix)*
