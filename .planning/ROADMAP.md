@@ -52,6 +52,21 @@ Each phase delivers a complete, verifiable capability that can be independently 
 4. **App follows Material 3 design with automatic dark/light theme switching** (UI-01, UI-02)
 5. **App launches in under 3 seconds with smooth 60fps transitions** (PERF-01, PERF-02)
 
+### Plans
+
+**3 plans in 3 waves**
+
+| Wave | Plan | Objective | Dependencies |
+|------|------|-----------|--------------|
+| 1 | 01-01 | Flutter project setup, Clean Architecture structure, core dependencies | None |
+| 2 | 01-02 | Authentication flow, login screen, password toggle, token storage, session persistence | 01-01 |
+| 3 | 01-03 | Navigation system, Material 3 theme, welcome screen, logout functionality | 01-02 |
+
+**Plan Files:**
+- [ ] `.planning/phases/01-foundation-auth/01-01-PLAN.md` - Project Setup & Core Architecture
+- [ ] `.planning/phases/01-foundation-auth/01-02-PLAN.md` - Authentication Flow & UI Foundation
+- [ ] `.planning/phases/01-foundation-auth/01-03-PLAN.md` - Navigation & Theme System
+
 ---
 
 ## Phase 2: Club Management & Offline Foundation
