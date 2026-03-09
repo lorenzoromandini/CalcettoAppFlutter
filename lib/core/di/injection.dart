@@ -6,12 +6,17 @@ import '../constants/app_constants.dart';
 import '../services/cache_service.dart';
 import '../services/secure_storage_service.dart';
 import '../services/auth_storage_service.dart';
+import '../services/connectivity_service.dart';
 import '../network/api_client.dart';
+import '../providers/connectivity_provider.dart';
 import '../../features/auth/data/datasources/auth_local_datasource.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/usecases/login.dart';
 import '../../features/auth/domain/usecases/signup.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
+
+// Export connectivity providers for feature modules
+export '../providers/connectivity_provider.dart';
 
 /// Provider for ApiClient instance.
 final apiClientProvider = Provider<ApiClient>(
