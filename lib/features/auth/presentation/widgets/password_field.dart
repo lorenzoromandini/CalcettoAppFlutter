@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 /// Password input field with visibility toggle.
 ///
 /// Material 3 styled TextField with eye icon to show/hide password.
-class PasswordField extends StatefulWidget {
+class PasswordField extends StatelessWidget {
   /// Controller for the text field.
-  final TextEditingController controller;
+  final TextEditingController? controller;
 
   /// Optional error text to display.
   final String? errorText;
@@ -28,9 +28,15 @@ class PasswordField extends StatefulWidget {
   /// Callback when field is submitted.
   final ValueChanged<String>? onFieldSubmitted;
 
+  /// Whether to obscure the text.
+  final bool obscureText;
+
+  /// Callback to toggle visibility.
+  final VoidCallback? onToggleVisibility;
+
   const PasswordField({
     super.key,
-    required this.controller,
+    this.controller,
     this.errorText,
     this.onChanged,
     this.labelText = 'Password',
@@ -38,44 +44,33 @@ class PasswordField extends StatefulWidget {
     this.textInputAction = TextInputAction.next,
     this.validator,
     this.onFieldSubmitted,
+    this.obscureText = true,
+    this.onToggleVisibility,
   });
-
-  @override
-  State<PasswordField> createState() => _PasswordFieldState();
-}
-
-class _PasswordFieldState extends State<PasswordField> {
-  bool _obscureText = true;
-
-  void _toggleVisibility() {
-    setState(() {
-      _obscureText = !_obscureText;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return TextFormField(
-      controller: widget.controller,
-      obscureText: _obscureText,
+      controller: controller,
+      obscureText: obscureText,
       keyboardType: TextInputType.visiblePassword,
-      textInputAction: widget.textInputAction,
-      onChanged: widget.onChanged,
-      onFieldSubmitted: widget.onFieldSubmitted,
-      validator: widget.validator,
+      textInputAction: textInputAction,
+      onChanged: onChanged,
+      onFieldSubmitted: onFieldSubmitted,
+      validator: validator,
       decoration: InputDecoration(
-        labelText: widget.labelText,
-        hintText: widget.hintText,
-        errorText: widget.errorText,
+        labelText: labelText,
+        hintText: hintText,
+        errorText: errorText,
         prefixIcon: const Icon(Icons.lock_outline),
         suffixIcon: IconButton(
           icon: Icon(
-            _obscureText ? Icons.visibility_off : Icons.visibility,
+            obscureText ? Icons.visibility_off : Icons.visibility,
           ),
-          onPressed: _toggleVisibility,
-          tooltip: _obscureText ? 'Show password' : 'Hide password',
+          onPressed: onToggleVisibility,
+          tooltip: obscureText ? 'Show password' : 'Hide password',
         ),
         border: const OutlineInputBorder(),
         filled: true,

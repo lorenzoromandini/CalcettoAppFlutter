@@ -116,4 +116,51 @@ class AuthRepositoryImpl implements AuthRepository {
       return FailureResult(CacheFailure('Failed to check auth status: $e'));
     }
   }
+
+  @override
+  Future<Result<User>> signup({
+    required String email,
+    required String firstName,
+    required String lastName,
+    String? nickname,
+    required String password,
+  }) async {
+    try {
+      final responseData = await _apiClient.signup(
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        nickname: nickname,
+        password: password,
+      );
+
+      final userData = Map<String, dynamic>.from(
+          responseData['user'] as Map<String, dynamic>);
+      final token = responseData['token'] as String?;
+
+      final user = UserModel(
+        id: userData['id']?.toString() ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
+        email: userData['email'] as String? ?? email,
+        name: userData['firstName'] as String? ?? firstName,
+        avatarUrl: userData['image'] as String?,
+        token: token,
+      );
+
+      if (token != null) {
+        await _authStorageService.saveToken(token);
+      }
+
+      await _localDataSource.cacheUser(user);
+      await _authStorageService.storeCredentials(email, password);
+
+      return Success(user.toEntity());
+    } on ApiException catch (e) {
+      return FailureResult(AuthFailure(e.message));
+    } on DioException catch (e) {
+      return FailureResult(ServerFailure('Network error: ${e.message}'));
+    } catch (e) {
+      return FailureResult(ServerFailure('Unexpected error: $e'));
+    }
+  }
 }

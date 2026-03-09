@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/auth/presentation/screens/login_screen.dart';
-import '../../features/auth/presentation/screens/welcome_screen.dart';
-import '../../features/auth/presentation/providers/auth_provider.dart';
-import '../../features/auth/presentation/providers/first_launch_provider.dart';
+import '../../features/auth/presentation/providers/auth_providers.dart';
 import '../../features/home/presentation/screens/main_layout.dart';
 import '../theme/app_theme.dart';
 import '../theme/theme_provider.dart';
@@ -16,6 +14,22 @@ class CalcettoApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final authState = ref.watch(authSessionProvider);
+
+    if (authState.isLoading) {
+      return MaterialApp(
+        title: 'Calcetto',
+        debugShowCheckedModeBanner: false,
+        themeMode: themeMode,
+        theme: AppTheme.lightTheme(),
+        darkTheme: AppTheme.darkTheme(),
+        home: const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
 
     return MaterialApp(
       title: 'Calcetto',
@@ -23,7 +37,8 @@ class CalcettoApp extends ConsumerWidget {
       themeMode: themeMode,
       theme: AppTheme.lightTheme(),
       darkTheme: AppTheme.darkTheme(),
-      home: const LoginScreen(),
+      home:
+          authState.isAuthenticated ? const MainLayout() : const LoginScreen(),
     );
   }
 }

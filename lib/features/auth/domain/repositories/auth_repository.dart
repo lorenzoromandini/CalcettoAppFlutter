@@ -27,4 +27,15 @@ abstract class AuthRepository {
   ///
   /// Returns true if valid credentials exist in storage.
   Future<Result<bool>> isAuthenticated();
+
+  /// Registers a new user with the provided details.
+  ///
+  /// Returns a [User] entity on success, or an [AuthFailure] on failure.
+  Future<Result<User>> signup({
+    required String email,
+    required String firstName,
+    required String lastName,
+    String? nickname,
+    required String password,
+  });
 }

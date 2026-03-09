@@ -10,6 +10,7 @@ import '../network/api_client.dart';
 import '../../features/auth/data/datasources/auth_local_datasource.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/usecases/login.dart';
+import '../../features/auth/domain/usecases/signup.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 
 /// Provider for ApiClient instance.
@@ -79,5 +80,13 @@ final loginAsyncUseCaseProvider = Provider<LoginAsyncUseCase>(
   (ref) {
     final repository = ref.watch(authRepositoryProvider);
     return LoginAsyncUseCase(repository);
+  },
+);
+
+/// Provider for signup use case.
+final signupAsyncUseCaseProvider = Provider<SignupAsyncUseCase>(
+  (ref) {
+    final repository = ref.watch(authRepositoryProvider);
+    return SignupAsyncUseCase(repository);
   },
 );
