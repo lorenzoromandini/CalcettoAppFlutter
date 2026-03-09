@@ -10,8 +10,9 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | 2 - Clubs & Offline |
-| **Plan** | ✓ Complete (1/1) |
-| **Status** | ✓✓ COMPLETE |
+| **Current Plan** | 3 |
+| **Total Plans** | 4 |
+| **Status** | ⏳ In Progress |
 | **Started** | 2026-03-09 |
 | **Target Completion** | TBD |
 
@@ -19,7 +20,7 @@
 
 ```
 Phase 1: Foundation & Auth     [██████████] 100% (5/5 criteria) ✅
-Phase 2: Clubs & Offline         [░░░░░░░░░░] 0%
+Phase 2: Clubs & Offline         [███████░░░] 75% (3/4 plans)
 Phase 3: Matches & RSVP          [░░░░░░░░░░] 0%
 Phase 4: Stats & FIFA Cards      [░░░░░░░░░░] 0%
 Phase 5: Live & Notifications    [░░░░░░░░░░] 0%
@@ -91,6 +92,10 @@ Phase 5: Live & Notifications    [░░░░░░░░░░] 0%
 | 2026-03-09 | Biometric auth gap | AUTH-04 needs gap-closure plan |
 | 2026-03-09 | Biometric auth implemented | AUTH-04 CLOSED - local_auth with Hive preference in 01-04 |
 | 2026-03-09 | Biometric auth bug fix | AUTH-04 line 67 fix - credentials stored/retrieved for biometric flow |
+| 2026-03-10 | FIFA-style member cards with gradient backgrounds | Visual role hierarchy (gold/blue/silver), foreshadows Phase 4 |
+| 2026-03-10 | Role icons instead of text badges | Better visual clarity at small sizes |
+| 2026-03-10 | 8-char alphanumeric invite codes | XXXX-XXXX format for readability, one-time use |
+| 2026-03-10 | Native share_plus for invite sharing | Platform-native UX over custom UI |
 
 ### Open Questions
 
@@ -101,7 +106,7 @@ Phase 5: Live & Notifications    [░░░░░░░░░░] 0%
 
 ### Known Blockers
 
-None - Phase 1 COMPLETE. Ready for Phase 2: Clubs & Offline.
+None - Phase 2 Plan 03 complete. Ready for Plan 04 (offline indicator, final integration).
 
 ### Technical Debt
 
@@ -116,14 +121,15 @@ None - Phase 1 COMPLETE. Ready for Phase 2: Clubs & Offline.
 
 ### Last Action
 
-Phase 1 COMPLETE: Real authentication with Next.js API, Riverpod providers, session persistence on app launch.
+Phase 2 Plan 03 COMPLETE: Club detail screen with tabs, FIFA-style member cards, role icons, and invite code generation.
 
 ### Next Actions
 
-1. ✅ Phase 1 COMPLETE - All authentication features implemented
-2. ⏭️ Begin Phase 2: Clubs & Offline planning
-3. ⏭️ Set up Hive offline caching for clubs/matches data
-4. ⏭️ Implement Home screen with actual club data from API
+1. ✅ Phase 2 Plan 01 - Clubs offline infrastructure (repositories, TTL cache)
+2. ✅ Phase 2 Plan 02 - Club list screen with switching
+3. ✅ Phase 2 Plan 03 - Club detail UI with FIFA-style cards
+4. ⏭️ Phase 2 Plan 04 - Offline indicator and final integration
+5. ⏭️ Phase 2 Plan 05 - Testing and polish (if needed)
 
 ### Working Notes
 
