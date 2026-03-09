@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import '../providers/biometric_provider.dart';
 import '../widgets/password_field.dart';
 import '../../../../core/services/biometric_service.dart';
+import '../../../../core/di/injection.dart';
 
 /// Login screen with email and password authentication.
 ///
@@ -54,17 +55,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
 
       if (authenticated && mounted) {
-        // Biometric auth succeeded - trigger login flow
-        // In a real app, this would use stored credentials or a token
-        // For now, show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Biometric authentication successful'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        // Trigger authenticated state
-        ref.read(authStateProvider.notifier).logout();
+        // Biometric auth succeeded - retrieve stored credentials
+        final authStorageService = ref.read(authStorageServiceProvider);
+        final credentials = await authStorageService.getCredentials();
+
+        if (credentials != null) {
+          // Credentials exist - log in with them
+          final email = credentials['email']!;
+          final password = credentials['password']!;
+
+          // Trigger login using the auth provider
+          ref.read(authStateProvider.notifier).login(email, password);
+        } else {
+          // No stored credentials - show error
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                    'Please log in with email and password first to enable biometric login'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+        }
       }
     } catch (e) {
       if (mounted) {
