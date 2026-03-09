@@ -1,0 +1,281 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:calcetto_app/features/clubs/domain/entities/club.dart';
+import 'package:calcetto_app/features/clubs/presentation/providers/invite_code_provider.dart';
+
+/// Invite code generator widget for admin users.
+///
+/// Features:
+/// - Admin-only visibility (OWNER or MANAGER)
+/// - Generate 8-char alphanumeric codes
+/// - Share via native share sheet
+/// - Copy to clipboard
+/// - One-time use warning
+class InviteCodeGenerator extends ConsumerWidget {
+  final String clubId;
+  final ClubRole userRole;
+
+  const InviteCodeGenerator({
+    super.key,
+    required this.clubId,
+    required this.userRole,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Only show for admins
+    if (!userRole.isAdmin) {
+      return _buildNonAdminMessage(context);
+    }
+
+    final inviteCodeAsync = ref.watch(inviteCodeProvider);
+    final notifier = ref.read(inviteCodeProvider.notifier);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        inviteCodeAsync.when(
+          loading: () => _buildLoadingState(context),
+          error: (error, stack) =>
+              _buildErrorState(context, error.toString(), notifier),
+          data: (code) => code != null
+              ? _buildGeneratedState(context, code, notifier)
+              : _buildNotGeneratedState(context, notifier),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNonAdminMessage(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceVariant,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.info_outline,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Contact an admin to invite members',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingState(BuildContext context) {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _buildNotGeneratedState(
+      BuildContext context, InviteCodeNotifier notifier) {
+    final theme = Theme.of(context);
+
+    return FilledButton.icon(
+      onPressed: () {
+        notifier.generate(clubId, userRole);
+      },
+      icon: const Icon(Icons.add_link),
+      label: const Text('Generate Invite Code'),
+      style: FilledButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      ),
+    );
+  }
+
+  Widget _buildGeneratedState(
+      BuildContext context, String code, InviteCodeNotifier notifier) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.primary,
+          width: 2,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Code display
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: theme.colorScheme.primary,
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  _formatCode(code),
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'monospace',
+                    letterSpacing: 4,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                IconButton(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: code));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Code copied to clipboard'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.copy),
+                  tooltip: 'Copy to clipboard',
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Action buttons
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () => _shareCode(context, code),
+                  icon: const Icon(Icons.share),
+                  label: const Text('Share'),
+                ),
+              ),
+              if (code.isNotEmpty) ...[
+                const SizedBox(width: 12),
+                OutlinedButton.icon(
+                  onPressed: notifier.clear,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('New Code'),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Security notes
+          Text(
+            '⚠️ This code can only be used once',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.error,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Text(
+            'Share privately with trusted people',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.7),
+            ),
+          ),
+          Text(
+            'Expires: Never',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.7),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(
+      BuildContext context, String error, InviteCodeNotifier notifier) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.errorContainer,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.error_outline,
+                color: theme.colorScheme.onErrorContainer,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Failed to generate code',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.onErrorContainer,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            error,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onErrorContainer,
+            ),
+          ),
+          const SizedBox(height: 16),
+          FilledButton.icon(
+            onPressed: () {
+              notifier.generate(clubId, userRole);
+            },
+            icon: const Icon(Icons.refresh),
+            label: const Text('Retry'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _shareCode(BuildContext context, String code) async {
+    final renderBox = context.findRenderObject() as RenderBox?;
+
+    await Share.share(
+      'Join my football club! Use invite code: $code',
+      subject: 'Club Invitation',
+      sharePositionOrigin: _getSharePositionOrigin(renderBox),
+    );
+  }
+
+  Rect? _getSharePositionOrigin(RenderBox? renderBox) {
+    if (renderBox != null) {
+      final size = renderBox.size;
+      final offset = renderBox.localToGlobal(Offset.zero);
+      return Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height / 3);
+    }
+    return null;
+  }
+
+  String _formatCode(String code) {
+    // Format as XXXX-XXXX for better readability
+    if (code.length == 8) {
+      return '${code.substring(0, 4)}-${code.substring(4)}';
+    }
+    return code.toUpperCase();
+  }
+}
