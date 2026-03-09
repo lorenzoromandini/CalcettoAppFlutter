@@ -179,7 +179,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: _StatCard(
               icon: Icons.people,
               label: 'Members',
-              value: '${club.memberCount ?? 0}',
+              value: '${club.memberCount}',
               color: theme.colorScheme.primary,
             ),
           ),
