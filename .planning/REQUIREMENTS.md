@@ -256,6 +256,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 - Mapped to phases: 67
 - Unmapped: 0 ✓
 
+**Phase Distribution:**
+- Phase 1 (Foundation & Auth): 17 requirements
+- Phase 2 (Clubs & Offline): 15 requirements
+- Phase 3 (Matches & RSVP): 14 requirements
+- Phase 4 (Stats & FIFA Cards): 16 requirements
+- Phase 5 (Live & Notifications): 13 requirements
+
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-09 after initial definition*
+*Last updated: 2026-03-09 after roadmap creation*
