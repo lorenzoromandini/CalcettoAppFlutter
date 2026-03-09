@@ -54,18 +54,22 @@ Each phase delivers a complete, verifiable capability that can be independently 
 
 ### Plans
 
-**3 plans in 3 waves**
+**5 plans in 3 waves**
 
 | Wave | Plan | Objective | Dependencies |
 |------|------|-----------|--------------|
 | 1 | 01-01 | Flutter project setup, Clean Architecture structure, core dependencies | None |
 | 2 | 01-02 | Authentication flow, login screen, password toggle, token storage, session persistence | 01-01 |
 | 3 | 01-03 | Navigation system, Material 3 theme, welcome screen, logout functionality | 01-02 |
+| 1 | 01-04 | Biometric authentication (Face ID/Touch ID) with settings toggle and login option | 01-01, 01-02, 01-03 |
+| 1 | 01-05 | Fix biometric login flow bug - credential storage/retrieval | 01-04 (gap closure) |
 
 **Plan Files:**
-- [ ] `.planning/phases/01-foundation-auth/01-01-PLAN.md` - Project Setup & Core Architecture
-- [ ] `.planning/phases/01-foundation-auth/01-02-PLAN.md` - Authentication Flow & UI Foundation
-- [ ] `.planning/phases/01-foundation-auth/01-03-PLAN.md` - Navigation & Theme System
+- [x] `.planning/phases/01-foundation-auth/01-01-PLAN.md` - Project Setup & Core Architecture
+- [x] `.planning/phases/01-foundation-auth/01-02-PLAN.md` - Authentication Flow & UI Foundation
+- [x] `.planning/phases/01-foundation-auth/01-03-PLAN.md` - Navigation & Theme System
+- [x] `.planning/phases/01-foundation-auth/01-04-PLAN.md` - Biometric Authentication Infrastructure
+- [ ] `.planning/phases/01-foundation-auth/01-05-PLAN.md` - Fix Biometric Login Flow (gap closure)
 
 ---
 
