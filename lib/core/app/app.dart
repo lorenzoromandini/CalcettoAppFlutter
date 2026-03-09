@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
+import '../../features/home/presentation/screens/main_layout.dart';
 import '../theme/app_theme.dart';
 import '../theme/theme_provider.dart';
 
@@ -54,8 +55,8 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
 
     return authState.maybeWhen(
       authenticated: (user) {
-        // TODO: Navigate to home screen when authenticated
-        return const LoginScreen(); // Temporary - will be replaced with home in next plan
+        // Navigate to main layout with bottom navigation
+        return const MainLayout();
       },
       loading: () => const Scaffold(
         body: Center(
