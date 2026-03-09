@@ -131,6 +131,23 @@ Backend required: Next.js on http://localhost:3000
 4. **App shows clear offline indicator and serves cached data when disconnected** (OFF-01, OFF-06)
 5. **Club lists scroll smoothly at 60fps with pull-to-refresh support** (UI-06, PERF-04)
 
+### Plans
+
+**4 plans in 2 waves**
+
+| Wave | Plan | Objective | Dependencies | Status |
+|------|------|-----------|--------------|--------|
+| 1 | 02-01 | Offline infrastructure: connectivity service, clubs repository with TTL cache, data models | None | ⏳ Ready |
+| 2 | 02-02 | Clubs list UI: loading skeletons, pull-to-refresh, active club indicator, club switching | 02-01 | ⏳ Ready |
+| 2 | 02-03 | Club detail screen: tabs, FIFA-style member cards, invite code generation | 02-01 | ⏳ Ready |
+| 2 | 02-04 | Offline indicator integration, home screen with active club context, final integration | 02-02, 02-03 | ⏳ Ready |
+
+**Plan Files:**
+- [ ] `.planning/phases/02-clubs-offline/02-01-PLAN.md` - Offline Infrastructure & Data Layer
+- [ ] `.planning/phases/02-clubs-offline/02-02-PLAN.md` - Clubs List UI & Club Switching
+- [ ] `.planning/phases/02-clubs-offline/02-03-PLAN.md` - Club Detail with FIFA Cards & Invites
+- [ ] `.planning/phases/02-clubs-offline/02-04-PLAN.md` - Offline Indicator & Home Screen Integration
+
 ---
 
 ## Phase 3: Matches & RSVP with Optimistic UI
