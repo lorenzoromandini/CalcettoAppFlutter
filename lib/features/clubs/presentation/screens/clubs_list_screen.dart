@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/providers/connectivity_provider.dart';
+import '../../../../core/providers/offline_status_provider.dart';
+import '../../../../core/widgets/offline_indicator.dart';
 import '../../domain/entities/club.dart';
 import '../providers/clubs_list_provider.dart';
 import '../providers/active_club_provider.dart';
@@ -38,29 +40,33 @@ class _ClubsListScreenState extends ConsumerState<ClubsListScreen> {
   Widget build(BuildContext context) {
     final clubsAsync = ref.watch(clubsListProvider);
     final activeClubAsync = ref.watch(activeClubProvider);
-    final isOnlineAsync = ref.watch(isOnlineProvider);
+    final isOffline = ref.watch(isOfflineProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Clubs'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _onCreateClub,
-            tooltip: 'Create club',
+          Tooltip(
+            message: isOffline ? 'Requires internet connection' : 'Create club',
+            child: IgnorePointer(
+              ignoring: isOffline,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: isOffline ? 0.5 : 1.0,
+                child: IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: isOffline ? null : _onCreateClub,
+                  tooltip: 'Create club',
+                ),
+              ),
+            ),
           ),
         ],
       ),
       body: Column(
         children: [
           // Offline indicator banner
-          if (isOnlineAsync.value == false)
-            MaterialBanner(
-              content: const Text('You are offline. Showing cached data.'),
-              actions: const [],
-              backgroundColor:
-                  Theme.of(context).colorScheme.surfaceContainerHighest,
-            ),
+          const OfflineIndicator(),
           // Main content
           Expanded(
             child: clubsAsync.when(

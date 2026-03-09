@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/theme_provider.dart';
+import '../providers/offline_status_provider.dart';
 
 class AppDrawer extends ConsumerStatefulWidget {
   const AppDrawer({super.key});
@@ -20,18 +21,50 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     return Drawer(
       child: SafeArea(
         child: Column(children: [
+          // Drawer header with offline indicator
           Container(
             padding: const EdgeInsets.all(20),
             color: cs.primaryContainer,
-            child: Row(children: [
-              Icon(Icons.menu, color: cs.onPrimaryContainer),
-              const SizedBox(width: 12),
-              Text('Settings',
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: cs.onPrimaryContainer))
-            ]),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [
+                  Icon(Icons.menu, color: cs.onPrimaryContainer),
+                  const SizedBox(width: 12),
+                  Text('Settings',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: cs.onPrimaryContainer))
+                ]),
+                const SizedBox(height: 8),
+                Consumer(
+                  builder: (context, ref, _) {
+                    final isOffline = ref.watch(isOfflineProvider);
+                    if (isOffline) {
+                      return Row(
+                        children: [
+                          Icon(
+                            Icons.cloud_off,
+                            size: 14,
+                            color: cs.onSecondaryContainer,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Offline mode',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: cs.onSecondaryContainer,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ],
+            ),
           ),
           Expanded(
               child: ListView(padding: EdgeInsets.zero, children: [

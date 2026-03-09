@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:calcetto_app/features/clubs/domain/entities/club.dart';
 import 'package:calcetto_app/features/clubs/presentation/providers/invite_code_provider.dart';
+import '../../../../core/providers/offline_status_provider.dart';
 
 /// Invite code generator widget for admin users.
 ///
@@ -30,21 +31,59 @@ class InviteCodeGenerator extends ConsumerWidget {
       return _buildNonAdminMessage(context);
     }
 
+    final isOffline = ref.watch(isOfflineProvider);
     final inviteCodeAsync = ref.watch(inviteCodeProvider);
     final notifier = ref.read(inviteCodeProvider.notifier);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        inviteCodeAsync.when(
-          loading: () => _buildLoadingState(context),
-          error: (error, stack) =>
-              _buildErrorState(context, error.toString(), notifier),
-          data: (code) => code != null
-              ? _buildGeneratedState(context, code, notifier)
-              : _buildNotGeneratedState(context, notifier),
+        if (isOffline) _buildOfflineMessage(context),
+        Opacity(
+          opacity: isOffline ? 0.5 : 1.0,
+          child: IgnorePointer(
+            ignoring: isOffline,
+            child: inviteCodeAsync.when(
+              loading: () => _buildLoadingState(context),
+              error: (error, stack) =>
+                  _buildErrorState(context, error.toString(), notifier),
+              data: (code) => code != null
+                  ? _buildGeneratedState(context, code, notifier)
+                  : _buildNotGeneratedState(context, notifier, isOffline),
+            ),
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildOfflineMessage(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.cloud_off,
+            color: Colors.orange,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Connect to internet to generate invite codes',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -84,13 +123,15 @@ class InviteCodeGenerator extends ConsumerWidget {
   }
 
   Widget _buildNotGeneratedState(
-      BuildContext context, InviteCodeNotifier notifier) {
+      BuildContext context, InviteCodeNotifier notifier, bool isOffline) {
     final theme = Theme.of(context);
 
     return FilledButton.icon(
-      onPressed: () {
-        notifier.generate(clubId, userRole);
-      },
+      onPressed: isOffline
+          ? null
+          : () {
+              notifier.generate(clubId, userRole);
+            },
       icon: const Icon(Icons.add_link),
       label: const Text('Generate Invite Code'),
       style: FilledButton.styleFrom(

@@ -8,6 +8,8 @@ import 'package:calcetto_app/features/clubs/presentation/widgets/invite_code_gen
 import 'package:calcetto_app/features/clubs/presentation/providers/club_members_provider.dart';
 import 'package:calcetto_app/core/di/injection.dart';
 import 'package:calcetto_app/features/clubs/domain/repositories/clubs_repository.dart';
+import '../../../../core/providers/offline_status_provider.dart';
+import '../../../../core/widgets/offline_indicator.dart';
 
 /// Club detail screen with tabs for Info, Members, and Matches
 class ClubDetailScreen extends ConsumerStatefulWidget {
@@ -43,6 +45,10 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
   bool get _isAdmin {
     final role = widget.club.userRole;
     return role == ClubRole.owner || role == ClubRole.manager;
+  }
+
+  bool _isOffline(WidgetRef ref) {
+    return ref.watch(isOfflineProvider);
   }
 
   Future<void> _handleShare() async {
@@ -98,10 +104,27 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
         ),
         actions: [
           if (_isAdmin)
-            IconButton(
-              icon: const Icon(Icons.share),
-              onPressed: _handleShare,
-              tooltip: 'Share invite code',
+            Consumer(
+              builder: (context, ref, _) {
+                final isOffline = _isOffline(ref);
+                return Tooltip(
+                  message: isOffline
+                      ? 'Requires internet connection'
+                      : 'Share invite code',
+                  child: IgnorePointer(
+                    ignoring: isOffline,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      opacity: isOffline ? 0.5 : 1.0,
+                      child: IconButton(
+                        icon: const Icon(Icons.share),
+                        onPressed: isOffline ? null : _handleShare,
+                        tooltip: 'Share invite code',
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -152,40 +175,7 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
       body: Column(
         children: [
           // Offline indicator
-          Consumer(
-            builder: (context, ref, child) {
-              final isOnlineAsync = ref.watch(isOnlineProvider);
-              final isOnline = isOnlineAsync.value ?? true;
-              if (!isOnline) {
-                return Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  color: theme.colorScheme.secondaryContainer,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.cloud_off,
-                        size: 16,
-                        color: theme.colorScheme.onSecondaryContainer,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Offline - Showing cached data',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSecondaryContainer,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
+          const OfflineIndicator(),
           // Tab content
           Expanded(
             child: TabBarView(
