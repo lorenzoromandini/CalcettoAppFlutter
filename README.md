@@ -13,7 +13,6 @@
   <a href="#"><img src="https://img.shields.io/badge/Flutter-3.19-02569B?logo=flutter" alt="Flutter Version"></a>
   <a href="#"><img src="https://img.shields.io/badge/Dart-3.3-00B4AB?logo=dart" alt="Dart Version"></a>
   <a href="#"><img src="https://img.shields.io/badge/Riverpod-2.5-4CAF50?logo=flutter" alt="Riverpod"></a>
-  <a href="#"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License"></a>
 </p>
 
 ---
@@ -466,30 +465,13 @@ npm run dev
 
 ---
 
-## 🤝 Contributing
+## ⚠️ License & Usage
 
-1. **Fork** the repository
-2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
-3. **Commit your changes** (`git commit -m 'feat: add amazing feature'`)
-4. **Push to branch** (`git push origin feature/amazing-feature`)
-5. **Open a Pull Request**
+This software is proprietary and confidential. All rights reserved.
 
-### Commit Convention
-```
-feat: New feature
-fix: Bug fix
-docs: Documentation changes
-style: Code style (formatting, etc.)
-refactor: Code refactoring
-test: Add tests
-chore: Maintenance tasks
-```
+**Unauthorized copying, distribution, or replication of this software is strictly prohibited.**
 
----
-
-## 📝 License
-
-MIT License - feel free to use for your own football club!
+This codebase is part of the Calcetto Manager platform and is intended for use only by authorized developers and team members.
 
 ---
 
