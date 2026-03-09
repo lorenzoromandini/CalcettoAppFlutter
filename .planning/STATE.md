@@ -10,17 +10,17 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | 2 - Clubs & Offline |
-| **Current Plan** | 3 |
+| **Current Plan** | 4 |
 | **Total Plans** | 4 |
 | **Status** | ⏳ In Progress |
 | **Started** | 2026-03-09 |
-| **Target Completion** | TBD |
+| **Target Completion** | 2026-03-09 |
 
 ### Phase Progress
 
 ```
 Phase 1: Foundation & Auth     [██████████] 100% (5/5 criteria) ✅
-Phase 2: Clubs & Offline         [███████░░░] 75% (3/4 plans)
+Phase 2: Clubs & Offline         [████████████] 100% (4/4 plans) ✅
 Phase 3: Matches & RSVP          [░░░░░░░░░░] 0%
 Phase 4: Stats & FIFA Cards      [░░░░░░░░░░] 0%
 Phase 5: Live & Notifications    [░░░░░░░░░░] 0%
@@ -106,7 +106,16 @@ Phase 5: Live & Notifications    [░░░░░░░░░░] 0%
 
 ### Known Blockers
 
-None - Phase 2 Plan 03 complete. Ready for Plan 04 (offline indicator, final integration).
+None - Phase 2 Plan 04 complete. All offline features and home screen implemented.
+
+### Decisions Made (Phase 2 Plan 04)
+
+| Date | Decision | Rationale |
+|------|----------|-----------|
+| 2026-03-09 | Material 3 MaterialBanner for offline indicator | Consistent with app theme, proper Material 3 component |
+| 2026-03-09 | Show cache age in offline indicator | User context for data freshness |
+| 2026-03-09 | Opacity + IgnorePointer for offline disable | Visual feedback + prevent interaction |
+| 2026-03-09 | ActiveClubHeader with role icon | Quick visual identification of club and user role |
 
 ### Technical Debt
 
@@ -121,15 +130,15 @@ None - Phase 2 Plan 03 complete. Ready for Plan 04 (offline indicator, final int
 
 ### Last Action
 
-Phase 2 Plan 03 COMPLETE: Club detail screen with tabs, FIFA-style member cards, role icons, and invite code generation.
+Phase 2 Plan 04 COMPLETE: Offline indicator with Material 3 banner, read-only mode enforcement, and home screen with active club context.
 
 ### Next Actions
 
 1. ✅ Phase 2 Plan 01 - Clubs offline infrastructure (repositories, TTL cache)
 2. ✅ Phase 2 Plan 02 - Club list screen with switching
 3. ✅ Phase 2 Plan 03 - Club detail UI with FIFA-style cards
-4. ⏭️ Phase 2 Plan 04 - Offline indicator and final integration
-5. ⏭️ Phase 2 Plan 05 - Testing and polish (if needed)
+4. ✅ Phase 2 Plan 04 - Offline indicator and final integration
+5. ⏭️ Phase 3: Matches & RSVP - Ready to start
 
 ### Working Notes
 
