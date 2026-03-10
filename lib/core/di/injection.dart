@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../constants/app_constants.dart';
 import '../services/cache_service.dart';
@@ -33,16 +32,16 @@ final apiClientProvider = Provider<ApiClient>(
   (ref) => ApiClient(),
 );
 
-/// Provider for FlutterSecureStorage instance.
-final secureStorageProvider = Provider<FlutterSecureStorage>(
-  (ref) => const FlutterSecureStorage(),
-);
+// Global singleton for secure storage to ensure consistency
+SecureStorageService? _globalSecureStorage;
 
 /// Provider for SecureStorageService.
+/// Uses platform-appropriate implementation (FlutterSecureStorage for mobile/desktop, localStorage for web).
+/// Uses a singleton pattern to ensure the same instance is used everywhere.
 final secureStorageServiceProvider = Provider<SecureStorageService>(
   (ref) {
-    final storage = ref.watch(secureStorageProvider);
-    return FlutterSecureStorageService(storage: storage);
+    _globalSecureStorage ??= createSecureStorageService();
+    return _globalSecureStorage!;
   },
 );
 
@@ -111,18 +110,12 @@ final signupAsyncUseCaseProvider = Provider<SignupAsyncUseCase>(
 // ============================================================================
 
 /// Provider for Dio instance (shared across datasources).
+/// Uses the authenticated Dio from ApiClient to ensure auth token is sent.
 final dioProvider = Provider<Dio>(
   (ref) {
     final apiClient = ref.watch(apiClientProvider);
-    // Access private _dio via mirror pattern - create Dio instance with same config
-    return Dio(BaseOptions(
-      baseUrl: 'http://localhost:3000/api',
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    ));
+    // Use the Dio instance from ApiClient which has auth interceptor
+    return apiClient.dio;
   },
 );
 

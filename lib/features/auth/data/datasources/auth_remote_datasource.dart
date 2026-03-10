@@ -28,7 +28,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        return UserModel.fromJson(response.data);
+        final data = response.data as Map<String, dynamic>;
+        if (data['success'] == true) {
+          final user = data['user'] as Map<String, dynamic>;
+          return UserModel(
+            id: user['id'].toString(),
+            email: user['email'] as String,
+            name: '${user['firstName']} ${user['lastName']}',
+            token: data['token'] as String?,
+          );
+        } else {
+          throw AuthException(
+              data['error'] as String? ?? 'Invalid email or password');
+        }
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         throw AuthException('Invalid email or password');
       } else {

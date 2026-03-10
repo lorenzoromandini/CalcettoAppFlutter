@@ -1,0 +1,219 @@
+{
+  "@@locale": "en",
+  "@@last_modified": "2026-03-10T00:00:00.000Z",
+  
+  "appTitle": "Calcetto Manager",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  
+  "login": "Login",
+  "@login": {
+    "description": "Login button text"
+  },
+  
+  "signup": "Sign Up",
+  "@signup": {
+    "description": "Sign up button text"
+  },
+  
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+  
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+  
+  "firstName": "First Name",
+  "@firstName": {
+    "description": "First name field label"
+  },
+  
+  "lastName": "Last Name",
+  "@lastName": {
+    "description": "Last name field label"
+  },
+  
+  "nickname": "Nickname (Optional)",
+  "@nickname": {
+    "description": "Nickname field label"
+  },
+  
+  "confirmPassword": "Confirm Password",
+  "@confirmPassword": {
+    "description": "Confirm password field label"
+  },
+  
+  "forgotPassword": "Forgot Password?",
+  "@forgotPassword": {
+    "description": "Forgot password link"
+  },
+  
+  "noAccount": "Don't have an account?",
+  "@noAccount": {
+    "description": "Text before sign up link"
+  },
+  
+  "haveAccount": "Already have an account?",
+  "@haveAccount": {
+    "description": "Text before login link"
+  },
+  
+  "home": "Home",
+  "@home": {
+    "description": "Home tab label"
+  },
+  
+  "clubs": "Clubs",
+  "@clubs": {
+    "description": "Clubs tab label"
+  },
+  
+  "matches": "Matches",
+  "@matches": {
+    "description": "Matches tab label"
+  },
+  
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile tab label"
+  },
+  
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings menu item"
+  },
+  
+  "help": "Help",
+  "@help": {
+    "description": "Help menu item"
+  },
+  
+  "about": "About",
+  "@about": {
+    "description": "About menu item"
+  },
+  
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout menu item"
+  },
+  
+  "myClubs": "My Clubs",
+  "@myClubs": {
+    "description": "My clubs screen title"
+  },
+  
+  "noClubs": "No clubs yet",
+  "@noClubs": {
+    "description": "Message when user has no clubs"
+  },
+  
+  "noClubsDescription": "Join a club or create one to get started",
+  "@noClubsDescription": {
+    "description": "Description for no clubs state"
+  },
+  
+  "createClub": "Create Club",
+  "@createClub": {
+    "description": "Create club button"
+  },
+  
+  "members": "Members",
+  "@members": {
+    "description": "Members label"
+  },
+  
+  "owner": "Owner",
+  "@owner": {
+    "description": "Owner role label"
+  },
+  
+  "manager": "Manager",
+  "@manager": {
+    "description": "Manager role label"
+  },
+  
+  "member": "Member",
+  "@member": {
+    "description": "Member role label"
+  },
+  
+  "switchClub": "Switch Club",
+  "@switchClub": {
+    "description": "Switch club dialog title"
+  },
+  
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+  
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button"
+  },
+  
+  "offline": "You're offline",
+  "@offline": {
+    "description": "Offline indicator message"
+  },
+  
+  "cachedData": "Showing cached data",
+  "@cachedData": {
+    "description": "Cached data indicator"
+  },
+  
+  "requiresInternet": "Requires internet connection",
+  "@requiresInternet": {
+    "description": "Tooltip for offline-disabled actions"
+  },
+  
+  "pullToRefresh": "Pull to refresh",
+  "@pullToRefresh": {
+    "description": "Pull to refresh hint"
+  },
+  
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button"
+  },
+  
+  "errorLoading": "Error loading data",
+  "@errorLoading": {
+    "description": "Error loading message"
+  },
+  
+  "comingSoon": "Coming Soon",
+  "@comingSoon": {
+    "description": "Coming soon message"
+  },
+  
+  "quickStats": "Quick Stats",
+  "@quickStats": {
+    "description": "Quick stats section title"
+  },
+  
+  "upcomingMatches": "Upcoming Matches",
+  "@upcomingMatches": {
+    "description": "Upcoming matches section title"
+  },
+  
+  "recentActivity": "Recent Activity",
+  "@recentActivity": {
+    "description": "Recent activity section title"
+  },
+  
+  "viewAll": "View All",
+  "@viewAll": {
+    "description": "View all link"
+  },
+  
+  "yourRole": "Your Role",
+  "@yourRole": {
+    "description": "Your role stat label"
+  }
+}

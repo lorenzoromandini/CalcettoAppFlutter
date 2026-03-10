@@ -1,10 +1,11 @@
+import 'dart:html';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../constants/app_constants.dart';
 
 /// Abstract interface for secure storage operations.
-///
-/// Used for storing sensitive data like JWT tokens.
 abstract class SecureStorageService {
   Future<void> writeToken(String key, String value);
   Future<String?> readToken(String key);
@@ -12,7 +13,16 @@ abstract class SecureStorageService {
   Future<void> clearAll();
 }
 
-/// Implementation of [SecureStorageService] using flutter_secure_storage.
+/// Factory to get the appropriate secure storage implementation.
+SecureStorageService createSecureStorageService() {
+  debugPrint('STORAGE FACTORY: kIsWeb = $kIsWeb');
+  if (kIsWeb) {
+    return HiveSecureStorageService();
+  }
+  return FlutterSecureStorageService();
+}
+
+/// Implementation using flutter_secure_storage for mobile/desktop.
 class FlutterSecureStorageService implements SecureStorageService {
   final FlutterSecureStorage _storage;
 
@@ -37,6 +47,64 @@ class FlutterSecureStorageService implements SecureStorageService {
   @override
   Future<void> clearAll() async {
     await _storage.deleteAll();
+  }
+}
+
+/// Web implementation using localStorage for persistence.
+class HiveSecureStorageService implements SecureStorageService {
+  @override
+  Future<void> writeToken(String key, String value) async {
+    try {
+      // Use 'auth-token' key to match backend's getUserIdFromRequest expectation
+      final storageKey = (key == AppConstants.jwtTokenKey) ? 'auth-token' : key;
+      window.localStorage[storageKey] = value;
+      debugPrint('✅ STORAGE: Saved $storageKey (${value.length} chars)');
+    } catch (e) {
+      debugPrint('❌ STORAGE ERROR: $e');
+    }
+  }
+
+  @override
+  Future<String?> readToken(String key) async {
+    try {
+      // Use 'auth-token' key to match backend's getUserIdFromRequest expectation
+      final storageKey = (key == AppConstants.jwtTokenKey) ? 'auth-token' : key;
+      final value = window.localStorage[storageKey];
+      if (value != null) {
+        debugPrint('✅ STORAGE: Found $storageKey (${value.length} chars)');
+      } else {
+        debugPrint('⚠️ STORAGE: $storageKey not found');
+      }
+      return value;
+    } catch (e) {
+      debugPrint('❌ STORAGE READ ERROR: $e');
+      return null;
+    }
+  }
+
+  @override
+  Future<void> deleteToken(String key) async {
+    try {
+      final storageKey = (key == AppConstants.jwtTokenKey) ? 'auth-token' : key;
+      window.localStorage.remove(storageKey);
+      debugPrint('✅ STORAGE: Deleted $storageKey');
+    } catch (e) {
+      debugPrint('❌ STORAGE DELETE ERROR: $e');
+    }
+  }
+
+  @override
+  Future<void> clearAll() async {
+    try {
+      window.localStorage.remove('auth-token');
+      window.localStorage.remove(AppConstants.refreshTokenKey);
+      window.localStorage.remove(AppConstants.userIdKey);
+      window.localStorage.remove('user_data');
+      window.localStorage.remove('stored_credentials');
+      debugPrint('✅ STORAGE: Cleared all keys');
+    } catch (e) {
+      debugPrint('❌ STORAGE CLEAR ERROR: $e');
+    }
   }
 }
 

@@ -10,7 +10,6 @@ part 'club_model.g.dart';
 /// Converts to/from Club entity for domain layer compatibility.
 /// Includes Hive type annotations for local persistence.
 @HiveType(typeId: 0)
-@JsonSerializable()
 class ClubModel {
   @HiveField(0)
   final String id;
@@ -70,11 +69,51 @@ class ClubModel {
       );
 
   /// Creates a ClubModel from a JSON map.
-  factory ClubModel.fromJson(Map<String, dynamic> json) =>
-      _$ClubModelFromJson(json);
+  /// Handles API field name differences:
+  /// - API sends 'imageUrl' but we use 'logoUrl'
+  /// - API doesn't send 'userRole' - defaults to member
+  factory ClubModel.fromJson(Map<String, dynamic> json) {
+    return ClubModel(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      logoUrl: json['imageUrl'] as String?, // API uses imageUrl
+      memberCount: (json['memberCount'] as num?)?.toInt() ?? 0,
+      userRole: _parseUserRole(json['userRole']), // API might not send this
+      description: json['description'] as String?,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : DateTime.now(),
+    );
+  }
+
+  /// Helper to parse userRole from API or default to member
+  static ClubRole _parseUserRole(dynamic value) {
+    if (value == null) return ClubRole.member;
+    if (value is String) {
+      switch (value.toLowerCase()) {
+        case 'owner':
+          return ClubRole.owner;
+        case 'manager':
+          return ClubRole.manager;
+        case 'member':
+        default:
+          return ClubRole.member;
+      }
+    }
+    return ClubRole.member;
+  }
 
   /// Converts this ClubModel to a JSON map.
-  Map<String, dynamic> toJson() => _$ClubModelToJson(this);
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'id': id,
+        'name': name,
+        'logoUrl': logoUrl,
+        'memberCount': memberCount,
+        'userRole': userRole.name,
+        'description': description,
+        'createdAt': createdAt.toIso8601String(),
+        'cachedAt': cachedAt?.toIso8601String(),
+      };
 
   /// Creates a ClubModel with cache timestamp.
   factory ClubModel.withTimestamp(ClubModel model, DateTime timestamp) =>

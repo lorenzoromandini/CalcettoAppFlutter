@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/di/injection.dart';
 import '../../domain/entities/club.dart';
@@ -26,7 +27,21 @@ class ClubsList extends Notifier<AsyncValue<List<Club>>> {
 
     state = result.fold(
       (failure) => AsyncValue.error(failure, StackTrace.current),
-      (clubs) => AsyncValue.data(clubs),
+      (clubs) {
+        // Auto-set first club as active if none is set
+        if (clubs.isNotEmpty) {
+          final activeClub = ref.read(activeClubProvider);
+          if (activeClub.value == null) {
+            // No active club set, set the first one
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ref
+                  .read(activeClubProvider.notifier)
+                  .setActiveClub(clubs.first.id);
+            });
+          }
+        }
+        return AsyncValue.data(clubs);
+      },
     );
   }
 

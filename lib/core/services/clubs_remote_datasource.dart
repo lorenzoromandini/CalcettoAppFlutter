@@ -30,22 +30,32 @@ class DioClubsRemoteDataSource implements ClubsRemoteDataSource {
 
   @override
   Future<List<ClubModel>> getClubs() async {
-    final response = await _dio.get('/api/clubs');
-    final data = response.data as List;
-    return data
-        .map((e) => ClubModel.fromJson(e as Map<String, dynamic>))
-        .toList();
+    try {
+      print('REMOTE DATASOURCE: Fetching clubs...');
+      final response = await _dio.get('/clubs');
+      print('REMOTE DATASOURCE: Response status: ${response.statusCode}');
+      print('REMOTE DATASOURCE: Response data: ${response.data}');
+      final data = response.data as List;
+      final clubs = data
+          .map((e) => ClubModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+      print('REMOTE DATASOURCE: Parsed ${clubs.length} clubs');
+      return clubs;
+    } catch (e) {
+      print('REMOTE DATASOURCE ERROR: $e');
+      rethrow;
+    }
   }
 
   @override
   Future<ClubModel> getClubById(String id) async {
-    final response = await _dio.get('/api/clubs/$id');
+    final response = await _dio.get('/clubs/$id');
     return ClubModel.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
   Future<List<MemberModel>> getClubMembers(String clubId) async {
-    final response = await _dio.get('/api/clubs/$clubId/members');
+    final response = await _dio.get('/clubs/$clubId/members');
     final data = response.data as List;
     return data
         .map((e) => MemberModel.fromJson(e as Map<String, dynamic>))
@@ -54,7 +64,7 @@ class DioClubsRemoteDataSource implements ClubsRemoteDataSource {
 
   @override
   Future<String> generateInviteCode(String clubId) async {
-    final response = await _dio.post('/api/clubs/$clubId/invite');
+    final response = await _dio.post('/clubs/$clubId/invite');
     return response.data['code'] as String;
   }
 }

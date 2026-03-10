@@ -33,7 +33,7 @@ class ClubsRepositoryImpl implements ClubsRepository {
           final clubs = await _remote.getClubs();
           await _local.cacheClubs(clubs);
           return Success(clubs.map((m) => m.toEntity()).toList());
-        } on DioException {
+        } on DioException catch (e) {
           // Network error: try cache fallback
           final cached = await _local.getCachedClubs();
           if (cached != null) {
@@ -49,9 +49,14 @@ class ClubsRepositoryImpl implements ClubsRepository {
         }
         return FailureResult(NetworkFailure.noConnection());
       }
-    } on Exception {
+    } on Exception catch (e) {
+      // Log the actual error for debugging
+      print('CLUBS REPOSITORY ERROR: $e');
+      print('Stack trace: ${StackTrace.current}');
       return FailureResult(CacheFailure.readError());
-    } catch (_) {
+    } catch (e) {
+      print('CLUBS REPOSITORY UNKNOWN ERROR: $e');
+      print('Stack trace: ${StackTrace.current}');
       return FailureResult(ServerFailure.internalError());
     }
   }

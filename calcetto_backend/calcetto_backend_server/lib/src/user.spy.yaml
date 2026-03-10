@@ -1,0 +1,17 @@
+# User model for authentication
+class: UserInfo
+table: user_info
+
+fields:
+  id: int?
+  email: String
+  firstName: String
+  lastName: String
+  nickname: String?
+  imageUrl: String?
+  passwordHash: String
+  passwordSalt: String
+  createdAt: DateTime
+  updatedAt: DateTime
+  lastLogin: DateTime?
+  deletedAt: DateTime?

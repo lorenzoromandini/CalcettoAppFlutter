@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/theme_provider.dart';
 import '../providers/offline_status_provider.dart';
+import '../../features/auth/presentation/providers/auth_provider.dart';
+import '../../features/auth/presentation/screens/login_screen.dart';
 
 class AppDrawer extends ConsumerStatefulWidget {
   const AppDrawer({super.key});
@@ -13,10 +15,21 @@ class AppDrawer extends ConsumerStatefulWidget {
 class _AppDrawerState extends ConsumerState<AppDrawer> {
   final _lang = 'it';
 
+  // Store theme locally to avoid rebuilds when theme changes
+  late ThemeMode _currentTheme;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Initialize theme from provider once
+    _currentTheme = ref.read(themeModeProvider);
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final theme = ref.watch(themeModeProvider);
+    // Don't watch themeModeProvider - use read instead to prevent rebuilds
+    final theme = _currentTheme;
 
     return Drawer(
       child: SafeArea(
@@ -69,18 +82,28 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           Expanded(
               child: ListView(padding: EdgeInsets.zero, children: [
             ListTile(
-                leading: Icon(theme == ThemeMode.dark
+                leading: Icon(_currentTheme == ThemeMode.dark
                     ? Icons.dark_mode
                     : Icons.light_mode),
                 title: const Text('Theme'),
-                subtitle: Text(theme == ThemeMode.dark
+                subtitle: Text(_currentTheme == ThemeMode.dark
                     ? 'Dark'
-                    : theme == ThemeMode.light
+                    : _currentTheme == ThemeMode.light
                         ? 'Light'
                         : 'System'),
                 onTap: () {
                   final n = ref.read(themeModeProvider.notifier);
-                  theme == ThemeMode.dark ? n.setLight() : n.setDark();
+                  if (_currentTheme == ThemeMode.dark) {
+                    n.setLight();
+                    _currentTheme = ThemeMode.light;
+                  } else {
+                    n.setDark();
+                    _currentTheme = ThemeMode.dark;
+                  }
+                  // Use postFrameCallback to update after rebuild cycle
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) setState(() {});
+                  });
                 }),
             const Divider(),
             ListTile(
@@ -109,10 +132,31 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           ])),
           Padding(
               padding: const EdgeInsets.all(16),
-              child: Text('Calcetto Manager',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: cs.onSurface.withValues(alpha: 0.5)))),
+              child: Column(
+                children: [
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.logout),
+                    title: const Text('Logout'),
+                    textColor: cs.error,
+                    iconColor: cs.error,
+                    onTap: () async {
+                      await ref.read(authStateProvider.notifier).logout();
+                      if (context.mounted) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (_) => const LoginScreen()),
+                          (route) => false,
+                        );
+                      }
+                    },
+                  ),
+                  Text('Calcetto Manager',
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: cs.onSurface.withValues(alpha: 0.5))),
+                ],
+              )),
         ]),
       ),
     );

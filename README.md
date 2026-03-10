@@ -6,7 +6,7 @@
 
 <p align="center">
   A <strong>native mobile app</strong> (iOS/Android) for organizing football matches with friends. 
-  Built with Flutter and Riverpod, connecting to existing Next.js backend.
+  Built with Flutter and Riverpod, with standalone Serverpod backend.
 </p>
 
 <p align="center">
@@ -24,8 +24,9 @@ It provides the same powerful club management features in a native mobile experi
 
 | Project | Platform | Purpose |
 |---------|----------|---------|
-| **calcetto_app/** (../CalcettoApp) | React/Next.js Web | Full-featured web app for desktop + mobile |
+| **calcetto_backend/** (./calcetto_backend) | Serverpod (Dart) | Standalone REST API with PostgreSQL |
 | **calcetto_app_flutter/** (this repo) | Flutter (iOS/Android) | Native mobile app with offline-first design |
+| **CalcettoApp** (../CalcettoApp) | React/Next.js Web | Original web platform (optional) |
 
 ---
 
@@ -95,10 +96,19 @@ It provides the same powerful club management features in a native mobile experi
                                                └─────────────────┘
                                                         │
                                                         ▼
-                                               ┌─────────────────┐
-                                               │  Next.js API    │
-                                               │  (port 3000)    │
-                                               └─────────────────┘
+                                                ┌─────────────────┐
+                                                │ Serverpod API   │
+                                                │  (port 8080)    │
+                                                └─────────────────┘
+```
+
+### Backend Architecture
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│  Flutter App    │────▶│ Serverpod API    │────▶│  PostgreSQL     │
+│  (port 8080)    │ JWT │  (Dart/Serverpod)│ SQL │  Database       │
+└─────────────────┘     └──────────────────┘     └─────────────────┘
 ```
 
 ### State Management Example
@@ -216,7 +226,7 @@ test/
 
 ## 🏗️ Database Schema (Backend)
 
-The Flutter app connects to the existing Next.js backend with this schema:
+The Flutter app connects to the Serverpod backend with this schema:
 
 **Auth Models:**
 - `User` - Authentication and profile (id, email, firstName, lastName, nickname, image)
@@ -230,13 +240,35 @@ The Flutter app connects to the existing Next.js backend with this schema:
 
 ---
 
+## 🎯 Backend Options
+
+You can run this Flutter app with **two backend choices**:
+
+### Option 1: Serverpod Backend (Recommended ✅)
+Independent Dart backend created for this project:
+- **Location:** `./calcetto_backend/`
+- **Port:** 8080
+- **Language:** Dart (same as Flutter)
+- **Setup:** Simple, minimal dependencies
+- **Use:** For new development and testing
+
+### Option 2: Next.js Backend
+Original CalcettoApp web platform:
+- **Location:** `../CalcettoApp/`
+- **Port:** 3000
+- **Language:** TypeScript/JavaScript
+- **Setup:** Requires Node.js, Prisma, full web stack
+- **Use:** For full web platform features
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
 
 1. **Flutter 3.19+** - [Install Flutter](https://flutter.dev/docs/get-started/install)
-2. **Node.js 20+** - For running the Next.js backend
-3. **PostgreSQL** - Backend database (Next.js app dependency)
+2. **Dart 3.6+** - For Serverpod backend (included with Flutter)
+3. **PostgreSQL** - Backend database (Docker container)
 4. **Android Studio / VS Code** - Recommended IDEs
 
 ### Setup
@@ -252,21 +284,33 @@ cd calcetto-app-flutter
 flutter pub get
 ```
 
-#### 3. Start the Next.js backend (required for API)
+#### 3. Start the PostgreSQL database
 ```bash
-cd ../CalcettoApp
-cp .env.example .env.local
-# Configure DATABASE_URL and AUTH_SECRET in .env.local
-npm install
-npm run dev
+# Uses existing Postgres container
+docker start calcetto-postgres
+
+# Or create new if needed:
+docker run -d \
+  --name calcetto-postgres \
+  -e POSTGRES_USER=calcetto \
+  -e POSTGRES_PASSWORD=calcetto \
+  -e POSTGRES_DB=calcetto \
+  -p 5432:5432 \
+  postgres:16-alpine
 ```
 
-> **Backend must be running on** `http://localhost:3000`
+#### 4. Start the Serverpod backend
+```bash
+cd calcetto_backend/calcetto_backend_server
+dart bin/main.dart
+```
 
-#### 4. Configure API base URL (if needed)
+> **Backend must be running on** `http://localhost:8080`
+
+#### 5. Configure API base URL (if needed)
 Edit `lib/core/constants/app_constants.dart`:
 ```dart
-static const String apiBaseUrl = 'http://localhost:3000/api';
+static const String apiBaseUrl = 'http://localhost:8080';
 ```
 
 #### 5. Run the Flutter app
@@ -282,6 +326,38 @@ flutter run -d android
 
 # Run on iOS simulator (macOS only)
 flutter run -d ios
+```
+
+---
+
+## 🔄 Quick Start Script
+
+Start everything at once:
+```bash
+# Terminal 1: Start backend
+cd calcetto_backend/calcetto_backend_server && \
+  dart bin/main.dart
+
+# Terminal 2: Start Flutter app  
+flutter run -d chrome
+```
+
+---
+
+## 🧪 Testing the Backend
+
+Create a test user:
+```bash
+curl -X POST http://localhost:8080/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123","firstName":"Test"}'
+```
+
+Login:
+```bash
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123"}'
 ```
 
 ---
@@ -415,13 +491,13 @@ If backend is not running:
 
 ### Common Issues
 
-#### 1. "Failed to connect to localhost:3000"
-**Cause:** Next.js backend is not running.
+#### 1. "Failed to connect to localhost:8080"
+**Cause:** Serverpod backend is not running.
 
 **Solution:**
 ```bash
-cd ../CalcettoApp
-npm run dev
+cd calcetto_backend/calcetto_backend_server
+dart bin/main.dart
 ```
 
 #### 2. Flutter web shows old version after rebuild
@@ -459,7 +535,7 @@ npm run dev
 | Drawer menu | ✅ | Right-side sliding |
 | Real API integration | ✅ | Next.js /api/auth/* endpoints |
 | Error translation | ✅ | Italian → English mapping |
-| Web build | ✅ | Deployed at localhost:8080 |
+| Web build | ✅ | Deployed at localhost:8080 (Flutter web) |
 
 ### Phase 2: Clubs & Offline ⏳ NEXT (0/17 requirements)
 
@@ -477,9 +553,10 @@ This codebase is part of the Calcetto Manager platform and is intended for use o
 
 ## 📞 Links
 
-- **Web Platform (React/Next.js):** [../CalcettoApp](../CalcettoApp)
-- **Backend API:** http://localhost:3000/api
-- **Flutter App:** http://localhost:8080
+- **Backend (Serverpod):** `./calcetto_backend` - Dart REST API
+- **Web Platform (React/Next.js):** [../CalcettoApp](../CalcettoApp) - Optional original web app
+- **Backend API:** http://localhost:8080
+- **Flutter App:** http://localhost:8080 (web) or mobile device
 - **GitHub Repository:** [lorenzoromandini/CalcettoAppFlutter](https://github.com/lorenzoromandini/CalcettoAppFlutter)
 
 ---

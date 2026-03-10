@@ -3,9 +3,10 @@ class AppConstants {
   AppConstants._();
 
   // API Configuration
-  // Local development: http://localhost:3000/api
+  // Serverpod backend: http://localhost:8080
+  // Next.js backend: http://localhost:3000/api
   // Production: Update to your deployed backend URL
-  static const String apiBaseUrl = 'http://localhost:3000/api';
+  static const String apiBaseUrl = 'http://localhost:8080';
 
   // Storage Keys
   static const String jwtTokenKey = 'jwt_token';

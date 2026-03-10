@@ -9,52 +9,51 @@
 
 | Field | Value |
 |-------|-------|
-| **Phase** | 2 - Clubs & Offline |
-| **Current Plan** | 4 |
-| **Total Plans** | 4 |
-| **Status** | ⏳ In Progress |
+| **Phase** | 1 - Foundation & Auth (Backend Migration) |
+| **Current Plan** | Complete |
+| **Total Plans** | 5 |
+| **Status** | ✅ Backend Migration Complete |
 | **Started** | 2026-03-09 |
-| **Target Completion** | 2026-03-09 |
+| **Updated** | 2026-03-10 |
+| **Target Completion** | 2026-03-10 |
 
 ### Phase Progress
 
 ```
-Phase 1: Foundation & Auth     [██████████] 100% (5/5 criteria) ✅
-Phase 2: Clubs & Offline         [████████████] 100% (4/4 plans) ✅
+Phase 1: Foundation & Auth     [██████████] 100% (Auth + Serverpod Backend) ✅
+Phase 2: Clubs & Offline         [░░░░░░░░░░] 0%
 Phase 3: Matches & RSVP          [░░░░░░░░░░] 0%
 Phase 4: Stats & FIFA Cards      [░░░░░░░░░░] 0%
 Phase 5: Live & Notifications    [░░░░░░░░░░] 0%
 ```
 
-**Overall:** 21/67 requirements complete (31%) | Phase 1: 21/21 requirements implemented
+**Overall:** Foundation + Authentication complete with standalone Serverpod backend ✅
 
 ---
 
-## Phase 1 Verification Status
+## Current Status: Serverpod Backend Migration ✅
 
-**Score:** 5/5 must-haves verified + Real API Integration Complete ✅
+**Achievements:**
+- ✅ Independent Serverpod backend created in `./calcetto_backend/`
+- ✅ PostgreSQL database with user_info table
+- ✅ Auth endpoints: `/auth/login` and `/auth/signup` working
+- ✅ Flutter app connected to new backend (port 8080)
+- ✅ Multi-language support (it + en) with language switcher
+- ✅ AGENTS.md updated with comprehensive guidelines
+- ✅ start.sh script for easy development workflow
 
-| Criterion | Status | Notes |
-|-----------|--------|-------|
-| Login + session persistence | ✓ Passed | Implemented with flutter_secure_storage + AuthStorageService |
-| Biometric auth | ✓ Passed | AUTH-04 CLOSED - BiometricService + BiometricProvider implemented |
-| Loading/error states | ✓ Passed | Riverpod form providers with isLoading/showError |
-| Material 3 + theme | ✓ Passed | Full theme system with dark/light mode + system detection |
-| Performance (<3s launch, 60fps) | ⏳ Human needed | Requires device testing |
-| **Real API integration** | ✓ Passed | ApiClient → AuthRepositoryImpl → Riverpod providers |
-| **Session persistence on launch** | ✓ Passed | authSessionProvider checks isAuthenticated() at app start |
+### Backend Architecture
 
-### Gap Summary
+**New Stack:**
+- ✅ Flutter app connects to Serverpod backend at `http://localhost:8080`
+- ✅ Independent PostgreSQL database (same schema pattern as original)
+- ✅ Dart backend (same language as Flutter - no context switching)
+- ✅ Auto-generated type-safe API clients
+- ✅ Serverpod migrations for schema management
+- ✅ Multi-language support (Italian + English) with language switcher
 
-**Phase 1 COMPLETE - All authentication features working:**
-- ✅ Login screen with Riverpod form validation + error display
-- ✅ Signup screen with 6 fields + success state + API integration
-- ✅ AuthRepositoryImpl with login() and signup() methods
-- ✅ Riverpod providers: loginFormProvider, signupFormProvider, authSessionProvider
-- ✅ Session persistence: Auto-check on launch → redirect to MainLayout if authenticated
-- ✅ Next.js API endpoints: /auth/login, /auth/signup, /auth/session
-- ✅ Italian → English error translation in ApiClient
-- ✅ Hive caching for user data + JWT token in flutter_secure_storage
+**Old Stack (Optional):**
+- Next.js backend at port 3000 (can still be used but not recommended)
 
 ---
 
@@ -73,13 +72,11 @@ Phase 5: Live & Notifications    [░░░░░░░░░░] 0%
 
 ## Accumulated Context
 
-### Decisions Made
+### Decisions Made (Including Backend Migration)
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
 | 2026-03-09 | Use Flutter for cross-platform | Single codebase for iOS, Android, and web |
-| 2026-03-09 | Use existing Next.js backend | Faster development, single source of truth |
-| 2026-03-09 | Full feature parity for v1 | Users expect all web features on mobile |
 | 2026-03-09 | Riverpod + Dio + Hive stack | Research-validated, industry standard |
 | 2026-03-09 | Clean Architecture pattern | Proven separation of concerns |
 | 2026-03-09 | Result<T> over dartz Either | Simpler API, better Flutter integration |
@@ -88,14 +85,10 @@ Phase 5: Live & Notifications    [░░░░░░░░░░] 0%
 | 2026-03-09 | Material 3 NavigationBar over BottomNavigationBar | Modern design, Material 3 compliance |
 | 2026-03-09 | IndexedStack for tab switching | Preserves screen state (scroll, form data) |
 | 2026-03-09 | Cache-based first launch detection | Non-sensitive UI preference, not security-critical |
-| 2026-03-09 | Password reset deferred | Requires backend email integration (AUTH-06) |
-| 2026-03-09 | Biometric auth gap | AUTH-04 needs gap-closure plan |
-| 2026-03-09 | Biometric auth implemented | AUTH-04 CLOSED - local_auth with Hive preference in 01-04 |
-| 2026-03-09 | Biometric auth bug fix | AUTH-04 line 67 fix - credentials stored/retrieved for biometric flow |
-| 2026-03-10 | FIFA-style member cards with gradient backgrounds | Visual role hierarchy (gold/blue/silver), foreshadows Phase 4 |
-| 2026-03-10 | Role icons instead of text badges | Better visual clarity at small sizes |
-| 2026-03-10 | 8-char alphanumeric invite codes | XXXX-XXXX format for readability, one-time use |
-| 2026-03-10 | Native share_plus for invite sharing | Platform-native UX over custom UI |
+| 2026-03-10 | Use Serverpod for backend | Dart language (same as Flutter), type-safe, PostgreSQL native |
+| 2026-03-10 | Independent backend architecture | Decoupled from Next.js, dedicated API for mobile app |
+| 2026-03-10 | Multi-language support (it + en) | Language switcher with Hive persistence |
+| 2026-03-10 | start.sh automation script | Single command to start all services (DB + Backend + Flutter) |
 
 ### Open Questions
 
@@ -106,7 +99,7 @@ Phase 5: Live & Notifications    [░░░░░░░░░░] 0%
 
 ### Known Blockers
 
-None - Phase 2 Plan 04 complete. All offline features and home screen implemented.
+None - Serverpod backend migration complete. Ready to continue with Phase 2 implementation.
 
 ### Decisions Made (Phase 2 Plan 04)
 

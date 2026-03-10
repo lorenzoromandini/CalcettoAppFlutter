@@ -3,6 +3,54 @@
 part of 'club.dart';
 
 // **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
+class ClubRoleAdapter extends TypeAdapter<ClubRole> {
+  @override
+  final int typeId = 1;
+
+  @override
+  ClubRole read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return ClubRole.owner;
+      case 1:
+        return ClubRole.manager;
+      case 2:
+        return ClubRole.member;
+      default:
+        return ClubRole.owner;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, ClubRole obj) {
+    switch (obj) {
+      case ClubRole.owner:
+        writer.writeByte(0);
+        break;
+      case ClubRole.manager:
+        writer.writeByte(1);
+        break;
+      case ClubRole.member:
+        writer.writeByte(2);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ClubRoleAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+// **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 

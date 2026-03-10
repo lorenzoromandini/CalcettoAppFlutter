@@ -278,20 +278,30 @@ class AuthSessionNotifier extends StateNotifier<AuthSessionState> {
 
   Future<void> _checkAuthStatus() async {
     state = state.copyWith(isLoading: true);
+    print('AUTH SESSION: Checking auth status...');
     final result = await _repository.isAuthenticated();
     result.fold(
-      (failure) => state = state.copyWith(
-        isAuthenticated: false,
-        user: null,
-        isLoading: false,
-      ),
+      (failure) {
+        print('AUTH SESSION: Auth check failed: ${failure.message}');
+        state = state.copyWith(
+          isAuthenticated: false,
+          user: null,
+          isLoading: false,
+        );
+      },
       (isAuth) async {
+        print('AUTH SESSION: isAuthenticated = $isAuth');
         User? user;
         if (isAuth) {
           final userResult = await _repository.getCurrentUser();
           userResult.fold(
-            (_) {},
-            (u) => user = u,
+            (failure) {
+              print('AUTH SESSION: Failed to get user: ${failure.message}');
+            },
+            (u) {
+              user = u;
+              print('AUTH SESSION: Got user: ${u?.email}');
+            },
           );
         }
         state = state.copyWith(

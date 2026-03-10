@@ -1,12 +1,17 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 part 'club.freezed.dart';
 part 'club.g.dart';
 
 /// Club role enum representing user's permission level in a club.
+@HiveType(typeId: 1)
 enum ClubRole {
+  @HiveField(0)
   owner,
+  @HiveField(1)
   manager,
+  @HiveField(2)
   member;
 
   /// Returns display name for the role.

@@ -1,5 +1,15 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import '../constants/app_constants.dart';
+import '../services/secure_storage_service.dart';
+
+// Global storage instance to ensure consistency across the app
+SecureStorageService? _globalStorage;
+
+SecureStorageService _getStorage() {
+  _globalStorage ??= createSecureStorageService();
+  return _globalStorage!;
+}
 
 /// API client for connecting to Next.js backend.
 ///
@@ -8,7 +18,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class ApiClient {
   static const String _baseUrl = 'http://localhost:3000/api';
   final Dio _dio;
-  final FlutterSecureStorage _storage;
+  SecureStorageService get _storage => _getStorage();
 
   ApiClient()
       : _dio = Dio(BaseOptions(
@@ -18,11 +28,10 @@ class ApiClient {
           headers: {
             'Content-Type': 'application/json',
           },
-        )),
-        _storage = const FlutterSecureStorage() {
+        )) {
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final token = await _storage.read(key: 'jwt_token');
+        final token = await _storage.readJwtToken();
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
         }
@@ -30,7 +39,7 @@ class ApiClient {
       },
       onError: (error, handler) async {
         if (error.response?.statusCode == 401) {
-          await _storage.delete(key: 'jwt_token');
+          await _storage.clearAuthTokens();
         }
         return handler.next(error);
       },
@@ -82,7 +91,10 @@ class ApiClient {
 
       // Extract and store token
       if (data.containsKey('token')) {
-        await _storage.write(key: 'jwt_token', value: data['token']);
+        final token = data['token'] as String;
+        print('API CLIENT: Saving token, length: ${token.length}');
+        await _storage.writeJwtToken(token);
+        print('API CLIENT: Token saved');
       }
 
       return data;
@@ -106,7 +118,7 @@ class ApiClient {
 
   /// Logout current user
   Future<void> logout() async {
-    await _storage.delete(key: 'jwt_token');
+    await _storage.clearAuthTokens();
     try {
       await _dio.post('/auth/logout');
     } catch (_) {
@@ -116,8 +128,11 @@ class ApiClient {
 
   /// Delete JWT token from storage
   Future<void> clearToken() async {
-    await _storage.delete(key: 'jwt_token');
+    await _storage.clearAuthTokens();
   }
+
+  /// Get the Dio instance for use by other services
+  Dio get dio => _dio;
 
   /// Translate Italian error messages to English
   String _translateError(String error) {

@@ -60,37 +60,3 @@ class ClubModelAdapter extends TypeAdapter<ClubModel> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
-
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
-
-ClubModel _$ClubModelFromJson(Map<String, dynamic> json) => ClubModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      logoUrl: json['logoUrl'] as String?,
-      memberCount: (json['memberCount'] as num).toInt(),
-      userRole: $enumDecode(_$ClubRoleEnumMap, json['userRole']),
-      description: json['description'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      cachedAt: json['cachedAt'] == null
-          ? null
-          : DateTime.parse(json['cachedAt'] as String),
-    );
-
-Map<String, dynamic> _$ClubModelToJson(ClubModel instance) => <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'logoUrl': instance.logoUrl,
-      'memberCount': instance.memberCount,
-      'userRole': _$ClubRoleEnumMap[instance.userRole]!,
-      'description': instance.description,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'cachedAt': instance.cachedAt?.toIso8601String(),
-    };
-
-const _$ClubRoleEnumMap = {
-  ClubRole.owner: 'owner',
-  ClubRole.manager: 'manager',
-  ClubRole.member: 'member',
-};

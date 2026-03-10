@@ -25,6 +25,15 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
+  void initState() {
+    super.initState();
+    // Initialize active club from cache
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(activeClubProvider.notifier).initialize();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final activeClubAsync = ref.watch(activeClubProvider);
 
