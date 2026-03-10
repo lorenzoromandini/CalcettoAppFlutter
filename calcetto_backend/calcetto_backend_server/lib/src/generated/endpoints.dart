@@ -11,7 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../auth_endpoint.dart' as _i2;
-import '../greeting_endpoint.dart' as _i3;
+import '../clubs_endpoint.dart' as _i3;
+import '../greeting_endpoint.dart' as _i4;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -23,7 +24,13 @@ class Endpoints extends _i1.EndpointDispatch {
           'auth',
           null,
         ),
-      'greeting': _i3.GreetingEndpoint()
+      'clubs': _i3.ClubsEndpoint()
+        ..initialize(
+          server,
+          'clubs',
+          null,
+        ),
+      'greeting': _i4.GreetingEndpoint()
         ..initialize(
           server,
           'greeting',
@@ -108,6 +115,51 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
+    connectors['clubs'] = _i1.EndpointConnector(
+      name: 'clubs',
+      endpoint: endpoints['clubs']!,
+      methodConnectors: {
+        'getClubs': _i1.MethodConnector(
+          name: 'getClubs',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['clubs'] as _i3.ClubsEndpoint).getClubs(session),
+        ),
+        'createClub': _i1.MethodConnector(
+          name: 'createClub',
+          params: {
+            'name': _i1.ParameterDescription(
+              name: 'name',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'description': _i1.ParameterDescription(
+              name: 'description',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'imageUrl': _i1.ParameterDescription(
+              name: 'imageUrl',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['clubs'] as _i3.ClubsEndpoint).createClub(
+            session,
+            params['name'],
+            params['description'],
+            params['imageUrl'],
+          ),
+        ),
+      },
+    );
     connectors['greeting'] = _i1.EndpointConnector(
       name: 'greeting',
       endpoint: endpoints['greeting']!,
@@ -125,7 +177,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['greeting'] as _i3.GreetingEndpoint).hello(
+              (endpoints['greeting'] as _i4.GreetingEndpoint).hello(
             session,
             params['name'],
           ),

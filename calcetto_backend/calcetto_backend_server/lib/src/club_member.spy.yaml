@@ -1,0 +1,11 @@
+# Club member - links users to clubs
+class: ClubMember
+table: club_member
+
+fields:
+  id: int?
+  clubId: int
+  userId: int
+  privileges: int
+  joinedAt: DateTime
+  deletedAt: DateTime?

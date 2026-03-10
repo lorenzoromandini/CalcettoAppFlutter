@@ -71,13 +71,14 @@ class ClubModel {
   /// Creates a ClubModel from a JSON map.
   /// Handles API field name differences:
   /// - API sends 'imageUrl' but we use 'logoUrl'
+  /// - API sends 'id' as int but we need String
   /// - API doesn't send 'userRole' - defaults to member
   factory ClubModel.fromJson(Map<String, dynamic> json) {
     return ClubModel(
-      id: json['id'] as String,
+      id: json['id'].toString(), // Convert int/any to String
       name: json['name'] as String,
       logoUrl: json['imageUrl'] as String?, // API uses imageUrl
-      memberCount: (json['memberCount'] as num?)?.toInt() ?? 0,
+      memberCount: (json['memberCount'] as num?)?.toInt() ?? 1,
       userRole: _parseUserRole(json['userRole']), // API might not send this
       description: json['description'] as String?,
       createdAt: json['createdAt'] != null

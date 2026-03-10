@@ -32,9 +32,15 @@ class DioClubsRemoteDataSource implements ClubsRemoteDataSource {
   Future<List<ClubModel>> getClubs() async {
     try {
       print('REMOTE DATASOURCE: Fetching clubs...');
-      final response = await _dio.get('/clubs');
+      final response = await _dio.post('/clubs/getClubs');
       print('REMOTE DATASOURCE: Response status: ${response.statusCode}');
       print('REMOTE DATASOURCE: Response data: ${response.data}');
+
+      if (response.data == null || response.data is! List) {
+        print('REMOTE DATASOURCE: Empty clubs list');
+        return [];
+      }
+
       final data = response.data as List;
       final clubs = data
           .map((e) => ClubModel.fromJson(e as Map<String, dynamic>))

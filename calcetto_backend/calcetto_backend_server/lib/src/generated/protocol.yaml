@@ -1,5 +1,8 @@
 auth:
   - login:
   - signup:
+clubs:
+  - getClubs:
+  - createClub:
 greeting:
   - hello:

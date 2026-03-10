@@ -16,7 +16,7 @@ SecureStorageService _getStorage() {
 /// Base URL: http://localhost:3000/api (for local development)
 /// Change [baseUrl] for production deployment.
 class ApiClient {
-  static const String _baseUrl = 'http://localhost:3000/api';
+  static const String _baseUrl = 'http://localhost:8080';
   final Dio _dio;
   SecureStorageService get _storage => _getStorage();
 

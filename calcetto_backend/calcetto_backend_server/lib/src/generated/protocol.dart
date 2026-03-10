@@ -12,9 +12,16 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod/protocol.dart' as _i2;
 import 'authentication_response.dart' as _i3;
-import 'greeting.dart' as _i4;
-import 'user.dart' as _i5;
+import 'club.dart' as _i4;
+import 'club_member.dart' as _i5;
+import 'club_privilege.dart' as _i6;
+import 'greeting.dart' as _i7;
+import 'user.dart' as _i8;
+import 'package:calcetto_backend_server/src/generated/club.dart' as _i9;
 export 'authentication_response.dart';
+export 'club.dart';
+export 'club_member.dart';
+export 'club_privilege.dart';
 export 'greeting.dart';
 export 'user.dart';
 
@@ -26,6 +33,136 @@ class Protocol extends _i1.SerializationManagerServer {
   static final Protocol _instance = Protocol._();
 
   static final List<_i2.TableDefinition> targetTableDefinitions = [
+    _i2.TableDefinition(
+      name: 'club',
+      dartName: 'Club',
+      schema: 'public',
+      module: 'calcetto_backend',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'club_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'name',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'description',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'imageUrl',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _i2.ColumnDefinition(
+          name: 'updatedAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _i2.ColumnDefinition(
+          name: 'deletedAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'club_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        )
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'club_member',
+      dartName: 'ClubMember',
+      schema: 'public',
+      module: 'calcetto_backend',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'club_member_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'clubId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'userId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'privileges',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'joinedAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _i2.ColumnDefinition(
+          name: 'deletedAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'club_member_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        )
+      ],
+      managed: true,
+    ),
     _i2.TableDefinition(
       name: 'user_info',
       dartName: 'UserInfo',
@@ -136,21 +273,42 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i3.AuthenticationResponse) {
       return _i3.AuthenticationResponse.fromJson(data) as T;
     }
-    if (t == _i4.Greeting) {
-      return _i4.Greeting.fromJson(data) as T;
+    if (t == _i4.Club) {
+      return _i4.Club.fromJson(data) as T;
     }
-    if (t == _i5.UserInfo) {
-      return _i5.UserInfo.fromJson(data) as T;
+    if (t == _i5.ClubMember) {
+      return _i5.ClubMember.fromJson(data) as T;
+    }
+    if (t == _i6.ClubPrivilege) {
+      return _i6.ClubPrivilege.fromJson(data) as T;
+    }
+    if (t == _i7.Greeting) {
+      return _i7.Greeting.fromJson(data) as T;
+    }
+    if (t == _i8.UserInfo) {
+      return _i8.UserInfo.fromJson(data) as T;
     }
     if (t == _i1.getType<_i3.AuthenticationResponse?>()) {
       return (data != null ? _i3.AuthenticationResponse.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i4.Greeting?>()) {
-      return (data != null ? _i4.Greeting.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i4.Club?>()) {
+      return (data != null ? _i4.Club.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i5.UserInfo?>()) {
-      return (data != null ? _i5.UserInfo.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i5.ClubMember?>()) {
+      return (data != null ? _i5.ClubMember.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i6.ClubPrivilege?>()) {
+      return (data != null ? _i6.ClubPrivilege.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i7.Greeting?>()) {
+      return (data != null ? _i7.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i8.UserInfo?>()) {
+      return (data != null ? _i8.UserInfo.fromJson(data) : null) as T;
+    }
+    if (t == List<_i9.Club>) {
+      return (data as List).map((e) => deserialize<_i9.Club>(e)).toList() as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -165,10 +323,19 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i3.AuthenticationResponse) {
       return 'AuthenticationResponse';
     }
-    if (data is _i4.Greeting) {
+    if (data is _i4.Club) {
+      return 'Club';
+    }
+    if (data is _i5.ClubMember) {
+      return 'ClubMember';
+    }
+    if (data is _i6.ClubPrivilege) {
+      return 'ClubPrivilege';
+    }
+    if (data is _i7.Greeting) {
       return 'Greeting';
     }
-    if (data is _i5.UserInfo) {
+    if (data is _i8.UserInfo) {
       return 'UserInfo';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -187,11 +354,20 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'AuthenticationResponse') {
       return deserialize<_i3.AuthenticationResponse>(data['data']);
     }
+    if (dataClassName == 'Club') {
+      return deserialize<_i4.Club>(data['data']);
+    }
+    if (dataClassName == 'ClubMember') {
+      return deserialize<_i5.ClubMember>(data['data']);
+    }
+    if (dataClassName == 'ClubPrivilege') {
+      return deserialize<_i6.ClubPrivilege>(data['data']);
+    }
     if (dataClassName == 'Greeting') {
-      return deserialize<_i4.Greeting>(data['data']);
+      return deserialize<_i7.Greeting>(data['data']);
     }
     if (dataClassName == 'UserInfo') {
-      return deserialize<_i5.UserInfo>(data['data']);
+      return deserialize<_i8.UserInfo>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -209,8 +385,12 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
     switch (t) {
-      case _i5.UserInfo:
-        return _i5.UserInfo.t;
+      case _i4.Club:
+        return _i4.Club.t;
+      case _i5.ClubMember:
+        return _i5.ClubMember.t;
+      case _i8.UserInfo:
+        return _i8.UserInfo.t;
     }
     return null;
   }
