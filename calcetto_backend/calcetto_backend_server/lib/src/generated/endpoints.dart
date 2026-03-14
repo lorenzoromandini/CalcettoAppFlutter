@@ -128,34 +128,58 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['clubs'] as _i3.ClubsEndpoint).getClubs(session),
         ),
-        'createClub': _i1.MethodConnector(
-          name: 'createClub',
+        'getClubById': _i1.MethodConnector(
+          name: 'getClubById',
           params: {
-            'name': _i1.ParameterDescription(
-              name: 'name',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-            'description': _i1.ParameterDescription(
-              name: 'description',
-              type: _i1.getType<String?>(),
+            'id': _i1.ParameterDescription(
+              name: 'id',
+              type: _i1.getType<int?>(),
               nullable: true,
-            ),
-            'imageUrl': _i1.ParameterDescription(
-              name: 'imageUrl',
-              type: _i1.getType<String?>(),
-              nullable: true,
-            ),
+            )
           },
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['clubs'] as _i3.ClubsEndpoint).createClub(
+              (endpoints['clubs'] as _i3.ClubsEndpoint).getClubById(
             session,
-            params['name'],
-            params['description'],
-            params['imageUrl'],
+            params['id'],
+          ),
+        ),
+        'getClubMembers': _i1.MethodConnector(
+          name: 'getClubMembers',
+          params: {
+            'clubId': _i1.ParameterDescription(
+              name: 'clubId',
+              type: _i1.getType<int?>(),
+              nullable: true,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['clubs'] as _i3.ClubsEndpoint).getClubMembers(
+            session,
+            params['clubId'],
+          ),
+        ),
+        'generateInviteCode': _i1.MethodConnector(
+          name: 'generateInviteCode',
+          params: {
+            'clubId': _i1.ParameterDescription(
+              name: 'clubId',
+              type: _i1.getType<int?>(),
+              nullable: true,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['clubs'] as _i3.ClubsEndpoint).generateInviteCode(
+            session,
+            params['clubId'],
           ),
         ),
       },

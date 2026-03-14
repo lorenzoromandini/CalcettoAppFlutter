@@ -204,15 +204,43 @@ class InviteCodeGenerator extends ConsumerWidget {
                 child: FilledButton.icon(
                   onPressed: () => _shareCode(context, code),
                   icon: const Icon(Icons.share),
-                  label: const Text('Share'),
+                  label: const Text('Condividi'),
                 ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: code.isNotEmpty
+                      ? () => _shareWhatsApp(context, code)
+                      : null,
+                  icon: const Icon(Icons.chat),
+                  label: const Text('WhatsApp'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              OutlinedButton.icon(
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: code));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Codice copiato!'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.copy),
+                label: const Text('Copia codice'),
               ),
               if (code.isNotEmpty) ...[
                 const SizedBox(width: 12),
                 OutlinedButton.icon(
                   onPressed: notifier.clear,
                   icon: const Icon(Icons.refresh),
-                  label: const Text('New Code'),
+                  label: const Text('Nuovo'),
                 ),
               ],
             ],
@@ -296,11 +324,48 @@ class InviteCodeGenerator extends ConsumerWidget {
   Future<void> _shareCode(BuildContext context, String code) async {
     final renderBox = context.findRenderObject() as RenderBox?;
 
+    // Create invite link (web URL format)
+    final inviteLink = 'https://calcetto.app/join?code=$code';
+
+    // Share with share_plus (includes WhatsApp, etc.)
     await Share.share(
-      'Join my football club! Use invite code: $code',
-      subject: 'Club Invitation',
+      'Unisciti al nostro club di calcetto! Usa questo link: $inviteLink\nOppure codice: $code',
+      subject: 'Invito al Calcio a 5',
       sharePositionOrigin: _getSharePositionOrigin(renderBox),
     );
+  }
+
+  Future<void> _shareWhatsApp(BuildContext context, String code) async {
+    final inviteLink = 'https://calcetto.app/join?code=$code';
+    final message =
+        'Unisciti al nostro club di calcetto! Usa questo link: $inviteLink';
+
+    // WhatsApp URL scheme
+    final whatsappUrl = 'https://wa.me/?text=${Uri.encodeComponent(message)}';
+
+    try {
+      // Try to launch WhatsApp
+      await Share.share(
+        message,
+        subject: 'Invito al Calcio a 5',
+      );
+    } catch (e) {
+      // Fallback: copy to clipboard
+      await Clipboard.setData(ClipboardData(text: inviteLink));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Link copiato! Incolla su WhatsApp'),
+            action: SnackBarAction(
+              label: 'Apri WA',
+              onPressed: () {
+                // Would need url_launcher package for direct WhatsApp
+              },
+            ),
+          ),
+        );
+      }
+    }
   }
 
   Rect? _getSharePositionOrigin(RenderBox? renderBox) {

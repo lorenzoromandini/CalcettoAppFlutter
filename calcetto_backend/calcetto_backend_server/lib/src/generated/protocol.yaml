@@ -3,6 +3,8 @@ auth:
   - signup:
 clubs:
   - getClubs:
-  - createClub:
+  - getClubById:
+  - getClubMembers:
+  - generateInviteCode:
 greeting:
   - hello:

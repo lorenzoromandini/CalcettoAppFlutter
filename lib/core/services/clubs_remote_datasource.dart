@@ -18,6 +18,9 @@ abstract class ClubsRemoteDataSource {
 
   /// Generates an invite code for a club (admin only).
   Future<String> generateInviteCode(String clubId);
+
+  /// Deletes a club (owner only).
+  Future<void> deleteClub(String clubId);
 }
 
 /// Dio implementation of ClubsRemoteDataSource.
@@ -55,13 +58,19 @@ class DioClubsRemoteDataSource implements ClubsRemoteDataSource {
 
   @override
   Future<ClubModel> getClubById(String id) async {
-    final response = await _dio.get('/clubs/$id');
+    final response = await _dio.post(
+      '/clubs/getClubById',
+      data: {'id': int.tryParse(id)},
+    );
     return ClubModel.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
   Future<List<MemberModel>> getClubMembers(String clubId) async {
-    final response = await _dio.get('/clubs/$clubId/members');
+    final response = await _dio.post(
+      '/clubs/getClubMembers',
+      data: {'clubId': int.tryParse(clubId)},
+    );
     final data = response.data as List;
     return data
         .map((e) => MemberModel.fromJson(e as Map<String, dynamic>))
@@ -70,7 +79,18 @@ class DioClubsRemoteDataSource implements ClubsRemoteDataSource {
 
   @override
   Future<String> generateInviteCode(String clubId) async {
-    final response = await _dio.post('/clubs/$clubId/invite');
+    final response = await _dio.post(
+      '/clubs/generateInviteCode',
+      data: {'clubId': int.tryParse(clubId)},
+    );
     return response.data['code'] as String;
+  }
+
+  @override
+  Future<void> deleteClub(String clubId) async {
+    await _dio.delete(
+      '/clubs/deleteClub',
+      data: {'clubId': int.tryParse(clubId)},
+    );
   }
 }

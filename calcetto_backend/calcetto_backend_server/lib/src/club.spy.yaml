@@ -1,12 +1,11 @@
-# Club model
 class: Club
 table: club
 
 fields:
   id: int?
   name: String
-  description: String?
-  imageUrl: String?
+  description: String
+  imageUrl: String
   createdAt: DateTime
   updatedAt: DateTime
-  deletedAt: DateTime?
+  deletedAt: DateTime

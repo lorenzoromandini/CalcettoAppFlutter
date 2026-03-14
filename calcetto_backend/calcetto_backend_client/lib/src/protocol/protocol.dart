@@ -17,6 +17,7 @@ import 'club_privilege.dart' as _i5;
 import 'greeting.dart' as _i6;
 import 'user.dart' as _i7;
 import 'package:calcetto_backend_client/src/protocol/club.dart' as _i8;
+import 'package:calcetto_backend_client/src/protocol/club_member.dart' as _i9;
 export 'authentication_response.dart';
 export 'club.dart';
 export 'club_member.dart';
@@ -77,6 +78,14 @@ class Protocol extends _i1.SerializationManager {
     }
     if (t == List<_i8.Club>) {
       return (data as List).map((e) => deserialize<_i8.Club>(e)).toList() as T;
+    }
+    if (t == List<_i9.ClubMember>) {
+      return (data as List).map((e) => deserialize<_i9.ClubMember>(e)).toList()
+          as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
     return super.deserialize<T>(data, t);
   }

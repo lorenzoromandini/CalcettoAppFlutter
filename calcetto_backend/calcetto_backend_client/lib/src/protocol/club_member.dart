@@ -24,7 +24,7 @@ abstract class ClubMember implements _i1.SerializableModel {
   factory ClubMember({
     int? id,
     required int clubId,
-    required int userId,
+    required String userId,
     required int privileges,
     required DateTime joinedAt,
     DateTime? deletedAt,
@@ -34,7 +34,7 @@ abstract class ClubMember implements _i1.SerializableModel {
     return ClubMember(
       id: jsonSerialization['id'] as int?,
       clubId: jsonSerialization['clubId'] as int,
-      userId: jsonSerialization['userId'] as int,
+      userId: jsonSerialization['userId'] as String,
       privileges: jsonSerialization['privileges'] as int,
       joinedAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['joinedAt']),
@@ -51,7 +51,7 @@ abstract class ClubMember implements _i1.SerializableModel {
 
   int clubId;
 
-  int userId;
+  String userId;
 
   int privileges;
 
@@ -65,7 +65,7 @@ abstract class ClubMember implements _i1.SerializableModel {
   ClubMember copyWith({
     int? id,
     int? clubId,
-    int? userId,
+    String? userId,
     int? privileges,
     DateTime? joinedAt,
     DateTime? deletedAt,
@@ -94,7 +94,7 @@ class _ClubMemberImpl extends ClubMember {
   _ClubMemberImpl({
     int? id,
     required int clubId,
-    required int userId,
+    required String userId,
     required int privileges,
     required DateTime joinedAt,
     DateTime? deletedAt,
@@ -114,7 +114,7 @@ class _ClubMemberImpl extends ClubMember {
   ClubMember copyWith({
     Object? id = _Undefined,
     int? clubId,
-    int? userId,
+    String? userId,
     int? privileges,
     DateTime? joinedAt,
     Object? deletedAt = _Undefined,

@@ -28,4 +28,10 @@ abstract class ClubsRepository {
   ///
   /// Requires network connection - returns NetworkFailure when offline.
   Future<Result<String>> generateInviteCode(String clubId);
+
+  /// Deletes a club (owner only).
+  ///
+  /// Requires owner privileges and network connection.
+  /// Returns error if user is not owner or club has other members.
+  Future<Result<void>> deleteClub(String clubId);
 }

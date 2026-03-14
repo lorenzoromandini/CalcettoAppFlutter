@@ -18,6 +18,7 @@ import 'club_privilege.dart' as _i6;
 import 'greeting.dart' as _i7;
 import 'user.dart' as _i8;
 import 'package:calcetto_backend_server/src/generated/club.dart' as _i9;
+import 'package:calcetto_backend_server/src/generated/club_member.dart' as _i10;
 export 'authentication_response.dart';
 export 'club.dart';
 export 'club_member.dart';
@@ -55,14 +56,14 @@ class Protocol extends _i1.SerializationManagerServer {
         _i2.ColumnDefinition(
           name: 'description',
           columnType: _i2.ColumnType.text,
-          isNullable: true,
-          dartType: 'String?',
+          isNullable: false,
+          dartType: 'String',
         ),
         _i2.ColumnDefinition(
           name: 'imageUrl',
           columnType: _i2.ColumnType.text,
-          isNullable: true,
-          dartType: 'String?',
+          isNullable: false,
+          dartType: 'String',
         ),
         _i2.ColumnDefinition(
           name: 'createdAt',
@@ -79,8 +80,8 @@ class Protocol extends _i1.SerializationManagerServer {
         _i2.ColumnDefinition(
           name: 'deletedAt',
           columnType: _i2.ColumnType.timestampWithoutTimeZone,
-          isNullable: true,
-          dartType: 'DateTime?',
+          isNullable: false,
+          dartType: 'DateTime',
         ),
       ],
       foreignKeys: [],
@@ -122,9 +123,9 @@ class Protocol extends _i1.SerializationManagerServer {
         ),
         _i2.ColumnDefinition(
           name: 'userId',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _i2.ColumnType.text,
           isNullable: false,
-          dartType: 'int',
+          dartType: 'String',
         ),
         _i2.ColumnDefinition(
           name: 'privileges',
@@ -309,6 +310,14 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == List<_i9.Club>) {
       return (data as List).map((e) => deserialize<_i9.Club>(e)).toList() as T;
+    }
+    if (t == List<_i10.ClubMember>) {
+      return (data as List).map((e) => deserialize<_i10.ClubMember>(e)).toList()
+          as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);

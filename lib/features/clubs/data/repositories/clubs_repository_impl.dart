@@ -156,4 +156,29 @@ class ClubsRepositoryImpl implements ClubsRepository {
       return FailureResult(ServerFailure.internalError());
     }
   }
+
+  @override
+  Future<Result<void>> deleteClub(String clubId) async {
+    try {
+      final isOnline = await _connectivity.isOnline;
+
+      if (!isOnline) {
+        return FailureResult(NetworkFailure.noConnection());
+      }
+
+      try {
+        await _remote.deleteClub(clubId);
+        await _local.removeClub(clubId);
+        return const Success(null);
+      } on DioException catch (e) {
+        if (e.response?.statusCode != null) {
+          return FailureResult(
+              ServerFailure.fromStatusCode(e.response!.statusCode!));
+        }
+        return FailureResult(NetworkFailure.unknown());
+      }
+    } catch (_) {
+      return FailureResult(ServerFailure.internalError());
+    }
+  }
 }

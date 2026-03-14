@@ -362,6 +362,133 @@ curl -X POST http://localhost:8080/auth/login \
 
 ---
 
+## 🗄️ Database Tools
+
+### PostgreSQL Database
+
+The backend uses PostgreSQL running in a Docker container:
+
+```bash
+# Start database
+docker start calcetto-postgres
+
+# Check status
+docker ps | grep calcetto-postgres
+```
+
+### View Database with pgAdmin (Web GUI)
+
+**Recommended:** Use pgAdmin for a visual database interface (like Prisma Studio).
+
+#### 1. Start pgAdmin Container
+```bash
+# IMPORTANT: Must be on same network as PostgreSQL
+docker run -d \
+  --name calcetto-pgadmin \
+  --network calcettoapp_default \
+  -e PGADMIN_DEFAULT_EMAIL=admin@admin.com \
+  -e PGADMIN_DEFAULT_PASSWORD=admin \
+  -e PGADMIN_CONFIG_SERVER_MANAGEMENT_MODE=False \
+  -p 5050:80 \
+  dpage/pgadmin4:latest
+```
+
+#### 2. Access pgAdmin
+Open: **http://localhost:5050**
+
+**Login:**
+- Email: `admin@admin.com`
+- Password: `admin`
+
+#### 3. Add Database Server
+1. Right-click "Servers" → "Register" → "Server..."
+2. **General Tab:** Name = `Calcetto Database`
+3. **Connection Tab:**
+   - **Host name:** `calcetto-postgres` (container name, auto-resolves on same network!)
+   - **Port:** `5432`
+   - **Database:** `calcetto`
+   - **Username:** `calcetto`
+   - **Password:** `calcetto`
+4. Click "Save" ✓
+
+#### 4. Browse Tables
+Expand: `Servers` → `Calcetto DB` → `Schemas` → `public` → `Tables`
+
+**Key Tables:**
+- `club` - Football clubs
+- `user_info` - User accounts
+- `club_member` - Club memberships with roles
+- `matches` - Scheduled matches (Phase 3)
+- `goals` - Match goals (Phase 3)
+- `player_ratings` - Performance ratings (Phase 4)
+
+---
+
+### PostgreSQL CLI (psql)
+
+Access database via command line:
+
+#### List all tables
+```bash
+docker exec calcetto-postgres psql -U calcetto -d calcetto -c '\dt'
+```
+
+#### View table data
+```bash
+# View all clubs
+docker exec calcetto-postgres psql -U calcetto -d calcetto -c "SELECT * FROM club;"
+
+# View all users  
+docker exec calcetto-postgres psql -U calcetto -d calcetto -c "SELECT * FROM user_info;"
+
+# Count members
+docker exec calcetto-postgres psql -U calcetto -d calcetto -c "SELECT COUNT(*) FROM club_member;"
+```
+
+#### Interactive psql session
+```bash
+docker exec -it calcetto-postgres psql -U calcetto -d calcetto
+```
+
+**Inside psql:**
+- `\dt` - List tables
+- `\d tablename` - Show table structure
+- `SELECT * FROM tablename;` - Query data
+- `\q` - Quit
+
+---
+
+### Serverpod ORM (Like Prisma Client)
+
+Serverpod includes a Dart ORM similar to Prisma:
+
+```dart
+// Query clubs (like Prisma's findMany)
+final clubs = await Club.db.find(
+  session,
+  where: (t) => t.deletedAt.isNull(),
+);
+
+// Find by ID (like findUnique)
+final club = await Club.db.findById(session, 1);
+
+// Create (like create)
+await Club.db.insertRow(session, club);
+
+// Update (like update)
+club.updatedAt = DateTime.now();
+await Club.db.updateRow(session, club);
+
+// Delete (like delete)
+await session.db.deleteRow<Club>(club);
+```
+
+**Generate code:** `serverpod generate` (like `prisma generate`)
+
+---
+
+---
+
 ## 🧪 Development Commands
 
 ```bash

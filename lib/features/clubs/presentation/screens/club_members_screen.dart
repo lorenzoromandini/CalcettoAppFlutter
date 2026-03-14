@@ -19,13 +19,18 @@ class ClubMembersTab extends ConsumerWidget {
 
     return membersAsync.when(
       loading: () => const MembersGridSkeleton(),
-      error: (error, stack) => _buildErrorState(context, error.toString()),
+      error: (error, stack) => _buildErrorState(context, ref, error.toString()),
       data: (members) => _buildMembersGrid(context, ref, members),
     );
   }
 
-  Widget _buildErrorState(BuildContext context, String error) {
+  Widget _buildErrorState(BuildContext context, WidgetRef ref, String error) {
     final theme = Theme.of(context);
+
+    // Check if it's a "no members" error (single member case)
+    if (error.contains('No members') || error.contains('empty')) {
+      return _buildEmptyState(theme);
+    }
 
     return Center(
       child: Padding(
@@ -40,7 +45,7 @@ class ClubMembersTab extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load members',
+              'Errore nel caricamento',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -56,10 +61,10 @@ class ClubMembersTab extends ConsumerWidget {
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: () {
-                // Refresh logic would go here
+                ref.invalidate(clubMembersProvider(clubId));
               },
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: const Text('Riprova'),
             ),
           ],
         ),

@@ -25,7 +25,7 @@ abstract class ClubMember
   factory ClubMember({
     int? id,
     required int clubId,
-    required int userId,
+    required String userId,
     required int privileges,
     required DateTime joinedAt,
     DateTime? deletedAt,
@@ -35,7 +35,7 @@ abstract class ClubMember
     return ClubMember(
       id: jsonSerialization['id'] as int?,
       clubId: jsonSerialization['clubId'] as int,
-      userId: jsonSerialization['userId'] as int,
+      userId: jsonSerialization['userId'] as String,
       privileges: jsonSerialization['privileges'] as int,
       joinedAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['joinedAt']),
@@ -54,7 +54,7 @@ abstract class ClubMember
 
   int clubId;
 
-  int userId;
+  String userId;
 
   int privileges;
 
@@ -71,7 +71,7 @@ abstract class ClubMember
   ClubMember copyWith({
     int? id,
     int? clubId,
-    int? userId,
+    String? userId,
     int? privileges,
     DateTime? joinedAt,
     DateTime? deletedAt,
@@ -136,7 +136,7 @@ class _ClubMemberImpl extends ClubMember {
   _ClubMemberImpl({
     int? id,
     required int clubId,
-    required int userId,
+    required String userId,
     required int privileges,
     required DateTime joinedAt,
     DateTime? deletedAt,
@@ -156,7 +156,7 @@ class _ClubMemberImpl extends ClubMember {
   ClubMember copyWith({
     Object? id = _Undefined,
     int? clubId,
-    int? userId,
+    String? userId,
     int? privileges,
     DateTime? joinedAt,
     Object? deletedAt = _Undefined,
@@ -178,7 +178,7 @@ class ClubMemberTable extends _i1.Table<int?> {
       'clubId',
       this,
     );
-    userId = _i1.ColumnInt(
+    userId = _i1.ColumnString(
       'userId',
       this,
     );
@@ -198,7 +198,7 @@ class ClubMemberTable extends _i1.Table<int?> {
 
   late final _i1.ColumnInt clubId;
 
-  late final _i1.ColumnInt userId;
+  late final _i1.ColumnString userId;
 
   late final _i1.ColumnInt privileges;
 

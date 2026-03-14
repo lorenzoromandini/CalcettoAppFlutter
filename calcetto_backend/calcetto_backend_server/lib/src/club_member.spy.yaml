@@ -1,11 +1,10 @@
-# Club member - links users to clubs
 class: ClubMember
 table: club_member
 
 fields:
   id: int?
   clubId: int
-  userId: int
+  userId: String
   privileges: int
   joinedAt: DateTime
   deletedAt: DateTime?

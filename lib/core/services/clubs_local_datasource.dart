@@ -42,6 +42,9 @@ abstract class ClubsLocalDataSource {
 
   /// Clears all cached clubs data.
   Future<void> clearAllCache();
+
+  /// Removes a club and its members from cache.
+  Future<void> removeClub(String clubId);
 }
 
 /// Hive implementation of ClubsLocalDataSource with TTL support.
@@ -121,6 +124,28 @@ class HiveClubsLocalDataSource implements ClubsLocalDataSource {
   @override
   Future<void> clearAllCache() async {
     await _box.clear();
+  }
+
+  @override
+  Future<void> removeClub(String clubId) async {
+    // Remove club from cached list
+    final cachedClubs = _box.get(ClubsCacheKeys.clubs) as List?;
+    if (cachedClubs != null) {
+      final updated = cachedClubs.where((c) {
+        final club = c as ClubModel;
+        return club.id != clubId;
+      }).toList();
+      await _box.put(ClubsCacheKeys.clubs, updated);
+    }
+
+    // Remove club timestamp
+    await _box.delete(ClubsCacheKeys.clubsTimestamp);
+
+    // Remove members cache for this club
+    final membersKey = '${ClubsCacheKeys.membersPrefix}$clubId';
+    final timestampKey = '${ClubsCacheKeys.membersTimestampPrefix}$clubId';
+    await _box.delete(membersKey);
+    await _box.delete(timestampKey);
   }
 
   /// Checks if cache entry for key is valid (not expired).

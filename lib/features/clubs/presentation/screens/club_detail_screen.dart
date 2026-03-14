@@ -5,9 +5,10 @@ import 'package:calcetto_app/features/clubs/domain/entities/club.dart';
 import 'package:calcetto_app/features/clubs/presentation/widgets/club_info_tab.dart';
 import 'package:calcetto_app/features/clubs/presentation/screens/club_members_screen.dart';
 import 'package:calcetto_app/features/clubs/presentation/widgets/invite_code_generator.dart';
+import 'package:calcetto_app/features/clubs/presentation/widgets/delete_club_dialog.dart';
 import 'package:calcetto_app/features/clubs/presentation/providers/club_members_provider.dart';
-import 'package:calcetto_app/core/di/injection.dart';
 import 'package:calcetto_app/features/clubs/domain/repositories/clubs_repository.dart';
+import 'package:calcetto_app/core/di/injection.dart';
 import '../../../../core/providers/offline_status_provider.dart';
 import '../../../../core/widgets/offline_indicator.dart';
 
@@ -46,6 +47,8 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
     final role = widget.club.userRole;
     return role == ClubRole.owner || role == ClubRole.manager;
   }
+
+  bool get _isOwner => widget.club.userRole == ClubRole.owner;
 
   bool _isOffline(WidgetRef ref) {
     return ref.watch(isOfflineProvider);
@@ -127,30 +130,61 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
               },
             ),
           PopupMenuButton<String>(
-            onSelected: (value) {
-              // Future: edit club, leave club
+            onSelected: (value) async {
+              if (value == 'delete' && _isOwner) {
+                final result = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => DeleteClubDialog(
+                    clubId: widget.club.id,
+                    clubName: widget.club.name,
+                  ),
+                );
+
+                if (result == true && mounted) {
+                  // Navigate back to clubs list
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Club "${widget.club.name}" eliminato'),
+                      backgroundColor: theme.colorScheme.primary,
+                    ),
+                  );
+                }
+              }
+              // Future: edit club
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 'edit',
+                enabled: false,
                 child: Row(
                   children: [
-                    Icon(Icons.edit),
+                    Icon(Icons.edit, color: Colors.grey),
                     SizedBox(width: 8),
-                    Text('Edit club'),
+                    Text('Modifica club (prossimamente)',
+                        style: TextStyle(color: Colors.grey)),
                   ],
                 ),
               ),
-              const PopupMenuItem(
-                value: 'leave',
-                child: Row(
-                  children: [
-                    Icon(Icons.exit_to_app),
-                    SizedBox(width: 8),
-                    Text('Leave club'),
-                  ],
+              if (_isOwner) ...[
+                const PopupMenuDivider(),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.delete_forever,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Elimina club',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
         ],

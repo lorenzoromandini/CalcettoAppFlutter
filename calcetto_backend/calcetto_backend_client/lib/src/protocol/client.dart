@@ -14,8 +14,9 @@ import 'dart:async' as _i2;
 import 'package:calcetto_backend_client/src/protocol/authentication_response.dart'
     as _i3;
 import 'package:calcetto_backend_client/src/protocol/club.dart' as _i4;
-import 'package:calcetto_backend_client/src/protocol/greeting.dart' as _i5;
-import 'protocol.dart' as _i6;
+import 'package:calcetto_backend_client/src/protocol/club_member.dart' as _i5;
+import 'package:calcetto_backend_client/src/protocol/greeting.dart' as _i6;
+import 'protocol.dart' as _i7;
 
 /// Authentication endpoint - handles login and signup
 /// {@category Endpoint}
@@ -62,7 +63,6 @@ class EndpointAuth extends _i1.EndpointRef {
       );
 }
 
-/// Endpoint for club operations
 /// {@category Endpoint}
 class EndpointClubs extends _i1.EndpointRef {
   EndpointClubs(_i1.EndpointCaller caller) : super(caller);
@@ -70,7 +70,6 @@ class EndpointClubs extends _i1.EndpointRef {
   @override
   String get name => 'clubs';
 
-  /// Get all clubs for the authenticated user
   _i2.Future<List<_i4.Club>> getClubs() =>
       caller.callServerEndpoint<List<_i4.Club>>(
         'clubs',
@@ -78,20 +77,25 @@ class EndpointClubs extends _i1.EndpointRef {
         {},
       );
 
-  /// Create a new club
-  _i2.Future<_i4.Club> createClub(
-    String name,
-    String? description,
-    String? imageUrl,
-  ) =>
-      caller.callServerEndpoint<_i4.Club>(
+  _i2.Future<_i4.Club?> getClubById(int? id) =>
+      caller.callServerEndpoint<_i4.Club?>(
         'clubs',
-        'createClub',
-        {
-          'name': name,
-          'description': description,
-          'imageUrl': imageUrl,
-        },
+        'getClubById',
+        {'id': id},
+      );
+
+  _i2.Future<List<_i5.ClubMember>> getClubMembers(int? clubId) =>
+      caller.callServerEndpoint<List<_i5.ClubMember>>(
+        'clubs',
+        'getClubMembers',
+        {'clubId': clubId},
+      );
+
+  _i2.Future<Map<String, dynamic>> generateInviteCode(int? clubId) =>
+      caller.callServerEndpoint<Map<String, dynamic>>(
+        'clubs',
+        'generateInviteCode',
+        {'clubId': clubId},
       );
 }
 
@@ -105,8 +109,8 @@ class EndpointGreeting extends _i1.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i2.Future<_i5.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i5.Greeting>(
+  _i2.Future<_i6.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i6.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -129,7 +133,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i6.Protocol(),
+          _i7.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
