@@ -14,7 +14,7 @@ This roadmap delivers a cross-platform Flutter application that achieves full fe
 
 Each phase delivers a complete, verifiable capability that can be independently tested and validated before proceeding to the next phase.
 
-**Status:** Phase 1 complete (21/21 requirements) on 2026-03-09. Ready for Phase 2.
+**Status:** Phase 1 complete (21/21 requirements) on 2026-03-09. Database schema restructured on 2026-03-16. Ready for Phase 2.
 
 ---
 

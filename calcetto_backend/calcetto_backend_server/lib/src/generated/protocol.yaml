@@ -1,10 +1,31 @@
 auth:
   - login:
   - signup:
+  - getCurrentUser:
 clubs:
   - getClubs:
   - getClubById:
   - getClubMembers:
   - generateInviteCode:
-greeting:
-  - hello:
+  - deleteClub:
+  - createClub:
+goals:
+  - getMatchGoals:
+  - addGoal:
+  - removeGoal:
+  - getPlayerStats:
+matches:
+  - getClubMatches:
+  - getMatchById:
+  - createMatch:
+  - updateMatchStatus:
+  - updateScore:
+  - getMatchParticipants:
+  - addParticipant:
+  - removeParticipant:
+ratings:
+  - getMatchRatings:
+  - getPlayerRating:
+  - ratePlayer:
+  - getPlayerAverageRating:
+  - getRatingsByUser:

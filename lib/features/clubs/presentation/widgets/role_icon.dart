@@ -1,51 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:calcetto_app/features/clubs/domain/entities/club.dart';
+import 'package:calcetto_app/features/clubs/domain/entities/club_privilege.dart';
 
-/// Displays role-appropriate icon for club members.
+/// Displays privilege-appropriate icon for club members.
 ///
 /// Visual indicators:
 /// - OWNER: Gold star (Icons.stars)
 /// - MANAGER: Blue shield (Icons.shield)
 /// - MEMBER: Grey person (Icons.person)
 class RoleIcon extends StatelessWidget {
-  final ClubRole role;
+  final ClubPrivilege privilege;
   final double size;
 
   const RoleIcon({
     super.key,
-    required this.role,
+    required this.privilege,
     this.size = 24,
   });
 
   IconData get _icon {
-    switch (role) {
-      case ClubRole.owner:
+    switch (privilege) {
+      case ClubPrivilege.OWNER:
         return Icons.stars;
-      case ClubRole.manager:
+      case ClubPrivilege.MANAGER:
         return Icons.shield;
-      case ClubRole.member:
+      case ClubPrivilege.MEMBER:
         return Icons.person;
     }
   }
 
   Color get _color {
-    switch (role) {
-      case ClubRole.owner:
+    switch (privilege) {
+      case ClubPrivilege.OWNER:
         return Colors.amber;
-      case ClubRole.manager:
+      case ClubPrivilege.MANAGER:
         return Colors.blue;
-      case ClubRole.member:
+      case ClubPrivilege.MEMBER:
         return Colors.grey;
     }
   }
 
   String get _roleName {
-    switch (role) {
-      case ClubRole.owner:
+    switch (privilege) {
+      case ClubPrivilege.OWNER:
         return 'Owner';
-      case ClubRole.manager:
+      case ClubPrivilege.MANAGER:
         return 'Manager';
-      case ClubRole.member:
+      case ClubPrivilege.MEMBER:
         return 'Member';
     }
   }

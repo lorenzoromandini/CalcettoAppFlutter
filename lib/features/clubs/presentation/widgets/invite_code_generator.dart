@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:calcetto_app/features/clubs/domain/entities/club.dart';
+import 'package:calcetto_app/features/clubs/domain/entities/club_privilege.dart';
 import 'package:calcetto_app/features/clubs/presentation/providers/invite_code_provider.dart';
 import '../../../../core/providers/offline_status_provider.dart';
 
@@ -16,18 +16,18 @@ import '../../../../core/providers/offline_status_provider.dart';
 /// - One-time use warning
 class InviteCodeGenerator extends ConsumerWidget {
   final String clubId;
-  final ClubRole userRole;
+  final ClubPrivilege userPrivilege;
 
   const InviteCodeGenerator({
     super.key,
     required this.clubId,
-    required this.userRole,
+    required this.userPrivilege,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Only show for admins
-    if (!userRole.isAdmin) {
+    if (!userPrivilege.isAdmin) {
       return _buildNonAdminMessage(context);
     }
 
@@ -130,7 +130,7 @@ class InviteCodeGenerator extends ConsumerWidget {
       onPressed: isOffline
           ? null
           : () {
-              notifier.generate(clubId, userRole);
+              notifier.generate(clubId, userPrivilege);
             },
       icon: const Icon(Icons.add_link),
       label: const Text('Generate Invite Code'),
@@ -311,7 +311,7 @@ class InviteCodeGenerator extends ConsumerWidget {
           const SizedBox(height: 16),
           FilledButton.icon(
             onPressed: () {
-              notifier.generate(clubId, userRole);
+              notifier.generate(clubId, userPrivilege);
             },
             icon: const Icon(Icons.refresh),
             label: const Text('Retry'),

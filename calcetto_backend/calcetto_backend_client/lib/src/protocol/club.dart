@@ -15,63 +15,74 @@ abstract class Club implements _i1.SerializableModel {
   Club._({
     this.id,
     required this.name,
-    required this.description,
-    required this.imageUrl,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.deletedAt,
-  });
+    this.description,
+    this.imageUrl,
+    required this.createdBy,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    this.deletedAt,
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
 
   factory Club({
-    int? id,
+    _i1.UuidValue? id,
     required String name,
-    required String description,
-    required String imageUrl,
-    required DateTime createdAt,
-    required DateTime updatedAt,
-    required DateTime deletedAt,
+    String? description,
+    String? imageUrl,
+    required _i1.UuidValue createdBy,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? deletedAt,
   }) = _ClubImpl;
 
   factory Club.fromJson(Map<String, dynamic> jsonSerialization) {
     return Club(
-      id: jsonSerialization['id'] as int?,
+      id: jsonSerialization['id'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
       name: jsonSerialization['name'] as String,
-      description: jsonSerialization['description'] as String,
-      imageUrl: jsonSerialization['imageUrl'] as String,
+      description: jsonSerialization['description'] as String?,
+      imageUrl: jsonSerialization['imageUrl'] as String?,
+      createdBy:
+          _i1.UuidValueJsonExtension.fromJson(jsonSerialization['createdBy']),
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       updatedAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['updatedAt']),
-      deletedAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['deletedAt']),
+      deletedAt: jsonSerialization['deletedAt'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['deletedAt']),
     );
   }
 
   /// The database id, set if the object has been inserted into the
   /// database or if it has been fetched from the database. Otherwise,
   /// the id will be null.
-  int? id;
+  _i1.UuidValue? id;
 
   String name;
 
-  String description;
+  String? description;
 
-  String imageUrl;
+  String? imageUrl;
+
+  _i1.UuidValue createdBy;
 
   DateTime createdAt;
 
   DateTime updatedAt;
 
-  DateTime deletedAt;
+  DateTime? deletedAt;
 
   /// Returns a shallow copy of this [Club]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   Club copyWith({
-    int? id,
+    _i1.UuidValue? id,
     String? name,
     String? description,
     String? imageUrl,
+    _i1.UuidValue? createdBy,
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? deletedAt,
@@ -79,13 +90,14 @@ abstract class Club implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
+      if (id != null) 'id': id?.toJson(),
       'name': name,
-      'description': description,
-      'imageUrl': imageUrl,
+      if (description != null) 'description': description,
+      if (imageUrl != null) 'imageUrl': imageUrl,
+      'createdBy': createdBy.toJson(),
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
-      'deletedAt': deletedAt.toJson(),
+      if (deletedAt != null) 'deletedAt': deletedAt?.toJson(),
     };
   }
 
@@ -99,18 +111,20 @@ class _Undefined {}
 
 class _ClubImpl extends Club {
   _ClubImpl({
-    int? id,
+    _i1.UuidValue? id,
     required String name,
-    required String description,
-    required String imageUrl,
-    required DateTime createdAt,
-    required DateTime updatedAt,
-    required DateTime deletedAt,
+    String? description,
+    String? imageUrl,
+    required _i1.UuidValue createdBy,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? deletedAt,
   }) : super._(
           id: id,
           name: name,
           description: description,
           imageUrl: imageUrl,
+          createdBy: createdBy,
           createdAt: createdAt,
           updatedAt: updatedAt,
           deletedAt: deletedAt,
@@ -123,20 +137,22 @@ class _ClubImpl extends Club {
   Club copyWith({
     Object? id = _Undefined,
     String? name,
-    String? description,
-    String? imageUrl,
+    Object? description = _Undefined,
+    Object? imageUrl = _Undefined,
+    _i1.UuidValue? createdBy,
     DateTime? createdAt,
     DateTime? updatedAt,
-    DateTime? deletedAt,
+    Object? deletedAt = _Undefined,
   }) {
     return Club(
-      id: id is int? ? id : this.id,
+      id: id is _i1.UuidValue? ? id : this.id,
       name: name ?? this.name,
-      description: description ?? this.description,
-      imageUrl: imageUrl ?? this.imageUrl,
+      description: description is String? ? description : this.description,
+      imageUrl: imageUrl is String? ? imageUrl : this.imageUrl,
+      createdBy: createdBy ?? this.createdBy,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      deletedAt: deletedAt ?? this.deletedAt,
+      deletedAt: deletedAt is DateTime? ? deletedAt : this.deletedAt,
     );
   }
 }

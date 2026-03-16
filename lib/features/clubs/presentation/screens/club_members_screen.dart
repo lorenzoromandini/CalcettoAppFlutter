@@ -18,9 +18,15 @@ class ClubMembersTab extends ConsumerWidget {
     final membersAsync = ref.watch(clubMembersProvider(clubId));
 
     return membersAsync.when(
-      loading: () => const MembersGridSkeleton(),
-      error: (error, stack) => _buildErrorState(context, ref, error.toString()),
-      data: (members) => _buildMembersGrid(context, ref, members),
+      loading: () {
+        return const MembersGridSkeleton();
+      },
+      error: (error, stack) {
+        return _buildErrorState(context, ref, error.toString());
+      },
+      data: (members) {
+        return _buildMembersGrid(context, ref, members);
+      },
     );
   }
 

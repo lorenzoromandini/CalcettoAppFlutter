@@ -8,6 +8,7 @@ import 'package:dio/dio.dart';
 import '../../domain/entities/club.dart';
 import '../../domain/entities/member.dart';
 import '../../domain/repositories/clubs_repository.dart';
+import '../../data/models/member_model.dart';
 
 /// Implementation of ClubsRepository with network awareness and cache-first strategy.
 class ClubsRepositoryImpl implements ClubsRepository {
@@ -50,13 +51,8 @@ class ClubsRepositoryImpl implements ClubsRepository {
         return FailureResult(NetworkFailure.noConnection());
       }
     } on Exception catch (e) {
-      // Log the actual error for debugging
-      print('CLUBS REPOSITORY ERROR: $e');
-      print('Stack trace: ${StackTrace.current}');
       return FailureResult(CacheFailure.readError());
     } catch (e) {
-      print('CLUBS REPOSITORY UNKNOWN ERROR: $e');
-      print('Stack trace: ${StackTrace.current}');
       return FailureResult(ServerFailure.internalError());
     }
   }
@@ -112,7 +108,7 @@ class ClubsRepositoryImpl implements ClubsRepository {
           final members = await _remote.getClubMembers(clubId);
           await _local.cacheClubMembers(clubId, members);
           return Success(members.map((m) => m.toEntity()).toList());
-        } on DioException {
+        } on DioException catch (e) {
           final cached = await _local.getCachedClubMembers(clubId);
           if (cached != null) {
             return Success(cached.map((m) => m.toEntity()).toList());
@@ -126,9 +122,9 @@ class ClubsRepositoryImpl implements ClubsRepository {
         }
         return FailureResult(NetworkFailure.noConnection());
       }
-    } on Exception {
+    } on Exception catch (e) {
       return FailureResult(CacheFailure.readError());
-    } catch (_) {
+    } catch (e) {
       return FailureResult(ServerFailure.internalError());
     }
   }

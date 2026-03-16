@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:calcetto_app/features/clubs/domain/entities/club.dart';
+import 'package:calcetto_app/features/clubs/domain/entities/club_privilege.dart';
 
 /// Info tab displaying club details, logo, statistics, and user role.
 class ClubInfoTab extends StatelessWidget {
@@ -243,25 +244,26 @@ class ClubInfoTab extends StatelessWidget {
   }
 
   Widget _buildRoleSection(ThemeData theme) {
-    final role = club.userRole;
-    final isAdmin = role == ClubRole.owner || role == ClubRole.manager;
+    final privilege = club.userPrivilege;
+    final isAdmin =
+        privilege == ClubPrivilege.OWNER || privilege == ClubPrivilege.MANAGER;
 
     IconData roleIcon;
     String roleName;
     Color roleColor;
 
-    switch (role) {
-      case ClubRole.owner:
+    switch (privilege) {
+      case ClubPrivilege.OWNER:
         roleIcon = Icons.stars;
         roleName = 'Owner';
         roleColor = Colors.amber;
         break;
-      case ClubRole.manager:
+      case ClubPrivilege.MANAGER:
         roleIcon = Icons.shield;
         roleName = 'Manager';
         roleColor = Colors.blue;
         break;
-      case ClubRole.member:
+      case ClubPrivilege.MEMBER:
         roleIcon = Icons.person;
         roleName = 'Member';
         roleColor = Colors.grey;

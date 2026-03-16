@@ -10,7 +10,7 @@ _$MemberImpl _$$MemberImplFromJson(Map<String, dynamic> json) => _$MemberImpl(
       id: json['id'] as String,
       name: json['name'] as String,
       avatarUrl: json['avatarUrl'] as String?,
-      role: $enumDecode(_$ClubRoleEnumMap, json['role']),
+      privilege: $enumDecode(_$ClubPrivilegeEnumMap, json['privilege']),
       joinedAt: DateTime.parse(json['joinedAt'] as String),
       stats: json['stats'] == null
           ? null
@@ -22,15 +22,15 @@ Map<String, dynamic> _$$MemberImplToJson(_$MemberImpl instance) =>
       'id': instance.id,
       'name': instance.name,
       'avatarUrl': instance.avatarUrl,
-      'role': _$ClubRoleEnumMap[instance.role]!,
+      'privilege': _$ClubPrivilegeEnumMap[instance.privilege]!,
       'joinedAt': instance.joinedAt.toIso8601String(),
       'stats': instance.stats,
     };
 
-const _$ClubRoleEnumMap = {
-  ClubRole.owner: 'owner',
-  ClubRole.manager: 'manager',
-  ClubRole.member: 'member',
+const _$ClubPrivilegeEnumMap = {
+  ClubPrivilege.OWNER: 'OWNER',
+  ClubPrivilege.MANAGER: 'MANAGER',
+  ClubPrivilege.MEMBER: 'MEMBER',
 };
 
 _$MemberStatsImpl _$$MemberStatsImplFromJson(Map<String, dynamic> json) =>

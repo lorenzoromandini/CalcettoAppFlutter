@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/club.dart';
+import '../../domain/entities/club_privilege.dart';
 import 'role_badge.dart';
 
 /// Individual club list item widget.
@@ -60,7 +61,7 @@ class ClubListItem extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          RoleBadge(role: club.userRole),
+          RoleBadge(privilege: club.userPrivilege),
           if (isActive) ...[
             const SizedBox(width: 8),
             Icon(

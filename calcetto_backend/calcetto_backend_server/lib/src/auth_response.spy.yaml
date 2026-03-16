@@ -1,0 +1,6 @@
+class: AuthResponse
+fields:
+  success: bool
+  error: String?
+  token: String?
+  userId: UuidValue?

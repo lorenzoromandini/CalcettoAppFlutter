@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calcetto_app/features/clubs/domain/entities/member.dart';
-import 'package:calcetto_app/features/clubs/domain/entities/club.dart';
+import 'package:calcetto_app/features/clubs/domain/entities/club_privilege.dart';
 import 'package:calcetto_app/features/clubs/domain/repositories/clubs_repository.dart';
 import 'package:calcetto_app/core/di/injection.dart';
 
@@ -15,26 +15,30 @@ final clubMembersProvider =
   final result = await repository.getClubMembers(clubId);
 
   return result.fold(
-    (error) => throw Exception('Failed to load members: $error'),
-    (members) => _sortMembers(members),
+    (error) {
+      throw Exception('Failed to load members: $error');
+    },
+    (members) {
+      return _sortMembers(members);
+    },
   );
 });
 
-/// Sorts members by role hierarchy, then by name.
+/// Sorts members by privilege hierarchy, then by name.
 ///
 /// Order:
 /// 1. Owners first
 /// 2. Managers second
 /// 3. Members last
-/// Within each role: alphabetical by name
+/// Within each privilege: alphabetical by name
 List<Member> _sortMembers(List<Member> members) {
   final sorted = List<Member>.from(members);
 
   sorted.sort((a, b) {
-    // First sort by role
-    final roleComparison = _compareRoles(a.role, b.role);
-    if (roleComparison != 0) {
-      return roleComparison;
+    // First sort by privilege
+    final privilegeComparison = _comparePrivileges(a.privilege, b.privilege);
+    if (privilegeComparison != 0) {
+      return privilegeComparison;
     }
 
     // Then by name
@@ -44,17 +48,17 @@ List<Member> _sortMembers(List<Member> members) {
   return sorted;
 }
 
-/// Compares two roles for sorting.
+/// Compares two privileges for sorting.
 ///
-/// Returns negative if roleA comes before roleB,
-/// positive if roleA comes after roleB,
+/// Returns negative if privilegeA comes before privilegeB,
+/// positive if privilegeA comes after privilegeB,
 /// zero if equal.
-int _compareRoles(ClubRole roleA, ClubRole roleB) {
+int _comparePrivileges(ClubPrivilege privilegeA, ClubPrivilege privilegeB) {
   const rank = {
-    ClubRole.owner: 1,
-    ClubRole.manager: 2,
-    ClubRole.member: 3,
+    ClubPrivilege.OWNER: 1,
+    ClubPrivilege.MANAGER: 2,
+    ClubPrivilege.MEMBER: 3,
   };
 
-  return rank[roleA]!.compareTo(rank[roleB]!);
+  return rank[privilegeA]!.compareTo(rank[privilegeB]!);
 }

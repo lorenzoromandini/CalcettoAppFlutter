@@ -1,0 +1,15 @@
+class: ClubInvite
+table: club_invites
+fields:
+  id: UuidValue?, defaultPersist=random_v7
+  clubId: UuidValue, relation(parent=clubs)
+  createdBy: UuidValue?, relation(parent=users)
+  token: String
+  expiresAt: DateTime
+  createdAt: DateTime, default=now
+indexes:
+  club_invites_club_id_idx:
+    fields: clubId
+  club_invites_token_idx:
+    fields: token
+    unique: true

@@ -12,18 +12,18 @@
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 
 enum ClubPrivilege implements _i1.SerializableModel {
-  member,
-  manager,
-  owner;
+  OWNER,
+  MANAGER,
+  MEMBER;
 
   static ClubPrivilege fromJson(int index) {
     switch (index) {
       case 0:
-        return ClubPrivilege.member;
+        return ClubPrivilege.OWNER;
       case 1:
-        return ClubPrivilege.manager;
+        return ClubPrivilege.MANAGER;
       case 2:
-        return ClubPrivilege.owner;
+        return ClubPrivilege.MEMBER;
       default:
         throw ArgumentError(
             'Value "$index" cannot be converted to "ClubPrivilege"');

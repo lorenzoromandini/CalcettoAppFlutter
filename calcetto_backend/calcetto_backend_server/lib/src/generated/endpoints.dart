@@ -12,7 +12,9 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../auth_endpoint.dart' as _i2;
 import '../clubs_endpoint.dart' as _i3;
-import '../greeting_endpoint.dart' as _i4;
+import '../goals_endpoint.dart' as _i4;
+import '../matches_endpoint.dart' as _i5;
+import '../ratings_endpoint.dart' as _i6;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -30,10 +32,22 @@ class Endpoints extends _i1.EndpointDispatch {
           'clubs',
           null,
         ),
-      'greeting': _i4.GreetingEndpoint()
+      'goals': _i4.GoalsEndpoint()
         ..initialize(
           server,
-          'greeting',
+          'goals',
+          null,
+        ),
+      'matches': _i5.MatchesEndpoint()
+        ..initialize(
+          server,
+          'matches',
+          null,
+        ),
+      'ratings': _i6.RatingsEndpoint()
+        ..initialize(
+          server,
+          'ratings',
           null,
         ),
     };
@@ -113,6 +127,15 @@ class Endpoints extends _i1.EndpointDispatch {
             params['imageUrl'],
           ),
         ),
+        'getCurrentUser': _i1.MethodConnector(
+          name: 'getCurrentUser',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['auth'] as _i2.AuthEndpoint).getCurrentUser(session),
+        ),
       },
     );
     connectors['clubs'] = _i1.EndpointConnector(
@@ -133,7 +156,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'id': _i1.ParameterDescription(
               name: 'id',
-              type: _i1.getType<int?>(),
+              type: _i1.getType<String?>(),
               nullable: true,
             )
           },
@@ -149,9 +172,9 @@ class Endpoints extends _i1.EndpointDispatch {
         'getClubMembers': _i1.MethodConnector(
           name: 'getClubMembers',
           params: {
-            'clubId': _i1.ParameterDescription(
-              name: 'clubId',
-              type: _i1.getType<int?>(),
+            'clubIdStr': _i1.ParameterDescription(
+              name: 'clubIdStr',
+              type: _i1.getType<String?>(),
               nullable: true,
             )
           },
@@ -161,15 +184,15 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['clubs'] as _i3.ClubsEndpoint).getClubMembers(
             session,
-            params['clubId'],
+            params['clubIdStr'],
           ),
         ),
         'generateInviteCode': _i1.MethodConnector(
           name: 'generateInviteCode',
           params: {
-            'clubId': _i1.ParameterDescription(
-              name: 'clubId',
-              type: _i1.getType<int?>(),
+            'clubIdStr': _i1.ParameterDescription(
+              name: 'clubIdStr',
+              type: _i1.getType<String?>(),
               nullable: true,
             )
           },
@@ -179,20 +202,68 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['clubs'] as _i3.ClubsEndpoint).generateInviteCode(
             session,
-            params['clubId'],
+            params['clubIdStr'],
+          ),
+        ),
+        'deleteClub': _i1.MethodConnector(
+          name: 'deleteClub',
+          params: {
+            'clubIdStr': _i1.ParameterDescription(
+              name: 'clubIdStr',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['clubs'] as _i3.ClubsEndpoint).deleteClub(
+            session,
+            params['clubIdStr'],
+          ),
+        ),
+        'createClub': _i1.MethodConnector(
+          name: 'createClub',
+          params: {
+            'name': _i1.ParameterDescription(
+              name: 'name',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'description': _i1.ParameterDescription(
+              name: 'description',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'imageUrl': _i1.ParameterDescription(
+              name: 'imageUrl',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['clubs'] as _i3.ClubsEndpoint).createClub(
+            session,
+            params['name'],
+            params['description'],
+            params['imageUrl'],
           ),
         ),
       },
     );
-    connectors['greeting'] = _i1.EndpointConnector(
-      name: 'greeting',
-      endpoint: endpoints['greeting']!,
+    connectors['goals'] = _i1.EndpointConnector(
+      name: 'goals',
+      endpoint: endpoints['goals']!,
       methodConnectors: {
-        'hello': _i1.MethodConnector(
-          name: 'hello',
+        'getMatchGoals': _i1.MethodConnector(
+          name: 'getMatchGoals',
           params: {
-            'name': _i1.ParameterDescription(
-              name: 'name',
+            'matchIdStr': _i1.ParameterDescription(
+              name: 'matchIdStr',
               type: _i1.getType<String>(),
               nullable: false,
             )
@@ -201,11 +272,407 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['greeting'] as _i4.GreetingEndpoint).hello(
+              (endpoints['goals'] as _i4.GoalsEndpoint).getMatchGoals(
             session,
-            params['name'],
+            params['matchIdStr'],
           ),
-        )
+        ),
+        'addGoal': _i1.MethodConnector(
+          name: 'addGoal',
+          params: {
+            'matchIdStr': _i1.ParameterDescription(
+              name: 'matchIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'scorerIdStr': _i1.ParameterDescription(
+              name: 'scorerIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'assisterIdStr': _i1.ParameterDescription(
+              name: 'assisterIdStr',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'isOwnGoal': _i1.ParameterDescription(
+              name: 'isOwnGoal',
+              type: _i1.getType<bool>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['goals'] as _i4.GoalsEndpoint).addGoal(
+            session,
+            params['matchIdStr'],
+            params['scorerIdStr'],
+            params['assisterIdStr'],
+            params['isOwnGoal'],
+          ),
+        ),
+        'removeGoal': _i1.MethodConnector(
+          name: 'removeGoal',
+          params: {
+            'goalIdStr': _i1.ParameterDescription(
+              name: 'goalIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['goals'] as _i4.GoalsEndpoint).removeGoal(
+            session,
+            params['goalIdStr'],
+          ),
+        ),
+        'getPlayerStats': _i1.MethodConnector(
+          name: 'getPlayerStats',
+          params: {
+            'clubMemberIdStr': _i1.ParameterDescription(
+              name: 'clubMemberIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['goals'] as _i4.GoalsEndpoint).getPlayerStats(
+            session,
+            params['clubMemberIdStr'],
+          ),
+        ),
+      },
+    );
+    connectors['matches'] = _i1.EndpointConnector(
+      name: 'matches',
+      endpoint: endpoints['matches']!,
+      methodConnectors: {
+        'getClubMatches': _i1.MethodConnector(
+          name: 'getClubMatches',
+          params: {
+            'clubIdStr': _i1.ParameterDescription(
+              name: 'clubIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'status': _i1.ParameterDescription(
+              name: 'status',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['matches'] as _i5.MatchesEndpoint).getClubMatches(
+            session,
+            params['clubIdStr'],
+            status: params['status'],
+          ),
+        ),
+        'getMatchById': _i1.MethodConnector(
+          name: 'getMatchById',
+          params: {
+            'matchIdStr': _i1.ParameterDescription(
+              name: 'matchIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['matches'] as _i5.MatchesEndpoint).getMatchById(
+            session,
+            params['matchIdStr'],
+          ),
+        ),
+        'createMatch': _i1.MethodConnector(
+          name: 'createMatch',
+          params: {
+            'clubIdStr': _i1.ParameterDescription(
+              name: 'clubIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'scheduledAt': _i1.ParameterDescription(
+              name: 'scheduledAt',
+              type: _i1.getType<DateTime>(),
+              nullable: false,
+            ),
+            'location': _i1.ParameterDescription(
+              name: 'location',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'modeStr': _i1.ParameterDescription(
+              name: 'modeStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['matches'] as _i5.MatchesEndpoint).createMatch(
+            session,
+            params['clubIdStr'],
+            params['scheduledAt'],
+            params['location'],
+            params['modeStr'],
+          ),
+        ),
+        'updateMatchStatus': _i1.MethodConnector(
+          name: 'updateMatchStatus',
+          params: {
+            'matchIdStr': _i1.ParameterDescription(
+              name: 'matchIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'statusStr': _i1.ParameterDescription(
+              name: 'statusStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['matches'] as _i5.MatchesEndpoint).updateMatchStatus(
+            session,
+            params['matchIdStr'],
+            params['statusStr'],
+          ),
+        ),
+        'updateScore': _i1.MethodConnector(
+          name: 'updateScore',
+          params: {
+            'matchIdStr': _i1.ParameterDescription(
+              name: 'matchIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'homeScore': _i1.ParameterDescription(
+              name: 'homeScore',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'awayScore': _i1.ParameterDescription(
+              name: 'awayScore',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['matches'] as _i5.MatchesEndpoint).updateScore(
+            session,
+            params['matchIdStr'],
+            params['homeScore'],
+            params['awayScore'],
+          ),
+        ),
+        'getMatchParticipants': _i1.MethodConnector(
+          name: 'getMatchParticipants',
+          params: {
+            'matchIdStr': _i1.ParameterDescription(
+              name: 'matchIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['matches'] as _i5.MatchesEndpoint)
+                  .getMatchParticipants(
+            session,
+            params['matchIdStr'],
+          ),
+        ),
+        'addParticipant': _i1.MethodConnector(
+          name: 'addParticipant',
+          params: {
+            'matchIdStr': _i1.ParameterDescription(
+              name: 'matchIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'clubMemberIdStr': _i1.ParameterDescription(
+              name: 'clubMemberIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'teamSideStr': _i1.ParameterDescription(
+              name: 'teamSideStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'positionStr': _i1.ParameterDescription(
+              name: 'positionStr',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['matches'] as _i5.MatchesEndpoint).addParticipant(
+            session,
+            params['matchIdStr'],
+            params['clubMemberIdStr'],
+            params['teamSideStr'],
+            params['positionStr'],
+          ),
+        ),
+        'removeParticipant': _i1.MethodConnector(
+          name: 'removeParticipant',
+          params: {
+            'participantIdStr': _i1.ParameterDescription(
+              name: 'participantIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['matches'] as _i5.MatchesEndpoint).removeParticipant(
+            session,
+            params['participantIdStr'],
+          ),
+        ),
+      },
+    );
+    connectors['ratings'] = _i1.EndpointConnector(
+      name: 'ratings',
+      endpoint: endpoints['ratings']!,
+      methodConnectors: {
+        'getMatchRatings': _i1.MethodConnector(
+          name: 'getMatchRatings',
+          params: {
+            'matchIdStr': _i1.ParameterDescription(
+              name: 'matchIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['ratings'] as _i6.RatingsEndpoint).getMatchRatings(
+            session,
+            params['matchIdStr'],
+          ),
+        ),
+        'getPlayerRating': _i1.MethodConnector(
+          name: 'getPlayerRating',
+          params: {
+            'matchIdStr': _i1.ParameterDescription(
+              name: 'matchIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'clubMemberIdStr': _i1.ParameterDescription(
+              name: 'clubMemberIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['ratings'] as _i6.RatingsEndpoint).getPlayerRating(
+            session,
+            params['matchIdStr'],
+            params['clubMemberIdStr'],
+          ),
+        ),
+        'ratePlayer': _i1.MethodConnector(
+          name: 'ratePlayer',
+          params: {
+            'matchIdStr': _i1.ParameterDescription(
+              name: 'matchIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'clubMemberIdStr': _i1.ParameterDescription(
+              name: 'clubMemberIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'rating': _i1.ParameterDescription(
+              name: 'rating',
+              type: _i1.getType<double>(),
+              nullable: false,
+            ),
+            'comment': _i1.ParameterDescription(
+              name: 'comment',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['ratings'] as _i6.RatingsEndpoint).ratePlayer(
+            session,
+            params['matchIdStr'],
+            params['clubMemberIdStr'],
+            params['rating'],
+            params['comment'],
+          ),
+        ),
+        'getPlayerAverageRating': _i1.MethodConnector(
+          name: 'getPlayerAverageRating',
+          params: {
+            'clubMemberIdStr': _i1.ParameterDescription(
+              name: 'clubMemberIdStr',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['ratings'] as _i6.RatingsEndpoint)
+                  .getPlayerAverageRating(
+            session,
+            params['clubMemberIdStr'],
+          ),
+        ),
+        'getRatingsByUser': _i1.MethodConnector(
+          name: 'getRatingsByUser',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['ratings'] as _i6.RatingsEndpoint)
+                  .getRatingsByUser(session),
+        ),
       },
     );
   }

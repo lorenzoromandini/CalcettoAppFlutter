@@ -4,6 +4,8 @@ import '../../../../core/di/injection.dart';
 import '../../../../core/widgets/offline_indicator.dart';
 import '../../../clubs/presentation/providers/active_club_provider.dart';
 import '../../../clubs/domain/entities/club.dart';
+import '../../../clubs/domain/entities/club_privilege.dart';
+import '../providers/navigation_provider.dart';
 import '../widgets/active_club_header.dart';
 
 /// Home screen with active club context and quick actions.
@@ -206,7 +208,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: _StatCard(
               icon: Icons.stars,
               label: 'Your Role',
-              value: _getRoleAbbreviation(club.userRole),
+              value: _getPrivilegeAbbreviation(club.userPrivilege),
               color: theme.colorScheme.secondary,
             ),
           ),
@@ -360,9 +362,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _openClubSwitcher() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Club switcher - tap club in Clubs tab')),
-    );
+    // Navigate to clubs tab (index 1)
+    ref.read(navigationProvider.notifier).setIndex(1);
   }
 
   void _navigateToClubs() {
@@ -372,13 +373,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  String _getRoleAbbreviation(ClubRole role) {
-    switch (role) {
-      case ClubRole.owner:
+  String _getPrivilegeAbbreviation(ClubPrivilege privilege) {
+    switch (privilege) {
+      case ClubPrivilege.OWNER:
         return 'OWN';
-      case ClubRole.manager:
+      case ClubPrivilege.MANAGER:
         return 'MAN';
-      case ClubRole.member:
+      case ClubPrivilege.MEMBER:
         return 'MEM';
     }
   }

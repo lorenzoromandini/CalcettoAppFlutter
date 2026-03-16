@@ -15,7 +15,6 @@ abstract class SecureStorageService {
 
 /// Factory to get the appropriate secure storage implementation.
 SecureStorageService createSecureStorageService() {
-  debugPrint('STORAGE FACTORY: kIsWeb = $kIsWeb');
   if (kIsWeb) {
     return HiveSecureStorageService();
   }
@@ -58,9 +57,8 @@ class HiveSecureStorageService implements SecureStorageService {
       // Use 'auth-token' key to match backend's getUserIdFromRequest expectation
       final storageKey = (key == AppConstants.jwtTokenKey) ? 'auth-token' : key;
       window.localStorage[storageKey] = value;
-      debugPrint('✅ STORAGE: Saved $storageKey (${value.length} chars)');
     } catch (e) {
-      debugPrint('❌ STORAGE ERROR: $e');
+      // Error handling without logging
     }
   }
 
@@ -70,14 +68,8 @@ class HiveSecureStorageService implements SecureStorageService {
       // Use 'auth-token' key to match backend's getUserIdFromRequest expectation
       final storageKey = (key == AppConstants.jwtTokenKey) ? 'auth-token' : key;
       final value = window.localStorage[storageKey];
-      if (value != null) {
-        debugPrint('✅ STORAGE: Found $storageKey (${value.length} chars)');
-      } else {
-        debugPrint('⚠️ STORAGE: $storageKey not found');
-      }
       return value;
     } catch (e) {
-      debugPrint('❌ STORAGE READ ERROR: $e');
       return null;
     }
   }
@@ -87,9 +79,8 @@ class HiveSecureStorageService implements SecureStorageService {
     try {
       final storageKey = (key == AppConstants.jwtTokenKey) ? 'auth-token' : key;
       window.localStorage.remove(storageKey);
-      debugPrint('✅ STORAGE: Deleted $storageKey');
     } catch (e) {
-      debugPrint('❌ STORAGE DELETE ERROR: $e');
+      // Error handling without logging
     }
   }
 
@@ -101,9 +92,8 @@ class HiveSecureStorageService implements SecureStorageService {
       window.localStorage.remove(AppConstants.userIdKey);
       window.localStorage.remove('user_data');
       window.localStorage.remove('stored_credentials');
-      debugPrint('✅ STORAGE: Cleared all keys');
     } catch (e) {
-      debugPrint('❌ STORAGE CLEAR ERROR: $e');
+      // Error handling without logging
     }
   }
 }

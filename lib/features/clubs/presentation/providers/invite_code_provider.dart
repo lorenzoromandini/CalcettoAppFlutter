@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:calcetto_app/features/clubs/domain/entities/club.dart';
+import 'package:calcetto_app/features/clubs/domain/entities/club_privilege.dart';
 import 'package:calcetto_app/features/clubs/domain/repositories/clubs_repository.dart';
 import 'package:calcetto_app/core/di/injection.dart';
 
@@ -20,11 +20,11 @@ class InviteCodeNotifier extends StateNotifier<AsyncValue<String?>> {
 
   /// Generates an invite code for the specified club.
   ///
-  /// Only users with OWNER or MANAGER role can generate codes.
+  /// Only users with OWNER or MANAGER privilege can generate codes.
   /// Returns one-time use code (8-char alphanumeric).
-  Future<void> generate(String clubId, ClubRole userRole) async {
+  Future<void> generate(String clubId, ClubPrivilege userPrivilege) async {
     // Check admin permission
-    if (!userRole.isAdmin) {
+    if (!userPrivilege.isAdmin) {
       state = AsyncValue.data(null);
       return;
     }

@@ -107,7 +107,7 @@ class ClubSwitcher extends ConsumerWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '${club.memberCount} members • ${club.userRole.displayName}',
+          '${club.memberCount} members • ${club.userPrivilege.displayName}',
           style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 8),

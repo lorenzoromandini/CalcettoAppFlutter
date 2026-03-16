@@ -1,52 +1,52 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:crypto/crypto.dart';
 import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:calcetto_backend_server/src/generated/protocol.dart';
 
-/// Authentication endpoint - handles login and signup
+/// Authentication endpoint - handles login and signup with secure password hashing
 class AuthEndpoint extends Endpoint {
   /// Authenticates user with email and password
-  Future<AuthenticationResponse> login(
+  Future<Map<String, dynamic>> login(
     Session session,
     String email,
     String password,
   ) async {
-    var users = await UserInfo.db.find(
+    var users = await User.db.find(
       session,
       where: (t) => t.email.equals(email),
     );
 
     if (users.isEmpty) {
-      return AuthenticationResponse(
-        success: false,
-        error: 'Invalid email or password',
-      );
+      return {
+        'success': false,
+        'error': 'Invalid email or password',
+      };
     }
 
     var user = users.first;
-    var hashedPassword = _hashPassword(password, user.passwordSalt);
 
-    if (hashedPassword != user.passwordHash) {
-      return AuthenticationResponse(
-        success: false,
-        error: 'Invalid email or password',
-      );
+    // Verify hashed password
+    if (!_verifyPassword(password, user.password)) {
+      return {
+        'success': false,
+        'error': 'Invalid email or password',
+      };
     }
 
     user.lastLogin = DateTime.now();
-    await UserInfo.db.updateRow(session, user);
+    await User.db.updateRow(session, user);
 
     var token = _generateToken(user);
 
-    return AuthenticationResponse(
-      success: true,
-      token: token,
-      user: user,
-    );
+    return {
+      'success': true,
+      'token': token,
+      'user': user.toJson(),
+    };
   }
 
-  /// Register new user
-  Future<AuthenticationResponse> signup(
+  /// Register new user with hashed password
+  Future<Map<String, dynamic>> signup(
     Session session,
     String email,
     String password,
@@ -55,32 +55,31 @@ class AuthEndpoint extends Endpoint {
     String? nickname,
     String? imageUrl,
   ) async {
-    var existingUsers = await UserInfo.db.find(
+    var existingUsers = await User.db.find(
       session,
       where: (t) => t.email.equals(email),
     );
 
     if (existingUsers.isNotEmpty) {
-      return AuthenticationResponse(
-        success: false,
-        error: 'Email already registered',
-      );
+      return {
+        'success': false,
+        'error': 'Email already registered',
+      };
     }
 
     if (password.length < 6) {
-      return AuthenticationResponse(
-        success: false,
-        error: 'Password must be at least 6 characters',
-      );
+      return {
+        'success': false,
+        'error': 'Password must be at least 6 characters',
+      };
     }
 
-    var salt = _generateSalt();
-    var passwordHash = _hashPassword(password, salt);
+    // Hash the password before storing
+    final hashedPassword = _hashPassword(password);
 
-    var user = UserInfo(
+    var user = User(
       email: email,
-      passwordHash: passwordHash,
-      passwordSalt: salt,
+      password: hashedPassword,
       firstName: firstName,
       lastName: lastName,
       nickname: nickname,
@@ -89,34 +88,65 @@ class AuthEndpoint extends Endpoint {
       updatedAt: DateTime.now(),
     );
 
-    var createdUser = await UserInfo.db.insertRow(session, user);
+    var createdUser = await User.db.insertRow(session, user);
     var token = _generateToken(createdUser);
 
-    return AuthenticationResponse(
-      success: true,
-      token: token,
-      user: createdUser,
-    );
+    return {
+      'success': true,
+      'token': token,
+      'user': createdUser.toJson(),
+    };
   }
 
-  String _generateSalt() {
-    var random =
-        List.generate(16, (_) => DateTime.now().millisecondsSinceEpoch % 256);
-    return base64Url.encode(random);
+  /// Get current authenticated user
+  Future<User?> getCurrentUser(Session session) async {
+    final userIdStr = session.authenticationKey;
+    if (userIdStr == null) return null;
+
+    final userId = UuidValue.fromString(userIdStr);
+    return await User.db.findById(session, userId);
   }
 
-  String _hashPassword(String password, String salt) {
-    var bytes = utf8.encode(password + salt);
-    var digest = sha256.convert(bytes);
-    return digest.toString();
+  /// Hash password using SHA-256 with salt
+  String _hashPassword(String password) {
+    // Generate a random salt
+    final salt = DateTime.now().millisecondsSinceEpoch.toString();
+    // Combine password + salt and hash
+    final bytes = utf8.encode(password + salt);
+    final digest = sha256.convert(bytes);
+    // Store salt + hash together
+    return '$salt:${digest.toString()}';
   }
 
-  String _generateToken(UserInfo user) {
-    var payload = base64Url.encode(utf8.encode(jsonEncode({
-      'user_id': user.id,
+  /// Verify password against stored hash
+  bool _verifyPassword(String password, String storedHash) {
+    try {
+      // Split stored hash into salt and hash
+      final parts = storedHash.split(':');
+      if (parts.length != 2) return false;
+
+      final salt = parts[0];
+      final originalHash = parts[1];
+
+      // Hash provided password with same salt
+      final bytes = utf8.encode(password + salt);
+      final digest = sha256.convert(bytes);
+
+      // Compare hashes
+      return digest.toString() == originalHash;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  String _generateToken(User user) {
+    // Simple JWT-like token (in production, use proper JWT library)
+    final payload = jsonEncode({
+      'user_id': user.id?.toString(),
       'email': user.email,
-      'exp': DateTime.now().add(const Duration(days: 7)).millisecondsSinceEpoch,
-    })));
-    return payload;
+      'exp':
+          DateTime.now().add(Duration(days: 7)).millisecondsSinceEpoch ~/ 1000,
+    });
+    return base64UrlEncode(utf8.encode(payload));
   }
 }

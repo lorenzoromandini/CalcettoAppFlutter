@@ -1,0 +1,24 @@
+class: Match
+table: matches
+fields:
+  id: UuidValue?, defaultPersist=random_v7
+  clubId: UuidValue, relation(parent=clubs)
+  scheduledAt: DateTime
+  location: String?
+  mode: MatchMode
+  status: MatchStatus
+  homeScore: int
+  awayScore: int
+  notes: String?
+  createdBy: UuidValue?, relation(parent=users)
+  scoreFinalizedBy: UuidValue?, relation(parent=users)
+  ratingsCompletedBy: UuidValue?, relation(parent=users)
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+indexes:
+  matches_club_id_idx:
+    fields: clubId
+  matches_scheduled_at_idx:
+    fields: scheduledAt
+  matches_status_idx:
+    fields: status

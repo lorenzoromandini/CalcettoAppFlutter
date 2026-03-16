@@ -35,7 +35,10 @@ Phase 5: Live & Notifications    [░░░░░░░░░░] 0%
 
 **Achievements:**
 - ✅ Independent Serverpod backend created in `./calcetto_backend/`
-- ✅ PostgreSQL database with user_info table
+- ✅ PostgreSQL database with complete schema (users, clubs, club_members, club_invites, matches, match_participants, goals, player_ratings)
+- ✅ UUID v7 primary keys for all tables
+- ✅ All indexes and foreign key constraints configured
+- ✅ Database migration created and ready to apply
 - ✅ Auth endpoints: `/auth/login` and `/auth/signup` working
 - ✅ Flutter app connected to new backend (port 8080)
 - ✅ Multi-language support (it + en) with language switcher
@@ -123,7 +126,7 @@ None - Serverpod backend migration complete. Ready to continue with Phase 2 impl
 
 ### Last Action
 
-Phase 2 Plan 04 COMPLETE: Offline indicator with Material 3 banner, read-only mode enforcement, and home screen with active club context.
+Database Schema Restructuring COMPLETE: Complete new schema implemented with Serverpod spy.yaml files, all tables created (users, clubs, club_members, club_invites, matches, match_participants, goals, player_ratings), UUID v7 primary keys, proper indexes and foreign keys, migration generated.
 
 ### Next Actions
 
@@ -131,7 +134,8 @@ Phase 2 Plan 04 COMPLETE: Offline indicator with Material 3 banner, read-only mo
 2. ✅ Phase 2 Plan 02 - Club list screen with switching
 3. ✅ Phase 2 Plan 03 - Club detail UI with FIFA-style cards
 4. ✅ Phase 2 Plan 04 - Offline indicator and final integration
-5. ⏭️ Phase 3: Matches & RSVP - Ready to start
+5. ✅ Database Schema Restructuring - Complete new schema
+6. ⏭️ Create endpoints for clubs, matches, goals, ratings
 
 ### Working Notes
 
@@ -187,4 +191,4 @@ flutter build web --release
 ---
 
 *State file: Tracks current position and accumulated context*  
-*Updated: 2026-03-09 after Phase 1 Plan 05 completion (line 67 biometric bug fix)*
+*Updated: 2026-03-16 after Database Schema Restructuring*

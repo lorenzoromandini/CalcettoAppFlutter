@@ -2,6 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../domain/entities/club.dart';
+import '../../domain/entities/club_privilege.dart';
 
 part 'club_model.g.dart';
 
@@ -24,7 +25,7 @@ class ClubModel {
   final int memberCount;
 
   @HiveField(4)
-  final ClubRole userRole;
+  final ClubPrivilege userPrivilege;
 
   @HiveField(5)
   final String? description;
@@ -40,7 +41,7 @@ class ClubModel {
     required this.name,
     this.logoUrl,
     required this.memberCount,
-    required this.userRole,
+    required this.userPrivilege,
     this.description,
     required this.createdAt,
     this.cachedAt,
@@ -52,7 +53,7 @@ class ClubModel {
         name: entity.name,
         logoUrl: entity.logoUrl,
         memberCount: entity.memberCount,
-        userRole: entity.userRole,
+        userPrivilege: entity.userPrivilege,
         description: entity.description,
         createdAt: entity.createdAt,
       );
@@ -63,7 +64,7 @@ class ClubModel {
         name: name,
         logoUrl: logoUrl,
         memberCount: memberCount,
-        userRole: userRole,
+        userPrivilege: userPrivilege,
         description: description,
         createdAt: createdAt,
       );
@@ -71,15 +72,15 @@ class ClubModel {
   /// Creates a ClubModel from a JSON map.
   /// Handles API field name differences:
   /// - API sends 'imageUrl' but we use 'logoUrl'
-  /// - API sends 'id' as int but we need String
-  /// - API doesn't send 'userRole' - defaults to member
+  /// - API sends 'id' as UUID string
+  /// - API sends 'privilege' as int index
   factory ClubModel.fromJson(Map<String, dynamic> json) {
     return ClubModel(
-      id: json['id'].toString(), // Convert int/any to String
+      id: json['id'] as String, // UUID string
       name: json['name'] as String,
       logoUrl: json['imageUrl'] as String?, // API uses imageUrl
       memberCount: (json['memberCount'] as num?)?.toInt() ?? 1,
-      userRole: _parseUserRole(json['userRole']), // API might not send this
+      userPrivilege: _parsePrivilege(json['privilege']), // API sends privilege
       description: json['description'] as String?,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
@@ -87,21 +88,18 @@ class ClubModel {
     );
   }
 
-  /// Helper to parse userRole from API or default to member
-  static ClubRole _parseUserRole(dynamic value) {
-    if (value == null) return ClubRole.member;
-    if (value is String) {
-      switch (value.toLowerCase()) {
-        case 'owner':
-          return ClubRole.owner;
-        case 'manager':
-          return ClubRole.manager;
-        case 'member':
-        default:
-          return ClubRole.member;
-      }
+  /// Helper to parse privilege from API or default to MEMBER
+  /// Handles both String names and int indices from Serverpod
+  static ClubPrivilege _parsePrivilege(dynamic value) {
+    if (value == null) return ClubPrivilege.MEMBER;
+    if (value is int) {
+      // Serverpod sends enum as index: 0=OWNER, 1=MANAGER, 2=MEMBER
+      return ClubPrivilege.fromIndex(value);
     }
-    return ClubRole.member;
+    if (value is String) {
+      return ClubPrivilege.fromName(value);
+    }
+    return ClubPrivilege.MEMBER;
   }
 
   /// Converts this ClubModel to a JSON map.
@@ -110,7 +108,7 @@ class ClubModel {
         'name': name,
         'logoUrl': logoUrl,
         'memberCount': memberCount,
-        'userRole': userRole.name,
+        'privilege': userPrivilege.name,
         'description': description,
         'createdAt': createdAt.toIso8601String(),
         'cachedAt': cachedAt?.toIso8601String(),
@@ -123,7 +121,7 @@ class ClubModel {
         name: model.name,
         logoUrl: model.logoUrl,
         memberCount: model.memberCount,
-        userRole: model.userRole,
+        userPrivilege: model.userPrivilege,
         description: model.description,
         createdAt: model.createdAt,
         cachedAt: timestamp,

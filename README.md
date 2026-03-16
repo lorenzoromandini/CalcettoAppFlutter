@@ -232,11 +232,21 @@ The Flutter app connects to the Serverpod backend with this schema:
 - `User` - Authentication and profile (id, email, firstName, lastName, nickname, image)
 
 **Club Models:**
-- `Club` - Football club info
-- `ClubMember` - Membership with roles (OWNER/MANAGER/MEMBER)
-- `Match` - Scheduled matches
-- `Goal` - Match goals with scorer/assister
-- `PlayerRating` - 38-value rating system (4-10 with 0.5 increments)
+- `User` - User accounts (id, email, firstName, lastName, nickname, imageUrl, password)
+- `Club` - Football clubs (id, name, description, imageUrl, createdBy, createdAt, updatedAt, deletedAt)
+- `ClubMember` - Memberships with roles (id, clubId, userId, jerseyNumber, symbol, nationality, primaryRole, secondaryRoles, privilege, joinedAt, leftAt)
+- `ClubInvite` - Invite tokens (id, clubId, createdBy, token, expiresAt, createdAt)
+- `Match` - Scheduled matches (id, clubId, scheduledAt, location, mode, status, homeScore, awayScore, notes, createdBy, scoreFinalizedBy, ratingsCompletedBy, createdAt, updatedAt)
+- `MatchParticipant` - Players in matches (id, matchId, clubMemberId, teamSide, position)
+- `Goal` - Match goals (id, matchId, scorerId, assisterId, isOwnGoal, createdAt)
+- `PlayerRating` - Performance ratings (id, matchId, clubMemberId, rating, comment, createdAt, updatedAt)
+
+**Enums:**
+- `PlayerPosition` - GK, DEF, MID, ST
+- `ClubPrivilege` - OWNER, MANAGER, MEMBER
+- `MatchMode` - fiveVsFive, eightVsEight, elevenVsEleven
+- `MatchStatus` - scheduled, live, finished, completed, cancelled
+- `MatchTeamSide` - home, away
 
 ---
 
@@ -415,12 +425,14 @@ Open: **http://localhost:5050**
 Expand: `Servers` → `Calcetto DB` → `Schemas` → `public` → `Tables`
 
 **Key Tables:**
-- `club` - Football clubs
-- `user_info` - User accounts
-- `club_member` - Club memberships with roles
-- `matches` - Scheduled matches (Phase 3)
-- `goals` - Match goals (Phase 3)
-- `player_ratings` - Performance ratings (Phase 4)
+- `users` - User accounts
+- `clubs` - Football clubs
+- `club_members` - Club memberships with roles
+- `club_invites` - Invite tokens
+- `matches` - Scheduled matches
+- `match_participants` - Players in matches
+- `goals` - Match goals
+- `player_ratings` - Performance ratings
 
 ---
 
@@ -439,7 +451,7 @@ docker exec calcetto-postgres psql -U calcetto -d calcetto -c '\dt'
 docker exec calcetto-postgres psql -U calcetto -d calcetto -c "SELECT * FROM club;"
 
 # View all users  
-docker exec calcetto-postgres psql -U calcetto -d calcetto -c "SELECT * FROM user_info;"
+docker exec calcetto-postgres psql -U calcetto -d calcetto -c "SELECT * FROM users;"
 
 # Count members
 docker exec calcetto-postgres psql -U calcetto -d calcetto -c "SELECT COUNT(*) FROM club_member;"

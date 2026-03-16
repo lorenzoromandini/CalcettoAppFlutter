@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:calcetto_app/features/clubs/domain/entities/club.dart';
+import 'package:calcetto_app/features/clubs/domain/entities/club_privilege.dart';
 import '../../../clubs/presentation/widgets/role_icon.dart';
 
 /// Active club header widget showing current club context.
@@ -74,10 +75,10 @@ class ActiveClubHeader extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        RoleIcon(role: club.userRole, size: 14),
+                        RoleIcon(privilege: club.userPrivilege, size: 14),
                         const SizedBox(width: 6),
                         Text(
-                          _getRoleName(club.userRole),
+                          _getPrivilegeName(club.userPrivilege),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -99,13 +100,13 @@ class ActiveClubHeader extends StatelessWidget {
     );
   }
 
-  String _getRoleName(ClubRole role) {
-    switch (role) {
-      case ClubRole.owner:
+  String _getPrivilegeName(ClubPrivilege privilege) {
+    switch (privilege) {
+      case ClubPrivilege.OWNER:
         return 'Owner';
-      case ClubRole.manager:
+      case ClubPrivilege.MANAGER:
         return 'Manager';
-      case ClubRole.member:
+      case ClubPrivilege.MEMBER:
         return 'Member';
     }
   }

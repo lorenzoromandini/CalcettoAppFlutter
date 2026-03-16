@@ -1,10 +1,22 @@
 class: ClubMember
-table: club_member
-
+table: club_members
 fields:
-  id: int?
-  clubId: int
-  userId: String
-  privileges: int
-  joinedAt: DateTime
-  deletedAt: DateTime?
+  id: UuidValue?, defaultPersist=random_v7
+  clubId: UuidValue, relation(parent=clubs)
+  userId: UuidValue, relation(parent=users)
+  jerseyNumber: int?
+  symbol: String?
+  nationality: String?
+  primaryRole: PlayerPosition
+  secondaryRoles: List<PlayerPosition>
+  privilege: ClubPrivilege
+  joinedAt: DateTime, default=now
+  leftAt: DateTime?
+indexes:
+  club_members_club_id_idx:
+    fields: clubId
+  club_members_user_id_idx:
+    fields: userId
+  club_members_club_user_unique:
+    fields: clubId, userId
+    unique: true

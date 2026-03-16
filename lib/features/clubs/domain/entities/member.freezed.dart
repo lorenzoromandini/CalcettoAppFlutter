@@ -23,7 +23,7 @@ mixin _$Member {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String? get avatarUrl => throw _privateConstructorUsedError;
-  ClubRole get role => throw _privateConstructorUsedError;
+  ClubPrivilege get privilege => throw _privateConstructorUsedError;
   DateTime get joinedAt => throw _privateConstructorUsedError;
   MemberStats? get stats => throw _privateConstructorUsedError;
 
@@ -45,7 +45,7 @@ abstract class $MemberCopyWith<$Res> {
       {String id,
       String name,
       String? avatarUrl,
-      ClubRole role,
+      ClubPrivilege privilege,
       DateTime joinedAt,
       MemberStats? stats});
 
@@ -70,7 +70,7 @@ class _$MemberCopyWithImpl<$Res, $Val extends Member>
     Object? id = null,
     Object? name = null,
     Object? avatarUrl = freezed,
-    Object? role = null,
+    Object? privilege = null,
     Object? joinedAt = null,
     Object? stats = freezed,
   }) {
@@ -87,10 +87,10 @@ class _$MemberCopyWithImpl<$Res, $Val extends Member>
           ? _value.avatarUrl
           : avatarUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      role: null == role
-          ? _value.role
-          : role // ignore: cast_nullable_to_non_nullable
-              as ClubRole,
+      privilege: null == privilege
+          ? _value.privilege
+          : privilege // ignore: cast_nullable_to_non_nullable
+              as ClubPrivilege,
       joinedAt: null == joinedAt
           ? _value.joinedAt
           : joinedAt // ignore: cast_nullable_to_non_nullable
@@ -128,7 +128,7 @@ abstract class _$$MemberImplCopyWith<$Res> implements $MemberCopyWith<$Res> {
       {String id,
       String name,
       String? avatarUrl,
-      ClubRole role,
+      ClubPrivilege privilege,
       DateTime joinedAt,
       MemberStats? stats});
 
@@ -152,7 +152,7 @@ class __$$MemberImplCopyWithImpl<$Res>
     Object? id = null,
     Object? name = null,
     Object? avatarUrl = freezed,
-    Object? role = null,
+    Object? privilege = null,
     Object? joinedAt = null,
     Object? stats = freezed,
   }) {
@@ -169,10 +169,10 @@ class __$$MemberImplCopyWithImpl<$Res>
           ? _value.avatarUrl
           : avatarUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      role: null == role
-          ? _value.role
-          : role // ignore: cast_nullable_to_non_nullable
-              as ClubRole,
+      privilege: null == privilege
+          ? _value.privilege
+          : privilege // ignore: cast_nullable_to_non_nullable
+              as ClubPrivilege,
       joinedAt: null == joinedAt
           ? _value.joinedAt
           : joinedAt // ignore: cast_nullable_to_non_nullable
@@ -192,7 +192,7 @@ class _$MemberImpl implements _Member {
       {required this.id,
       required this.name,
       this.avatarUrl,
-      required this.role,
+      required this.privilege,
       required this.joinedAt,
       this.stats});
 
@@ -206,7 +206,7 @@ class _$MemberImpl implements _Member {
   @override
   final String? avatarUrl;
   @override
-  final ClubRole role;
+  final ClubPrivilege privilege;
   @override
   final DateTime joinedAt;
   @override
@@ -214,7 +214,7 @@ class _$MemberImpl implements _Member {
 
   @override
   String toString() {
-    return 'Member(id: $id, name: $name, avatarUrl: $avatarUrl, role: $role, joinedAt: $joinedAt, stats: $stats)';
+    return 'Member(id: $id, name: $name, avatarUrl: $avatarUrl, privilege: $privilege, joinedAt: $joinedAt, stats: $stats)';
   }
 
   @override
@@ -226,7 +226,8 @@ class _$MemberImpl implements _Member {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.avatarUrl, avatarUrl) ||
                 other.avatarUrl == avatarUrl) &&
-            (identical(other.role, role) || other.role == role) &&
+            (identical(other.privilege, privilege) ||
+                other.privilege == privilege) &&
             (identical(other.joinedAt, joinedAt) ||
                 other.joinedAt == joinedAt) &&
             (identical(other.stats, stats) || other.stats == stats));
@@ -235,7 +236,7 @@ class _$MemberImpl implements _Member {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, id, name, avatarUrl, role, joinedAt, stats);
+      Object.hash(runtimeType, id, name, avatarUrl, privilege, joinedAt, stats);
 
   /// Create a copy of Member
   /// with the given fields replaced by the non-null parameter values.
@@ -258,7 +259,7 @@ abstract class _Member implements Member {
       {required final String id,
       required final String name,
       final String? avatarUrl,
-      required final ClubRole role,
+      required final ClubPrivilege privilege,
       required final DateTime joinedAt,
       final MemberStats? stats}) = _$MemberImpl;
 
@@ -271,7 +272,7 @@ abstract class _Member implements Member {
   @override
   String? get avatarUrl;
   @override
-  ClubRole get role;
+  ClubPrivilege get privilege;
   @override
   DateTime get joinedAt;
   @override

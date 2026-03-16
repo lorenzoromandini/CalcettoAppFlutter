@@ -24,7 +24,7 @@ mixin _$Club {
   String get name => throw _privateConstructorUsedError;
   String? get logoUrl => throw _privateConstructorUsedError;
   int get memberCount => throw _privateConstructorUsedError;
-  ClubRole get userRole => throw _privateConstructorUsedError;
+  ClubPrivilege get userPrivilege => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
 
@@ -47,7 +47,7 @@ abstract class $ClubCopyWith<$Res> {
       String name,
       String? logoUrl,
       int memberCount,
-      ClubRole userRole,
+      ClubPrivilege userPrivilege,
       String? description,
       DateTime createdAt});
 }
@@ -71,7 +71,7 @@ class _$ClubCopyWithImpl<$Res, $Val extends Club>
     Object? name = null,
     Object? logoUrl = freezed,
     Object? memberCount = null,
-    Object? userRole = null,
+    Object? userPrivilege = null,
     Object? description = freezed,
     Object? createdAt = null,
   }) {
@@ -92,10 +92,10 @@ class _$ClubCopyWithImpl<$Res, $Val extends Club>
           ? _value.memberCount
           : memberCount // ignore: cast_nullable_to_non_nullable
               as int,
-      userRole: null == userRole
-          ? _value.userRole
-          : userRole // ignore: cast_nullable_to_non_nullable
-              as ClubRole,
+      userPrivilege: null == userPrivilege
+          ? _value.userPrivilege
+          : userPrivilege // ignore: cast_nullable_to_non_nullable
+              as ClubPrivilege,
       description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
@@ -120,7 +120,7 @@ abstract class _$$ClubImplCopyWith<$Res> implements $ClubCopyWith<$Res> {
       String name,
       String? logoUrl,
       int memberCount,
-      ClubRole userRole,
+      ClubPrivilege userPrivilege,
       String? description,
       DateTime createdAt});
 }
@@ -141,7 +141,7 @@ class __$$ClubImplCopyWithImpl<$Res>
     Object? name = null,
     Object? logoUrl = freezed,
     Object? memberCount = null,
-    Object? userRole = null,
+    Object? userPrivilege = null,
     Object? description = freezed,
     Object? createdAt = null,
   }) {
@@ -162,10 +162,10 @@ class __$$ClubImplCopyWithImpl<$Res>
           ? _value.memberCount
           : memberCount // ignore: cast_nullable_to_non_nullable
               as int,
-      userRole: null == userRole
-          ? _value.userRole
-          : userRole // ignore: cast_nullable_to_non_nullable
-              as ClubRole,
+      userPrivilege: null == userPrivilege
+          ? _value.userPrivilege
+          : userPrivilege // ignore: cast_nullable_to_non_nullable
+              as ClubPrivilege,
       description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
@@ -186,7 +186,7 @@ class _$ClubImpl implements _Club {
       required this.name,
       this.logoUrl,
       required this.memberCount,
-      required this.userRole,
+      required this.userPrivilege,
       this.description,
       required this.createdAt});
 
@@ -202,7 +202,7 @@ class _$ClubImpl implements _Club {
   @override
   final int memberCount;
   @override
-  final ClubRole userRole;
+  final ClubPrivilege userPrivilege;
   @override
   final String? description;
   @override
@@ -210,7 +210,7 @@ class _$ClubImpl implements _Club {
 
   @override
   String toString() {
-    return 'Club(id: $id, name: $name, logoUrl: $logoUrl, memberCount: $memberCount, userRole: $userRole, description: $description, createdAt: $createdAt)';
+    return 'Club(id: $id, name: $name, logoUrl: $logoUrl, memberCount: $memberCount, userPrivilege: $userPrivilege, description: $description, createdAt: $createdAt)';
   }
 
   @override
@@ -223,8 +223,8 @@ class _$ClubImpl implements _Club {
             (identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl) &&
             (identical(other.memberCount, memberCount) ||
                 other.memberCount == memberCount) &&
-            (identical(other.userRole, userRole) ||
-                other.userRole == userRole) &&
+            (identical(other.userPrivilege, userPrivilege) ||
+                other.userPrivilege == userPrivilege) &&
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.createdAt, createdAt) ||
@@ -234,7 +234,7 @@ class _$ClubImpl implements _Club {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, name, logoUrl, memberCount,
-      userRole, description, createdAt);
+      userPrivilege, description, createdAt);
 
   /// Create a copy of Club
   /// with the given fields replaced by the non-null parameter values.
@@ -258,7 +258,7 @@ abstract class _Club implements Club {
       required final String name,
       final String? logoUrl,
       required final int memberCount,
-      required final ClubRole userRole,
+      required final ClubPrivilege userPrivilege,
       final String? description,
       required final DateTime createdAt}) = _$ClubImpl;
 
@@ -273,7 +273,7 @@ abstract class _Club implements Club {
   @override
   int get memberCount;
   @override
-  ClubRole get userRole;
+  ClubPrivilege get userPrivilege;
   @override
   String? get description;
   @override

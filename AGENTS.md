@@ -60,12 +60,12 @@ lib/
 
 These are enforced at both database and application level:
 
-- Exactly one formation per side per match (`Formation` unique on `matchId + isHome`).
 - One rating per player per match (`PlayerRating` unique on `matchId + clubMemberId`).
-- Goal order must be unique per match.
-- Jersey number unique per club (`ClubMember` unique on `clubId + jerseyNumber`).
+- One participant entry per player per match (`MatchParticipant` unique on `matchId + clubMemberId`).
 - Club membership unique (`ClubMember` unique on `clubId + userId`).
-- Player ratings use `Decimal(3,2)` precision.
+- Jersey number unique per club (`ClubMember` unique on `clubId + jerseyNumber`).
+- Invite token unique (`ClubInvite` unique on `token`).
+- Player ratings use `double` precision (1.0-10.0 range).
 - Password minimum 6 characters (validated in Flutter + backend).
 
 ---
@@ -83,9 +83,18 @@ These are enforced at both database and application level:
 calcetto_backend/
 └── calcetto_backend_server/
     ├── lib/src/
-    │   ├── auth_endpoint.dart       # Login/signup logic
-    │   ├── user.spy.yaml            # User database model
-    │   └── generated/               # Auto-generated (NEVER EDIT)
+    │   ├── *.spy.yaml               # Schema definition files (authoritative)
+    │   │   ├── user.spy.yaml        # User model
+    │   │   ├── club.spy.yaml        # Club model
+    │   │   ├── club_member.spy.yaml # Club membership
+    │   │   ├── club_invite.spy.yaml # Club invites
+    │   │   ├── match.spy.yaml       # Match model
+    │   │   ├── match_participant.spy.yaml # Match participants
+    │   │   ├── goal.spy.yaml        # Goals
+    │   │   ├── player_rating.spy.yaml     # Player ratings
+    │   │   └── *_enum.spy.yaml     # Enums (PlayerPosition, ClubPrivilege, etc.)
+    │   ├── generated/               # Auto-generated (NEVER EDIT)
+    │   └── endpoints/               # API endpoints (to be created)
     ├── migrations/                  # Database migrations
     └── config/                      # Database configuration
 ```
@@ -246,11 +255,11 @@ There is one and only one OWNER per club.
 ```dart
 // Check permissions in UI
 final member = ref.watch(currentClubMemberProvider);
-final canEditClub = member?.privileges == ClubPrivilege.owner;
+final canEditClub = member?.privilege == ClubPrivilege.OWNER;
 final canManageMatches = [
-  ClubPrivilege.owner,
-  ClubPrivilege.manager,
-].contains(member?.privileges);
+  ClubPrivilege.OWNER,
+  ClubPrivilege.MANAGER,
+].contains(member?.privilege);
 
 // Show/hide actions based on privileges
 if (canManageMatches) {
@@ -258,7 +267,7 @@ if (canManageMatches) {
   yield MatchAction.finalizeScore;
 }
 
-if (member?.privileges == ClubPrivilege.owner) {
+if (member?.privilege == ClubPrivilege.OWNER) {
   yield ClubAction.deleteClub;
   yield ClubAction.ejectMember;
 }
@@ -276,7 +285,7 @@ Future<MatchResponse> createMatch(Session session, String clubId, ...) async {
     where: (t) => t.clubId.equals(clubId) & t.userId.equals(session.authenticatedUserId),
   );
   
-  if (member == null || member.privileges == ClubPrivilege.member) {
+  if (member == null || member.privilege == ClubPrivilege.MEMBER) {
     throw ApiException('Permessi insufficienti');
   }
   
@@ -707,7 +716,7 @@ cd calcetto_backend/calcetto_backend_server
 
 ---
 
-**Last Updated:** March 10, 2026  
+**Last Updated:** March 16, 2026  
 **Framework:** Flutter 3.19 + Riverpod 2.5 + Serverpod 2.9.2  
-**Database:** PostgreSQL 16  
+**Database:** PostgreSQL 16 with UUID v7  
 **Language:** Dart 3.6+

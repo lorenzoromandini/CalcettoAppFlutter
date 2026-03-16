@@ -1,0 +1,6 @@
+enum: PlayerPosition
+values:
+  - GK
+  - DEF
+  - MID
+  - ST

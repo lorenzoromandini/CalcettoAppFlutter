@@ -1,0 +1,16 @@
+class: Goal
+table: goals
+fields:
+  id: UuidValue?, defaultPersist=random_v7
+  matchId: UuidValue, relation(parent=matches)
+  scorerId: UuidValue, relation(parent=club_members)
+  assisterId: UuidValue?, relation(parent=club_members)
+  isOwnGoal: bool
+  createdAt: DateTime, default=now
+indexes:
+  goals_match_id_idx:
+    fields: matchId
+  goals_scorer_id_idx:
+    fields: scorerId
+  goals_assister_id_idx:
+    fields: assisterId

@@ -32,20 +32,15 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Result<User>> login(String email, String password) async {
     try {
-      print('AUTH REPO: Starting login for $email');
-
       // Call API
       final responseData =
           await _apiClient.login(email: email, password: password);
-      print('AUTH REPO: API response received');
 
       // Create user object from API response
       // Next.js returns: {success: bool, token: String, user: Map}
       final userData = Map<String, dynamic>.from(
           responseData['user'] as Map<String, dynamic>);
       final token = responseData['token'] as String?;
-      print(
-          'AUTH REPO: Token from API: ${token != null ? "present (length ${token.length})" : "NULL"}');
 
       // Create UserModel
       final user = UserModel(
@@ -59,16 +54,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       // Store token if present
       if (token != null) {
-        print('AUTH REPO: Saving token to storage...');
         await _authStorageService.saveToken(token);
-        print('AUTH REPO: Token saved');
-
-        // Verify token was saved
-        final verifyToken = await _authStorageService.getToken();
-        print(
-            'AUTH REPO: Token verification: ${verifyToken != null ? "found" : "NOT FOUND"}');
-      } else {
-        print('AUTH REPO: WARNING - No token in response, skipping save');
       }
 
       // Cache user data
@@ -76,7 +62,6 @@ class AuthRepositoryImpl implements AuthRepository {
 
       // Store credentials for biometric authentication
       await _authStorageService.storeCredentials(email, password);
-      print('AUTH REPO: Credentials stored for biometric');
 
       // Return domain entity
       return Success(user.toEntity());

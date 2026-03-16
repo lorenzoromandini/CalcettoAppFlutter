@@ -92,9 +92,7 @@ class ApiClient {
       // Extract and store token
       if (data.containsKey('token')) {
         final token = data['token'] as String;
-        print('API CLIENT: Saving token, length: ${token.length}');
         await _storage.writeJwtToken(token);
-        print('API CLIENT: Token saved');
       }
 
       return data;

@@ -11,48 +11,46 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
-abstract class UserInfo
-    implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
-  UserInfo._({
+abstract class User
+    implements _i1.TableRow<_i1.UuidValue?>, _i1.ProtocolSerialization {
+  User._({
     this.id,
     required this.email,
     required this.firstName,
     required this.lastName,
     this.nickname,
     this.imageUrl,
-    required this.passwordHash,
-    required this.passwordSalt,
-    required this.createdAt,
-    required this.updatedAt,
+    required this.password,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     this.lastLogin,
-    this.deletedAt,
-  });
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
 
-  factory UserInfo({
-    int? id,
+  factory User({
+    _i1.UuidValue? id,
     required String email,
     required String firstName,
     required String lastName,
     String? nickname,
     String? imageUrl,
-    required String passwordHash,
-    required String passwordSalt,
-    required DateTime createdAt,
-    required DateTime updatedAt,
+    required String password,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     DateTime? lastLogin,
-    DateTime? deletedAt,
-  }) = _UserInfoImpl;
+  }) = _UserImpl;
 
-  factory UserInfo.fromJson(Map<String, dynamic> jsonSerialization) {
-    return UserInfo(
-      id: jsonSerialization['id'] as int?,
+  factory User.fromJson(Map<String, dynamic> jsonSerialization) {
+    return User(
+      id: jsonSerialization['id'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
       email: jsonSerialization['email'] as String,
       firstName: jsonSerialization['firstName'] as String,
       lastName: jsonSerialization['lastName'] as String,
       nickname: jsonSerialization['nickname'] as String?,
       imageUrl: jsonSerialization['imageUrl'] as String?,
-      passwordHash: jsonSerialization['passwordHash'] as String,
-      passwordSalt: jsonSerialization['passwordSalt'] as String,
+      password: jsonSerialization['password'] as String,
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       updatedAt:
@@ -60,18 +58,15 @@ abstract class UserInfo
       lastLogin: jsonSerialization['lastLogin'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['lastLogin']),
-      deletedAt: jsonSerialization['deletedAt'] == null
-          ? null
-          : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['deletedAt']),
     );
   }
 
-  static final t = UserInfoTable();
+  static final t = UserTable();
 
-  static const db = UserInfoRepository._();
+  static const db = UserRepository._();
 
   @override
-  int? id;
+  _i1.UuidValue? id;
 
   String email;
 
@@ -83,9 +78,7 @@ abstract class UserInfo
 
   String? imageUrl;
 
-  String passwordHash;
-
-  String passwordSalt;
+  String password;
 
   DateTime createdAt;
 
@@ -93,84 +86,76 @@ abstract class UserInfo
 
   DateTime? lastLogin;
 
-  DateTime? deletedAt;
-
   @override
-  _i1.Table<int?> get table => t;
+  _i1.Table<_i1.UuidValue?> get table => t;
 
-  /// Returns a shallow copy of this [UserInfo]
+  /// Returns a shallow copy of this [User]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  UserInfo copyWith({
-    int? id,
+  User copyWith({
+    _i1.UuidValue? id,
     String? email,
     String? firstName,
     String? lastName,
     String? nickname,
     String? imageUrl,
-    String? passwordHash,
-    String? passwordSalt,
+    String? password,
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? lastLogin,
-    DateTime? deletedAt,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
+      if (id != null) 'id': id?.toJson(),
       'email': email,
       'firstName': firstName,
       'lastName': lastName,
       if (nickname != null) 'nickname': nickname,
       if (imageUrl != null) 'imageUrl': imageUrl,
-      'passwordHash': passwordHash,
-      'passwordSalt': passwordSalt,
+      'password': password,
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
       if (lastLogin != null) 'lastLogin': lastLogin?.toJson(),
-      if (deletedAt != null) 'deletedAt': deletedAt?.toJson(),
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      if (id != null) 'id': id,
+      if (id != null) 'id': id?.toJson(),
       'email': email,
       'firstName': firstName,
       'lastName': lastName,
       if (nickname != null) 'nickname': nickname,
       if (imageUrl != null) 'imageUrl': imageUrl,
-      'passwordHash': passwordHash,
-      'passwordSalt': passwordSalt,
+      'password': password,
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
       if (lastLogin != null) 'lastLogin': lastLogin?.toJson(),
-      if (deletedAt != null) 'deletedAt': deletedAt?.toJson(),
     };
   }
 
-  static UserInfoInclude include() {
-    return UserInfoInclude._();
+  static UserInclude include() {
+    return UserInclude._();
   }
 
-  static UserInfoIncludeList includeList({
-    _i1.WhereExpressionBuilder<UserInfoTable>? where,
+  static UserIncludeList includeList({
+    _i1.WhereExpressionBuilder<UserTable>? where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<UserInfoTable>? orderBy,
+    _i1.OrderByBuilder<UserTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<UserInfoTable>? orderByList,
-    UserInfoInclude? include,
+    _i1.OrderByListBuilder<UserTable>? orderByList,
+    UserInclude? include,
   }) {
-    return UserInfoIncludeList._(
+    return UserIncludeList._(
       where: where,
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(UserInfo.t),
+      orderBy: orderBy?.call(User.t),
       orderDescending: orderDescending,
-      orderByList: orderByList?.call(UserInfo.t),
+      orderByList: orderByList?.call(User.t),
       include: include,
     );
   }
@@ -183,20 +168,18 @@ abstract class UserInfo
 
 class _Undefined {}
 
-class _UserInfoImpl extends UserInfo {
-  _UserInfoImpl({
-    int? id,
+class _UserImpl extends User {
+  _UserImpl({
+    _i1.UuidValue? id,
     required String email,
     required String firstName,
     required String lastName,
     String? nickname,
     String? imageUrl,
-    required String passwordHash,
-    required String passwordSalt,
-    required DateTime createdAt,
-    required DateTime updatedAt,
+    required String password,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     DateTime? lastLogin,
-    DateTime? deletedAt,
   }) : super._(
           id: id,
           email: email,
@@ -204,51 +187,45 @@ class _UserInfoImpl extends UserInfo {
           lastName: lastName,
           nickname: nickname,
           imageUrl: imageUrl,
-          passwordHash: passwordHash,
-          passwordSalt: passwordSalt,
+          password: password,
           createdAt: createdAt,
           updatedAt: updatedAt,
           lastLogin: lastLogin,
-          deletedAt: deletedAt,
         );
 
-  /// Returns a shallow copy of this [UserInfo]
+  /// Returns a shallow copy of this [User]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  UserInfo copyWith({
+  User copyWith({
     Object? id = _Undefined,
     String? email,
     String? firstName,
     String? lastName,
     Object? nickname = _Undefined,
     Object? imageUrl = _Undefined,
-    String? passwordHash,
-    String? passwordSalt,
+    String? password,
     DateTime? createdAt,
     DateTime? updatedAt,
     Object? lastLogin = _Undefined,
-    Object? deletedAt = _Undefined,
   }) {
-    return UserInfo(
-      id: id is int? ? id : this.id,
+    return User(
+      id: id is _i1.UuidValue? ? id : this.id,
       email: email ?? this.email,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       nickname: nickname is String? ? nickname : this.nickname,
       imageUrl: imageUrl is String? ? imageUrl : this.imageUrl,
-      passwordHash: passwordHash ?? this.passwordHash,
-      passwordSalt: passwordSalt ?? this.passwordSalt,
+      password: password ?? this.password,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       lastLogin: lastLogin is DateTime? ? lastLogin : this.lastLogin,
-      deletedAt: deletedAt is DateTime? ? deletedAt : this.deletedAt,
     );
   }
 }
 
-class UserInfoTable extends _i1.Table<int?> {
-  UserInfoTable({super.tableRelation}) : super(tableName: 'user_info') {
+class UserTable extends _i1.Table<_i1.UuidValue?> {
+  UserTable({super.tableRelation}) : super(tableName: 'users') {
     email = _i1.ColumnString(
       'email',
       this,
@@ -269,28 +246,22 @@ class UserInfoTable extends _i1.Table<int?> {
       'imageUrl',
       this,
     );
-    passwordHash = _i1.ColumnString(
-      'passwordHash',
-      this,
-    );
-    passwordSalt = _i1.ColumnString(
-      'passwordSalt',
+    password = _i1.ColumnString(
+      'password',
       this,
     );
     createdAt = _i1.ColumnDateTime(
       'createdAt',
       this,
+      hasDefault: true,
     );
     updatedAt = _i1.ColumnDateTime(
       'updatedAt',
       this,
+      hasDefault: true,
     );
     lastLogin = _i1.ColumnDateTime(
       'lastLogin',
-      this,
-    );
-    deletedAt = _i1.ColumnDateTime(
-      'deletedAt',
       this,
     );
   }
@@ -305,17 +276,13 @@ class UserInfoTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString imageUrl;
 
-  late final _i1.ColumnString passwordHash;
-
-  late final _i1.ColumnString passwordSalt;
+  late final _i1.ColumnString password;
 
   late final _i1.ColumnDateTime createdAt;
 
   late final _i1.ColumnDateTime updatedAt;
 
   late final _i1.ColumnDateTime lastLogin;
-
-  late final _i1.ColumnDateTime deletedAt;
 
   @override
   List<_i1.Column> get columns => [
@@ -325,28 +292,26 @@ class UserInfoTable extends _i1.Table<int?> {
         lastName,
         nickname,
         imageUrl,
-        passwordHash,
-        passwordSalt,
+        password,
         createdAt,
         updatedAt,
         lastLogin,
-        deletedAt,
       ];
 }
 
-class UserInfoInclude extends _i1.IncludeObject {
-  UserInfoInclude._();
+class UserInclude extends _i1.IncludeObject {
+  UserInclude._();
 
   @override
   Map<String, _i1.Include?> get includes => {};
 
   @override
-  _i1.Table<int?> get table => UserInfo.t;
+  _i1.Table<_i1.UuidValue?> get table => User.t;
 }
 
-class UserInfoIncludeList extends _i1.IncludeList {
-  UserInfoIncludeList._({
-    _i1.WhereExpressionBuilder<UserInfoTable>? where,
+class UserIncludeList extends _i1.IncludeList {
+  UserIncludeList._({
+    _i1.WhereExpressionBuilder<UserTable>? where,
     super.limit,
     super.offset,
     super.orderBy,
@@ -354,20 +319,20 @@ class UserInfoIncludeList extends _i1.IncludeList {
     super.orderByList,
     super.include,
   }) {
-    super.where = where?.call(UserInfo.t);
+    super.where = where?.call(User.t);
   }
 
   @override
   Map<String, _i1.Include?> get includes => include?.includes ?? {};
 
   @override
-  _i1.Table<int?> get table => UserInfo.t;
+  _i1.Table<_i1.UuidValue?> get table => User.t;
 }
 
-class UserInfoRepository {
-  const UserInfoRepository._();
+class UserRepository {
+  const UserRepository._();
 
-  /// Returns a list of [UserInfo]s matching the given query parameters.
+  /// Returns a list of [User]s matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -389,20 +354,20 @@ class UserInfoRepository {
   ///   limit: 100,
   /// );
   /// ```
-  Future<List<UserInfo>> find(
+  Future<List<User>> find(
     _i1.Session session, {
-    _i1.WhereExpressionBuilder<UserInfoTable>? where,
+    _i1.WhereExpressionBuilder<UserTable>? where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<UserInfoTable>? orderBy,
+    _i1.OrderByBuilder<UserTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<UserInfoTable>? orderByList,
+    _i1.OrderByListBuilder<UserTable>? orderByList,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.find<UserInfo>(
-      where: where?.call(UserInfo.t),
-      orderBy: orderBy?.call(UserInfo.t),
-      orderByList: orderByList?.call(UserInfo.t),
+    return session.db.find<User>(
+      where: where?.call(User.t),
+      orderBy: orderBy?.call(User.t),
+      orderByList: orderByList?.call(User.t),
       orderDescending: orderDescending,
       limit: limit,
       offset: offset,
@@ -410,7 +375,7 @@ class UserInfoRepository {
     );
   }
 
-  /// Returns the first matching [UserInfo] matching the given query parameters.
+  /// Returns the first matching [User] matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -427,136 +392,136 @@ class UserInfoRepository {
   ///   orderBy: (t) => t.age,
   /// );
   /// ```
-  Future<UserInfo?> findFirstRow(
+  Future<User?> findFirstRow(
     _i1.Session session, {
-    _i1.WhereExpressionBuilder<UserInfoTable>? where,
+    _i1.WhereExpressionBuilder<UserTable>? where,
     int? offset,
-    _i1.OrderByBuilder<UserInfoTable>? orderBy,
+    _i1.OrderByBuilder<UserTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<UserInfoTable>? orderByList,
+    _i1.OrderByListBuilder<UserTable>? orderByList,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.findFirstRow<UserInfo>(
-      where: where?.call(UserInfo.t),
-      orderBy: orderBy?.call(UserInfo.t),
-      orderByList: orderByList?.call(UserInfo.t),
+    return session.db.findFirstRow<User>(
+      where: where?.call(User.t),
+      orderBy: orderBy?.call(User.t),
+      orderByList: orderByList?.call(User.t),
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
     );
   }
 
-  /// Finds a single [UserInfo] by its [id] or null if no such row exists.
-  Future<UserInfo?> findById(
+  /// Finds a single [User] by its [id] or null if no such row exists.
+  Future<User?> findById(
     _i1.Session session,
-    int id, {
+    _i1.UuidValue id, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.findById<UserInfo>(
+    return session.db.findById<User>(
       id,
       transaction: transaction,
     );
   }
 
-  /// Inserts all [UserInfo]s in the list and returns the inserted rows.
+  /// Inserts all [User]s in the list and returns the inserted rows.
   ///
-  /// The returned [UserInfo]s will have their `id` fields set.
+  /// The returned [User]s will have their `id` fields set.
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
-  Future<List<UserInfo>> insert(
+  Future<List<User>> insert(
     _i1.Session session,
-    List<UserInfo> rows, {
+    List<User> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insert<UserInfo>(
+    return session.db.insert<User>(
       rows,
       transaction: transaction,
     );
   }
 
-  /// Inserts a single [UserInfo] and returns the inserted row.
+  /// Inserts a single [User] and returns the inserted row.
   ///
-  /// The returned [UserInfo] will have its `id` field set.
-  Future<UserInfo> insertRow(
+  /// The returned [User] will have its `id` field set.
+  Future<User> insertRow(
     _i1.Session session,
-    UserInfo row, {
+    User row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insertRow<UserInfo>(
+    return session.db.insertRow<User>(
       row,
       transaction: transaction,
     );
   }
 
-  /// Updates all [UserInfo]s in the list and returns the updated rows. If
+  /// Updates all [User]s in the list and returns the updated rows. If
   /// [columns] is provided, only those columns will be updated. Defaults to
   /// all columns.
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
-  Future<List<UserInfo>> update(
+  Future<List<User>> update(
     _i1.Session session,
-    List<UserInfo> rows, {
-    _i1.ColumnSelections<UserInfoTable>? columns,
+    List<User> rows, {
+    _i1.ColumnSelections<UserTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.update<UserInfo>(
+    return session.db.update<User>(
       rows,
-      columns: columns?.call(UserInfo.t),
+      columns: columns?.call(User.t),
       transaction: transaction,
     );
   }
 
-  /// Updates a single [UserInfo]. The row needs to have its id set.
+  /// Updates a single [User]. The row needs to have its id set.
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
-  Future<UserInfo> updateRow(
+  Future<User> updateRow(
     _i1.Session session,
-    UserInfo row, {
-    _i1.ColumnSelections<UserInfoTable>? columns,
+    User row, {
+    _i1.ColumnSelections<UserTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.updateRow<UserInfo>(
+    return session.db.updateRow<User>(
       row,
-      columns: columns?.call(UserInfo.t),
+      columns: columns?.call(User.t),
       transaction: transaction,
     );
   }
 
-  /// Deletes all [UserInfo]s in the list and returns the deleted rows.
+  /// Deletes all [User]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
-  Future<List<UserInfo>> delete(
+  Future<List<User>> delete(
     _i1.Session session,
-    List<UserInfo> rows, {
+    List<User> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.delete<UserInfo>(
+    return session.db.delete<User>(
       rows,
       transaction: transaction,
     );
   }
 
-  /// Deletes a single [UserInfo].
-  Future<UserInfo> deleteRow(
+  /// Deletes a single [User].
+  Future<User> deleteRow(
     _i1.Session session,
-    UserInfo row, {
+    User row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<UserInfo>(
+    return session.db.deleteRow<User>(
       row,
       transaction: transaction,
     );
   }
 
   /// Deletes all rows matching the [where] expression.
-  Future<List<UserInfo>> deleteWhere(
+  Future<List<User>> deleteWhere(
     _i1.Session session, {
-    required _i1.WhereExpressionBuilder<UserInfoTable> where,
+    required _i1.WhereExpressionBuilder<UserTable> where,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteWhere<UserInfo>(
-      where: where(UserInfo.t),
+    return session.db.deleteWhere<User>(
+      where: where(User.t),
       transaction: transaction,
     );
   }
@@ -565,12 +530,12 @@ class UserInfoRepository {
   /// will return the count of all rows in the table.
   Future<int> count(
     _i1.Session session, {
-    _i1.WhereExpressionBuilder<UserInfoTable>? where,
+    _i1.WhereExpressionBuilder<UserTable>? where,
     int? limit,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.count<UserInfo>(
-      where: where?.call(UserInfo.t),
+    return session.db.count<User>(
+      where: where?.call(User.t),
       limit: limit,
       transaction: transaction,
     );

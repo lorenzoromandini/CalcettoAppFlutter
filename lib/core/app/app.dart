@@ -16,9 +16,6 @@ class CalcettoApp extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     final authState = ref.watch(authSessionProvider);
 
-    debugPrint(
-        'APP: authState = isLoading:${authState.isLoading} isAuthenticated:${authState.isAuthenticated} user:${authState.user?.email}');
-
     if (authState.isLoading) {
       return MaterialApp(
         title: 'Calcetto',

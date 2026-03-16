@@ -11,39 +11,48 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
-abstract class Club implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
+abstract class Club
+    implements _i1.TableRow<_i1.UuidValue?>, _i1.ProtocolSerialization {
   Club._({
     this.id,
     required this.name,
-    required this.description,
-    required this.imageUrl,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.deletedAt,
-  });
+    this.description,
+    this.imageUrl,
+    required this.createdBy,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    this.deletedAt,
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
 
   factory Club({
-    int? id,
+    _i1.UuidValue? id,
     required String name,
-    required String description,
-    required String imageUrl,
-    required DateTime createdAt,
-    required DateTime updatedAt,
-    required DateTime deletedAt,
+    String? description,
+    String? imageUrl,
+    required _i1.UuidValue createdBy,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? deletedAt,
   }) = _ClubImpl;
 
   factory Club.fromJson(Map<String, dynamic> jsonSerialization) {
     return Club(
-      id: jsonSerialization['id'] as int?,
+      id: jsonSerialization['id'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
       name: jsonSerialization['name'] as String,
-      description: jsonSerialization['description'] as String,
-      imageUrl: jsonSerialization['imageUrl'] as String,
+      description: jsonSerialization['description'] as String?,
+      imageUrl: jsonSerialization['imageUrl'] as String?,
+      createdBy:
+          _i1.UuidValueJsonExtension.fromJson(jsonSerialization['createdBy']),
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       updatedAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['updatedAt']),
-      deletedAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['deletedAt']),
+      deletedAt: jsonSerialization['deletedAt'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['deletedAt']),
     );
   }
 
@@ -52,31 +61,34 @@ abstract class Club implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   static const db = ClubRepository._();
 
   @override
-  int? id;
+  _i1.UuidValue? id;
 
   String name;
 
-  String description;
+  String? description;
 
-  String imageUrl;
+  String? imageUrl;
+
+  _i1.UuidValue createdBy;
 
   DateTime createdAt;
 
   DateTime updatedAt;
 
-  DateTime deletedAt;
+  DateTime? deletedAt;
 
   @override
-  _i1.Table<int?> get table => t;
+  _i1.Table<_i1.UuidValue?> get table => t;
 
   /// Returns a shallow copy of this [Club]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   Club copyWith({
-    int? id,
+    _i1.UuidValue? id,
     String? name,
     String? description,
     String? imageUrl,
+    _i1.UuidValue? createdBy,
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? deletedAt,
@@ -84,26 +96,28 @@ abstract class Club implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   @override
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
+      if (id != null) 'id': id?.toJson(),
       'name': name,
-      'description': description,
-      'imageUrl': imageUrl,
+      if (description != null) 'description': description,
+      if (imageUrl != null) 'imageUrl': imageUrl,
+      'createdBy': createdBy.toJson(),
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
-      'deletedAt': deletedAt.toJson(),
+      if (deletedAt != null) 'deletedAt': deletedAt?.toJson(),
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      if (id != null) 'id': id,
+      if (id != null) 'id': id?.toJson(),
       'name': name,
-      'description': description,
-      'imageUrl': imageUrl,
+      if (description != null) 'description': description,
+      if (imageUrl != null) 'imageUrl': imageUrl,
+      'createdBy': createdBy.toJson(),
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
-      'deletedAt': deletedAt.toJson(),
+      if (deletedAt != null) 'deletedAt': deletedAt?.toJson(),
     };
   }
 
@@ -141,18 +155,20 @@ class _Undefined {}
 
 class _ClubImpl extends Club {
   _ClubImpl({
-    int? id,
+    _i1.UuidValue? id,
     required String name,
-    required String description,
-    required String imageUrl,
-    required DateTime createdAt,
-    required DateTime updatedAt,
-    required DateTime deletedAt,
+    String? description,
+    String? imageUrl,
+    required _i1.UuidValue createdBy,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? deletedAt,
   }) : super._(
           id: id,
           name: name,
           description: description,
           imageUrl: imageUrl,
+          createdBy: createdBy,
           createdAt: createdAt,
           updatedAt: updatedAt,
           deletedAt: deletedAt,
@@ -165,26 +181,28 @@ class _ClubImpl extends Club {
   Club copyWith({
     Object? id = _Undefined,
     String? name,
-    String? description,
-    String? imageUrl,
+    Object? description = _Undefined,
+    Object? imageUrl = _Undefined,
+    _i1.UuidValue? createdBy,
     DateTime? createdAt,
     DateTime? updatedAt,
-    DateTime? deletedAt,
+    Object? deletedAt = _Undefined,
   }) {
     return Club(
-      id: id is int? ? id : this.id,
+      id: id is _i1.UuidValue? ? id : this.id,
       name: name ?? this.name,
-      description: description ?? this.description,
-      imageUrl: imageUrl ?? this.imageUrl,
+      description: description is String? ? description : this.description,
+      imageUrl: imageUrl is String? ? imageUrl : this.imageUrl,
+      createdBy: createdBy ?? this.createdBy,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      deletedAt: deletedAt ?? this.deletedAt,
+      deletedAt: deletedAt is DateTime? ? deletedAt : this.deletedAt,
     );
   }
 }
 
-class ClubTable extends _i1.Table<int?> {
-  ClubTable({super.tableRelation}) : super(tableName: 'club') {
+class ClubTable extends _i1.Table<_i1.UuidValue?> {
+  ClubTable({super.tableRelation}) : super(tableName: 'clubs') {
     name = _i1.ColumnString(
       'name',
       this,
@@ -197,13 +215,19 @@ class ClubTable extends _i1.Table<int?> {
       'imageUrl',
       this,
     );
+    createdBy = _i1.ColumnUuid(
+      'createdBy',
+      this,
+    );
     createdAt = _i1.ColumnDateTime(
       'createdAt',
       this,
+      hasDefault: true,
     );
     updatedAt = _i1.ColumnDateTime(
       'updatedAt',
       this,
+      hasDefault: true,
     );
     deletedAt = _i1.ColumnDateTime(
       'deletedAt',
@@ -217,6 +241,8 @@ class ClubTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString imageUrl;
 
+  late final _i1.ColumnUuid createdBy;
+
   late final _i1.ColumnDateTime createdAt;
 
   late final _i1.ColumnDateTime updatedAt;
@@ -229,6 +255,7 @@ class ClubTable extends _i1.Table<int?> {
         name,
         description,
         imageUrl,
+        createdBy,
         createdAt,
         updatedAt,
         deletedAt,
@@ -242,7 +269,7 @@ class ClubInclude extends _i1.IncludeObject {
   Map<String, _i1.Include?> get includes => {};
 
   @override
-  _i1.Table<int?> get table => Club.t;
+  _i1.Table<_i1.UuidValue?> get table => Club.t;
 }
 
 class ClubIncludeList extends _i1.IncludeList {
@@ -262,7 +289,7 @@ class ClubIncludeList extends _i1.IncludeList {
   Map<String, _i1.Include?> get includes => include?.includes ?? {};
 
   @override
-  _i1.Table<int?> get table => Club.t;
+  _i1.Table<_i1.UuidValue?> get table => Club.t;
 }
 
 class ClubRepository {
@@ -350,7 +377,7 @@ class ClubRepository {
   /// Finds a single [Club] by its [id] or null if no such row exists.
   Future<Club?> findById(
     _i1.Session session,
-    int id, {
+    _i1.UuidValue id, {
     _i1.Transaction? transaction,
   }) async {
     return session.db.findById<Club>(

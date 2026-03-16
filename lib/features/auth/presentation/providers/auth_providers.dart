@@ -278,11 +278,9 @@ class AuthSessionNotifier extends StateNotifier<AuthSessionState> {
 
   Future<void> _checkAuthStatus() async {
     state = state.copyWith(isLoading: true);
-    print('AUTH SESSION: Checking auth status...');
     final result = await _repository.isAuthenticated();
     result.fold(
       (failure) {
-        print('AUTH SESSION: Auth check failed: ${failure.message}');
         state = state.copyWith(
           isAuthenticated: false,
           user: null,
@@ -290,17 +288,15 @@ class AuthSessionNotifier extends StateNotifier<AuthSessionState> {
         );
       },
       (isAuth) async {
-        print('AUTH SESSION: isAuthenticated = $isAuth');
         User? user;
         if (isAuth) {
           final userResult = await _repository.getCurrentUser();
           userResult.fold(
             (failure) {
-              print('AUTH SESSION: Failed to get user: ${failure.message}');
+              // Failed to get user
             },
             (u) {
               user = u;
-              print('AUTH SESSION: Got user: ${u?.email}');
             },
           );
         }

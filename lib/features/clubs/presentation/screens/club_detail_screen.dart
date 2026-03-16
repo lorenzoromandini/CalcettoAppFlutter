@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:calcetto_app/features/clubs/domain/entities/club.dart';
+import 'package:calcetto_app/features/clubs/domain/entities/club_privilege.dart';
 import 'package:calcetto_app/features/clubs/presentation/widgets/club_info_tab.dart';
 import 'package:calcetto_app/features/clubs/presentation/screens/club_members_screen.dart';
 import 'package:calcetto_app/features/clubs/presentation/widgets/invite_code_generator.dart';
@@ -44,11 +45,12 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
   }
 
   bool get _isAdmin {
-    final role = widget.club.userRole;
-    return role == ClubRole.owner || role == ClubRole.manager;
+    final privilege = widget.club.userPrivilege;
+    return privilege == ClubPrivilege.OWNER ||
+        privilege == ClubPrivilege.MANAGER;
   }
 
-  bool get _isOwner => widget.club.userRole == ClubRole.owner;
+  bool get _isOwner => widget.club.userPrivilege == ClubPrivilege.OWNER;
 
   bool _isOffline(WidgetRef ref) {
     return ref.watch(isOfflineProvider);
@@ -204,6 +206,9 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
               text: 'Matches',
             ),
           ],
+          onTap: (index) {
+            // Tab tapped
+          },
         ),
       ),
       body: Column(

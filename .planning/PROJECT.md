@@ -43,7 +43,14 @@ Football club members can easily manage their club activities, RSVP to matches, 
 - FIFA-style player cards with 9 rarity types
 - Club management with OWNER/MANAGER/MEMBER roles
 - Match lifecycle: scheduled → live → completed
-- 38-value player rating system (4-10 scale with .5 increments)
+- Player rating system (1.0-10.0 scale)
+
+**New Serverpod Backend:**
+- Dart/Serverpod standalone backend
+- PostgreSQL with UUID v7 primary keys
+- Type-safe generated API clients
+- Complete schema: users, clubs, club_members, club_invites, matches, match_participants, goals, player_ratings
+- Enums: PlayerPosition, ClubPrivilege, MatchMode, MatchStatus, MatchTeamSide
 
 **Translation to Mobile:**
 - Reuse existing API endpoints where possible
@@ -75,6 +82,7 @@ Football club members can easily manage their club activities, RSVP to matches, 
 | IndexedStack for tab switching | Preserves screen state (scroll, form data) | ✅ Implemented |
 | Cache-based first launch detection | Non-sensitive UI preference | ✅ Implemented |
 | Biometric auth with local_auth | Native device security | ✅ Implemented (ready for testing) |
+| Complete database schema restructure | New Serverpod schema with UUID v7, all tables, proper relations | ✅ Implemented (2026-03-16) |
 
 ---
-*Last updated: 2026-03-09 after Phase 1 completion*
+*Last updated: 2026-03-16 after Database Schema Restructuring*

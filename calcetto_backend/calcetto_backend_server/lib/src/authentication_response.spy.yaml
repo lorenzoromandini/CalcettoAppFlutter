@@ -1,8 +1,0 @@
-# Authentication response model
-class: AuthenticationResponse
-
-fields:
-  success: bool
-  token: String?
-  error: String?
-  user: UserInfo?

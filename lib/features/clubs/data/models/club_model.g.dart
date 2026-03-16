@@ -21,7 +21,7 @@ class ClubModelAdapter extends TypeAdapter<ClubModel> {
       name: fields[1] as String,
       logoUrl: fields[2] as String?,
       memberCount: fields[3] as int,
-      userRole: fields[4] as ClubRole,
+      userPrivilege: fields[4] as ClubPrivilege,
       description: fields[5] as String?,
       createdAt: fields[6] as DateTime,
       cachedAt: fields[7] as DateTime?,
@@ -41,7 +41,7 @@ class ClubModelAdapter extends TypeAdapter<ClubModel> {
       ..writeByte(3)
       ..write(obj.memberCount)
       ..writeByte(4)
-      ..write(obj.userRole)
+      ..write(obj.userPrivilege)
       ..writeByte(5)
       ..write(obj.description)
       ..writeByte(6)

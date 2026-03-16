@@ -8,7 +8,7 @@ part of 'member_model.dart';
 
 class MemberModelAdapter extends TypeAdapter<MemberModel> {
   @override
-  final int typeId = 1;
+  final int typeId = 3;
 
   @override
   MemberModel read(BinaryReader reader) {
@@ -20,9 +20,9 @@ class MemberModelAdapter extends TypeAdapter<MemberModel> {
       id: fields[0] as String,
       name: fields[1] as String,
       avatarUrl: fields[2] as String?,
-      role: fields[3] as ClubRole,
+      privilege: fields[3] as ClubPrivilege,
       joinedAt: fields[4] as DateTime,
-      stats: fields[5] as MemberStats?,
+      stats: fields[5] as MemberStatsModel?,
       cachedAt: fields[6] as DateTime?,
     );
   }
@@ -38,7 +38,7 @@ class MemberModelAdapter extends TypeAdapter<MemberModel> {
       ..writeByte(2)
       ..write(obj.avatarUrl)
       ..writeByte(3)
-      ..write(obj.role)
+      ..write(obj.privilege)
       ..writeByte(4)
       ..write(obj.joinedAt)
       ..writeByte(5)
@@ -109,11 +109,11 @@ MemberModel _$MemberModelFromJson(Map<String, dynamic> json) => MemberModel(
       id: json['id'] as String,
       name: json['name'] as String,
       avatarUrl: json['avatarUrl'] as String?,
-      role: $enumDecode(_$ClubRoleEnumMap, json['role']),
+      privilege: $enumDecode(_$ClubPrivilegeEnumMap, json['privilege']),
       joinedAt: DateTime.parse(json['joinedAt'] as String),
       stats: json['stats'] == null
           ? null
-          : MemberStats.fromJson(json['stats'] as Map<String, dynamic>),
+          : MemberStatsModel.fromJson(json['stats'] as Map<String, dynamic>),
       cachedAt: json['cachedAt'] == null
           ? null
           : DateTime.parse(json['cachedAt'] as String),
@@ -124,16 +124,16 @@ Map<String, dynamic> _$MemberModelToJson(MemberModel instance) =>
       'id': instance.id,
       'name': instance.name,
       'avatarUrl': instance.avatarUrl,
-      'role': _$ClubRoleEnumMap[instance.role]!,
+      'privilege': _$ClubPrivilegeEnumMap[instance.privilege]!,
       'joinedAt': instance.joinedAt.toIso8601String(),
       'stats': instance.stats,
       'cachedAt': instance.cachedAt?.toIso8601String(),
     };
 
-const _$ClubRoleEnumMap = {
-  ClubRole.owner: 'owner',
-  ClubRole.manager: 'manager',
-  ClubRole.member: 'member',
+const _$ClubPrivilegeEnumMap = {
+  ClubPrivilege.OWNER: 'OWNER',
+  ClubPrivilege.MANAGER: 'MANAGER',
+  ClubPrivilege.MEMBER: 'MEMBER',
 };
 
 MemberStatsModel _$MemberStatsModelFromJson(Map<String, dynamic> json) =>

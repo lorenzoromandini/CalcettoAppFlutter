@@ -59,6 +59,47 @@ class ClubsList extends Notifier<AsyncValue<List<Club>>> {
       (clubs) => AsyncValue.data(clubs),
     );
   }
+
+  /// Create a new club.
+  Future<void> createClub({
+    required String name,
+    String? description,
+  }) async {
+    final repository = ref.read(clubsRepositoryProvider);
+    final result = await repository.createClub(
+      name: name,
+      description: description,
+    );
+
+    result.fold(
+      (failure) => throw Exception('Failed to create club: $failure'),
+      (club) async {
+        // Refresh the list to include the new club
+        await refresh();
+        // Set the new club as active
+        await ref.read(activeClubProvider.notifier).setActiveClub(club.id);
+      },
+    );
+  }
+
+  /// Delete a club.
+  Future<void> deleteClub(String clubId) async {
+    final repository = ref.read(clubsRepositoryProvider);
+    final result = await repository.deleteClub(clubId);
+
+    result.fold(
+      (failure) => throw Exception('Failed to delete club: $failure'),
+      (_) async {
+        // Clear active club if it was the deleted one
+        final activeClub = ref.read(activeClubProvider).value;
+        if (activeClub?.id == clubId) {
+          await ref.read(activeClubProvider.notifier).clearActiveClub();
+        }
+        // Refresh the list
+        await refresh();
+      },
+    );
+  }
 }
 
 /// Provider notifier for clubs list operations.

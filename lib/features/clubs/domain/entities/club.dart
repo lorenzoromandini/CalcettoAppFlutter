@@ -1,38 +1,14 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+
+import 'club_privilege.dart';
 
 part 'club.freezed.dart';
 part 'club.g.dart';
 
-/// Club role enum representing user's permission level in a club.
-@HiveType(typeId: 1)
-enum ClubRole {
-  @HiveField(0)
-  owner,
-  @HiveField(1)
-  manager,
-  @HiveField(2)
-  member;
-
-  /// Returns display name for the role.
-  String get displayName {
-    switch (this) {
-      case ClubRole.owner:
-        return 'Owner';
-      case ClubRole.manager:
-        return 'Manager';
-      case ClubRole.member:
-        return 'Member';
-    }
-  }
-
-  /// Returns true if role has admin privileges (OWNER or MANAGER).
-  bool get isAdmin => this == ClubRole.owner || this == ClubRole.manager;
-}
-
 /// Immutable Club entity representing a football club.
 ///
 /// Contains basic club information displayed in club lists and details.
+/// Uses ClubPrivilege for the user's management level in the club.
 @freezed
 class Club with _$Club {
   const factory Club({
@@ -40,7 +16,7 @@ class Club with _$Club {
     required String name,
     String? logoUrl,
     required int memberCount,
-    required ClubRole userRole,
+    required ClubPrivilege userPrivilege,
     String? description,
     required DateTime createdAt,
   }) = _Club;

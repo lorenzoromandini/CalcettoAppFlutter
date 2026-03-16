@@ -1,0 +1,7 @@
+enum: MatchStatus
+values:
+  - scheduled
+  - live
+  - finished
+  - completed
+  - cancelled

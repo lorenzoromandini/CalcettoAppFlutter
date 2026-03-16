@@ -14,11 +14,14 @@
 import 'package:serverpod_test/serverpod_test.dart' as _i1;
 import 'package:serverpod/serverpod.dart' as _i2;
 import 'dart:async' as _i3;
-import 'package:calcetto_backend_server/src/generated/authentication_response.dart'
-    as _i4;
+import 'package:calcetto_backend_server/src/generated/user.dart' as _i4;
 import 'package:calcetto_backend_server/src/generated/club.dart' as _i5;
-import 'package:calcetto_backend_server/src/generated/club_member.dart' as _i6;
-import 'package:calcetto_backend_server/src/generated/greeting.dart' as _i7;
+import 'package:calcetto_backend_server/src/generated/goal.dart' as _i6;
+import 'package:calcetto_backend_server/src/generated/match.dart' as _i7;
+import 'package:calcetto_backend_server/src/generated/match_participant.dart'
+    as _i8;
+import 'package:calcetto_backend_server/src/generated/player_rating.dart'
+    as _i9;
 import 'package:calcetto_backend_server/src/generated/protocol.dart';
 import 'package:calcetto_backend_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -109,7 +112,11 @@ class TestEndpoints {
 
   late final _ClubsEndpoint clubs;
 
-  late final _GreetingEndpoint greeting;
+  late final _GoalsEndpoint goals;
+
+  late final _MatchesEndpoint matches;
+
+  late final _RatingsEndpoint ratings;
 }
 
 class _InternalTestEndpoints extends TestEndpoints
@@ -127,7 +134,15 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
-    greeting = _GreetingEndpoint(
+    goals = _GoalsEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    matches = _MatchesEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    ratings = _RatingsEndpoint(
       endpoints,
       serializationManager,
     );
@@ -144,7 +159,7 @@ class _AuthEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i4.AuthenticationResponse> login(
+  _i3.Future<Map<String, dynamic>> login(
     _i1.TestSessionBuilder sessionBuilder,
     String email,
     String password,
@@ -169,7 +184,7 @@ class _AuthEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i4.AuthenticationResponse>);
+        ) as _i3.Future<Map<String, dynamic>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -177,7 +192,7 @@ class _AuthEndpoint {
     });
   }
 
-  _i3.Future<_i4.AuthenticationResponse> signup(
+  _i3.Future<Map<String, dynamic>> signup(
     _i1.TestSessionBuilder sessionBuilder,
     String email,
     String password,
@@ -210,7 +225,34 @@ class _AuthEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i4.AuthenticationResponse>);
+        ) as _i3.Future<Map<String, dynamic>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i4.User?> getCurrentUser(
+      _i1.TestSessionBuilder sessionBuilder) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'auth',
+        method: 'getCurrentUser',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'auth',
+          methodName: 'getCurrentUser',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i4.User?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -229,7 +271,7 @@ class _ClubsEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i5.Club>> getClubs(
+  _i3.Future<List<Map<String, dynamic>>> getClubs(
       _i1.TestSessionBuilder sessionBuilder) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -248,7 +290,7 @@ class _ClubsEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<List<_i5.Club>>);
+        ) as _i3.Future<List<Map<String, dynamic>>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -256,9 +298,9 @@ class _ClubsEndpoint {
     });
   }
 
-  _i3.Future<_i5.Club?> getClubById(
+  _i3.Future<Map<String, dynamic>?> getClubById(
     _i1.TestSessionBuilder sessionBuilder,
-    int? id,
+    String? id,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -277,7 +319,7 @@ class _ClubsEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i5.Club?>);
+        ) as _i3.Future<Map<String, dynamic>?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -285,9 +327,9 @@ class _ClubsEndpoint {
     });
   }
 
-  _i3.Future<List<_i6.ClubMember>> getClubMembers(
+  _i3.Future<List<Map<String, dynamic>>> getClubMembers(
     _i1.TestSessionBuilder sessionBuilder,
-    int? clubId,
+    String? clubIdStr,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -300,13 +342,13 @@ class _ClubsEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'clubs',
           methodName: 'getClubMembers',
-          parameters: _i1.testObjectToJson({'clubId': clubId}),
+          parameters: _i1.testObjectToJson({'clubIdStr': clubIdStr}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<List<_i6.ClubMember>>);
+        ) as _i3.Future<List<Map<String, dynamic>>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -316,7 +358,7 @@ class _ClubsEndpoint {
 
   _i3.Future<Map<String, dynamic>> generateInviteCode(
     _i1.TestSessionBuilder sessionBuilder,
-    int? clubId,
+    String? clubIdStr,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -329,7 +371,207 @@ class _ClubsEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'clubs',
           methodName: 'generateInviteCode',
-          parameters: _i1.testObjectToJson({'clubId': clubId}),
+          parameters: _i1.testObjectToJson({'clubIdStr': clubIdStr}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<Map<String, dynamic>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> deleteClub(
+    _i1.TestSessionBuilder sessionBuilder,
+    String? clubIdStr,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'clubs',
+        method: 'deleteClub',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'clubs',
+          methodName: 'deleteClub',
+          parameters: _i1.testObjectToJson({'clubIdStr': clubIdStr}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i5.Club> createClub(
+    _i1.TestSessionBuilder sessionBuilder,
+    String name,
+    String? description,
+    String? imageUrl,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'clubs',
+        method: 'createClub',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'clubs',
+          methodName: 'createClub',
+          parameters: _i1.testObjectToJson({
+            'name': name,
+            'description': description,
+            'imageUrl': imageUrl,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i5.Club>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _GoalsEndpoint {
+  _GoalsEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<List<_i6.Goal>> getMatchGoals(
+    _i1.TestSessionBuilder sessionBuilder,
+    String matchIdStr,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'goals',
+        method: 'getMatchGoals',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'goals',
+          methodName: 'getMatchGoals',
+          parameters: _i1.testObjectToJson({'matchIdStr': matchIdStr}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<List<_i6.Goal>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i6.Goal> addGoal(
+    _i1.TestSessionBuilder sessionBuilder,
+    String matchIdStr,
+    String scorerIdStr,
+    String? assisterIdStr,
+    bool isOwnGoal,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'goals',
+        method: 'addGoal',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'goals',
+          methodName: 'addGoal',
+          parameters: _i1.testObjectToJson({
+            'matchIdStr': matchIdStr,
+            'scorerIdStr': scorerIdStr,
+            'assisterIdStr': assisterIdStr,
+            'isOwnGoal': isOwnGoal,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i6.Goal>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> removeGoal(
+    _i1.TestSessionBuilder sessionBuilder,
+    String goalIdStr,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'goals',
+        method: 'removeGoal',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'goals',
+          methodName: 'removeGoal',
+          parameters: _i1.testObjectToJson({'goalIdStr': goalIdStr}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<Map<String, dynamic>> getPlayerStats(
+    _i1.TestSessionBuilder sessionBuilder,
+    String clubMemberIdStr,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'goals',
+        method: 'getPlayerStats',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'goals',
+          methodName: 'getPlayerStats',
+          parameters:
+              _i1.testObjectToJson({'clubMemberIdStr': clubMemberIdStr}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
@@ -344,8 +586,8 @@ class _ClubsEndpoint {
   }
 }
 
-class _GreetingEndpoint {
-  _GreetingEndpoint(
+class _MatchesEndpoint {
+  _MatchesEndpoint(
     this._endpointDispatch,
     this._serializationManager,
   );
@@ -354,28 +596,429 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i7.Greeting> hello(
+  _i3.Future<List<_i7.Match>> getClubMatches(
     _i1.TestSessionBuilder sessionBuilder,
-    String name,
-  ) async {
+    String clubIdStr, {
+    String? status,
+  }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-        endpoint: 'greeting',
-        method: 'hello',
+        endpoint: 'matches',
+        method: 'getClubMatches',
       );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'greeting',
-          methodName: 'hello',
-          parameters: _i1.testObjectToJson({'name': name}),
+          endpointPath: 'matches',
+          methodName: 'getClubMatches',
+          parameters: _i1.testObjectToJson({
+            'clubIdStr': clubIdStr,
+            'status': status,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i7.Greeting>);
+        ) as _i3.Future<List<_i7.Match>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i7.Match?> getMatchById(
+    _i1.TestSessionBuilder sessionBuilder,
+    String matchIdStr,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'matches',
+        method: 'getMatchById',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'matches',
+          methodName: 'getMatchById',
+          parameters: _i1.testObjectToJson({'matchIdStr': matchIdStr}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i7.Match?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i7.Match> createMatch(
+    _i1.TestSessionBuilder sessionBuilder,
+    String clubIdStr,
+    DateTime scheduledAt,
+    String? location,
+    String modeStr,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'matches',
+        method: 'createMatch',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'matches',
+          methodName: 'createMatch',
+          parameters: _i1.testObjectToJson({
+            'clubIdStr': clubIdStr,
+            'scheduledAt': scheduledAt,
+            'location': location,
+            'modeStr': modeStr,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i7.Match>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i7.Match> updateMatchStatus(
+    _i1.TestSessionBuilder sessionBuilder,
+    String matchIdStr,
+    String statusStr,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'matches',
+        method: 'updateMatchStatus',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'matches',
+          methodName: 'updateMatchStatus',
+          parameters: _i1.testObjectToJson({
+            'matchIdStr': matchIdStr,
+            'statusStr': statusStr,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i7.Match>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i7.Match> updateScore(
+    _i1.TestSessionBuilder sessionBuilder,
+    String matchIdStr,
+    int homeScore,
+    int awayScore,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'matches',
+        method: 'updateScore',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'matches',
+          methodName: 'updateScore',
+          parameters: _i1.testObjectToJson({
+            'matchIdStr': matchIdStr,
+            'homeScore': homeScore,
+            'awayScore': awayScore,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i7.Match>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i8.MatchParticipant>> getMatchParticipants(
+    _i1.TestSessionBuilder sessionBuilder,
+    String matchIdStr,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'matches',
+        method: 'getMatchParticipants',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'matches',
+          methodName: 'getMatchParticipants',
+          parameters: _i1.testObjectToJson({'matchIdStr': matchIdStr}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<List<_i8.MatchParticipant>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i8.MatchParticipant> addParticipant(
+    _i1.TestSessionBuilder sessionBuilder,
+    String matchIdStr,
+    String clubMemberIdStr,
+    String teamSideStr,
+    String? positionStr,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'matches',
+        method: 'addParticipant',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'matches',
+          methodName: 'addParticipant',
+          parameters: _i1.testObjectToJson({
+            'matchIdStr': matchIdStr,
+            'clubMemberIdStr': clubMemberIdStr,
+            'teamSideStr': teamSideStr,
+            'positionStr': positionStr,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i8.MatchParticipant>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> removeParticipant(
+    _i1.TestSessionBuilder sessionBuilder,
+    String participantIdStr,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'matches',
+        method: 'removeParticipant',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'matches',
+          methodName: 'removeParticipant',
+          parameters:
+              _i1.testObjectToJson({'participantIdStr': participantIdStr}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _RatingsEndpoint {
+  _RatingsEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<List<_i9.PlayerRating>> getMatchRatings(
+    _i1.TestSessionBuilder sessionBuilder,
+    String matchIdStr,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'ratings',
+        method: 'getMatchRatings',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'ratings',
+          methodName: 'getMatchRatings',
+          parameters: _i1.testObjectToJson({'matchIdStr': matchIdStr}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<List<_i9.PlayerRating>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i9.PlayerRating?> getPlayerRating(
+    _i1.TestSessionBuilder sessionBuilder,
+    String matchIdStr,
+    String clubMemberIdStr,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'ratings',
+        method: 'getPlayerRating',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'ratings',
+          methodName: 'getPlayerRating',
+          parameters: _i1.testObjectToJson({
+            'matchIdStr': matchIdStr,
+            'clubMemberIdStr': clubMemberIdStr,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i9.PlayerRating?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i9.PlayerRating> ratePlayer(
+    _i1.TestSessionBuilder sessionBuilder,
+    String matchIdStr,
+    String clubMemberIdStr,
+    double rating,
+    String? comment,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'ratings',
+        method: 'ratePlayer',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'ratings',
+          methodName: 'ratePlayer',
+          parameters: _i1.testObjectToJson({
+            'matchIdStr': matchIdStr,
+            'clubMemberIdStr': clubMemberIdStr,
+            'rating': rating,
+            'comment': comment,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i9.PlayerRating>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<Map<String, dynamic>> getPlayerAverageRating(
+    _i1.TestSessionBuilder sessionBuilder,
+    String clubMemberIdStr,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'ratings',
+        method: 'getPlayerAverageRating',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'ratings',
+          methodName: 'getPlayerAverageRating',
+          parameters:
+              _i1.testObjectToJson({'clubMemberIdStr': clubMemberIdStr}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<Map<String, dynamic>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i9.PlayerRating>> getRatingsByUser(
+      _i1.TestSessionBuilder sessionBuilder) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'ratings',
+        method: 'getRatingsByUser',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'ratings',
+          methodName: 'getRatingsByUser',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<List<_i9.PlayerRating>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

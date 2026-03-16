@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/club.dart';
+import '../../domain/entities/club_privilege.dart';
 
-/// Widget displaying a user's role in a club.
+/// Widget displaying a user's privilege in a club.
 ///
-/// Shows a Material 3 Chip with role-specific colors:
+/// Shows a Material 3 Chip with privilege-specific colors:
 /// - OWNER: Gold/amber
 /// - MANAGER: Blue
 /// - MEMBER: Grey/neutral
 class RoleBadge extends StatelessWidget {
-  final ClubRole role;
+  final ClubPrivilege privilege;
 
   const RoleBadge({
     super.key,
-    required this.role,
+    required this.privilege,
   });
 
   @override
@@ -21,37 +21,37 @@ class RoleBadge extends StatelessWidget {
 
     return Chip(
       label: Text(
-        _getRoleName(role),
+        _getPrivilegeName(privilege),
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w600,
               fontSize: 10,
             ),
       ),
-      backgroundColor: _getRoleColor(colorScheme),
+      backgroundColor: _getPrivilegeColor(colorScheme),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       visualDensity: VisualDensity.compact,
     );
   }
 
-  String _getRoleName(ClubRole role) {
-    switch (role) {
-      case ClubRole.owner:
+  String _getPrivilegeName(ClubPrivilege privilege) {
+    switch (privilege) {
+      case ClubPrivilege.OWNER:
         return 'OWNER';
-      case ClubRole.manager:
+      case ClubPrivilege.MANAGER:
         return 'MANAGER';
-      case ClubRole.member:
+      case ClubPrivilege.MEMBER:
         return 'MEMBER';
     }
   }
 
-  Color _getRoleColor(ColorScheme colorScheme) {
-    switch (role) {
-      case ClubRole.owner:
+  Color _getPrivilegeColor(ColorScheme colorScheme) {
+    switch (privilege) {
+      case ClubPrivilege.OWNER:
         return Colors.amber.shade100;
-      case ClubRole.manager:
+      case ClubPrivilege.MANAGER:
         return Colors.blue.shade100;
-      case ClubRole.member:
+      case ClubPrivilege.MEMBER:
         return colorScheme.surfaceContainerHighest;
     }
   }

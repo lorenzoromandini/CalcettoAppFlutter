@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:calcetto_app/features/clubs/domain/entities/member.dart';
-import 'package:calcetto_app/features/clubs/domain/entities/club.dart';
+import 'package:calcetto_app/features/clubs/domain/entities/club_privilege.dart';
 import 'package:calcetto_app/features/clubs/presentation/widgets/role_icon.dart';
 
 /// FIFA-style player card for displaying club members.
@@ -22,20 +22,20 @@ class MemberCard extends StatelessWidget {
   });
 
   LinearGradient _getGradient() {
-    switch (member.role) {
-      case ClubRole.owner:
+    switch (member.privilege) {
+      case ClubPrivilege.OWNER:
         return LinearGradient(
           colors: [Colors.amber[200]!, Colors.amber[700]!],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
-      case ClubRole.manager:
+      case ClubPrivilege.MANAGER:
         return LinearGradient(
           colors: [Colors.blue[200]!, Colors.blue[700]!],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
-      case ClubRole.member:
+      case ClubPrivilege.MEMBER:
         return LinearGradient(
           colors: [Colors.grey[300]!, Colors.grey[700]!],
           begin: Alignment.topLeft,
@@ -122,7 +122,7 @@ class MemberCard extends StatelessWidget {
                           ),
                           const Spacer(),
                           RoleIcon(
-                            role: member.role,
+                            privilege: member.privilege,
                             size: 24,
                           ),
                         ],

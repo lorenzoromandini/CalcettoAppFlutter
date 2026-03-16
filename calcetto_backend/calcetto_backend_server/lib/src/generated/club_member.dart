@@ -10,38 +10,61 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
+import 'player_position.dart' as _i2;
+import 'club_privilege.dart' as _i3;
 
 abstract class ClubMember
-    implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
+    implements _i1.TableRow<_i1.UuidValue?>, _i1.ProtocolSerialization {
   ClubMember._({
     this.id,
     required this.clubId,
     required this.userId,
-    required this.privileges,
-    required this.joinedAt,
-    this.deletedAt,
-  });
+    this.jerseyNumber,
+    this.symbol,
+    this.nationality,
+    required this.primaryRole,
+    required this.secondaryRoles,
+    required this.privilege,
+    DateTime? joinedAt,
+    this.leftAt,
+  }) : joinedAt = joinedAt ?? DateTime.now();
 
   factory ClubMember({
-    int? id,
-    required int clubId,
-    required String userId,
-    required int privileges,
-    required DateTime joinedAt,
-    DateTime? deletedAt,
+    _i1.UuidValue? id,
+    required _i1.UuidValue clubId,
+    required _i1.UuidValue userId,
+    int? jerseyNumber,
+    String? symbol,
+    String? nationality,
+    required _i2.PlayerPosition primaryRole,
+    required List<_i2.PlayerPosition> secondaryRoles,
+    required _i3.ClubPrivilege privilege,
+    DateTime? joinedAt,
+    DateTime? leftAt,
   }) = _ClubMemberImpl;
 
   factory ClubMember.fromJson(Map<String, dynamic> jsonSerialization) {
     return ClubMember(
-      id: jsonSerialization['id'] as int?,
-      clubId: jsonSerialization['clubId'] as int,
-      userId: jsonSerialization['userId'] as String,
-      privileges: jsonSerialization['privileges'] as int,
+      id: jsonSerialization['id'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
+      clubId: _i1.UuidValueJsonExtension.fromJson(jsonSerialization['clubId']),
+      userId: _i1.UuidValueJsonExtension.fromJson(jsonSerialization['userId']),
+      jerseyNumber: jsonSerialization['jerseyNumber'] as int?,
+      symbol: jsonSerialization['symbol'] as String?,
+      nationality: jsonSerialization['nationality'] as String?,
+      primaryRole: _i2.PlayerPosition.fromJson(
+          (jsonSerialization['primaryRole'] as int)),
+      secondaryRoles: (jsonSerialization['secondaryRoles'] as List)
+          .map((e) => _i2.PlayerPosition.fromJson((e as int)))
+          .toList(),
+      privilege:
+          _i3.ClubPrivilege.fromJson((jsonSerialization['privilege'] as int)),
       joinedAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['joinedAt']),
-      deletedAt: jsonSerialization['deletedAt'] == null
+      leftAt: jsonSerialization['leftAt'] == null
           ? null
-          : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['deletedAt']),
+          : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['leftAt']),
     );
   }
 
@@ -50,53 +73,78 @@ abstract class ClubMember
   static const db = ClubMemberRepository._();
 
   @override
-  int? id;
+  _i1.UuidValue? id;
 
-  int clubId;
+  _i1.UuidValue clubId;
 
-  String userId;
+  _i1.UuidValue userId;
 
-  int privileges;
+  int? jerseyNumber;
+
+  String? symbol;
+
+  String? nationality;
+
+  _i2.PlayerPosition primaryRole;
+
+  List<_i2.PlayerPosition> secondaryRoles;
+
+  _i3.ClubPrivilege privilege;
 
   DateTime joinedAt;
 
-  DateTime? deletedAt;
+  DateTime? leftAt;
 
   @override
-  _i1.Table<int?> get table => t;
+  _i1.Table<_i1.UuidValue?> get table => t;
 
   /// Returns a shallow copy of this [ClubMember]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   ClubMember copyWith({
-    int? id,
-    int? clubId,
-    String? userId,
-    int? privileges,
+    _i1.UuidValue? id,
+    _i1.UuidValue? clubId,
+    _i1.UuidValue? userId,
+    int? jerseyNumber,
+    String? symbol,
+    String? nationality,
+    _i2.PlayerPosition? primaryRole,
+    List<_i2.PlayerPosition>? secondaryRoles,
+    _i3.ClubPrivilege? privilege,
     DateTime? joinedAt,
-    DateTime? deletedAt,
+    DateTime? leftAt,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
-      'clubId': clubId,
-      'userId': userId,
-      'privileges': privileges,
+      if (id != null) 'id': id?.toJson(),
+      'clubId': clubId.toJson(),
+      'userId': userId.toJson(),
+      if (jerseyNumber != null) 'jerseyNumber': jerseyNumber,
+      if (symbol != null) 'symbol': symbol,
+      if (nationality != null) 'nationality': nationality,
+      'primaryRole': primaryRole.toJson(),
+      'secondaryRoles': secondaryRoles.toJson(valueToJson: (v) => v.toJson()),
+      'privilege': privilege.toJson(),
       'joinedAt': joinedAt.toJson(),
-      if (deletedAt != null) 'deletedAt': deletedAt?.toJson(),
+      if (leftAt != null) 'leftAt': leftAt?.toJson(),
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      if (id != null) 'id': id,
-      'clubId': clubId,
-      'userId': userId,
-      'privileges': privileges,
+      if (id != null) 'id': id?.toJson(),
+      'clubId': clubId.toJson(),
+      'userId': userId.toJson(),
+      if (jerseyNumber != null) 'jerseyNumber': jerseyNumber,
+      if (symbol != null) 'symbol': symbol,
+      if (nationality != null) 'nationality': nationality,
+      'primaryRole': primaryRole.toJson(),
+      'secondaryRoles': secondaryRoles.toJson(valueToJson: (v) => v.toJson()),
+      'privilege': privilege.toJson(),
       'joinedAt': joinedAt.toJson(),
-      if (deletedAt != null) 'deletedAt': deletedAt?.toJson(),
+      if (leftAt != null) 'leftAt': leftAt?.toJson(),
     };
   }
 
@@ -134,19 +182,29 @@ class _Undefined {}
 
 class _ClubMemberImpl extends ClubMember {
   _ClubMemberImpl({
-    int? id,
-    required int clubId,
-    required String userId,
-    required int privileges,
-    required DateTime joinedAt,
-    DateTime? deletedAt,
+    _i1.UuidValue? id,
+    required _i1.UuidValue clubId,
+    required _i1.UuidValue userId,
+    int? jerseyNumber,
+    String? symbol,
+    String? nationality,
+    required _i2.PlayerPosition primaryRole,
+    required List<_i2.PlayerPosition> secondaryRoles,
+    required _i3.ClubPrivilege privilege,
+    DateTime? joinedAt,
+    DateTime? leftAt,
   }) : super._(
           id: id,
           clubId: clubId,
           userId: userId,
-          privileges: privileges,
+          jerseyNumber: jerseyNumber,
+          symbol: symbol,
+          nationality: nationality,
+          primaryRole: primaryRole,
+          secondaryRoles: secondaryRoles,
+          privilege: privilege,
           joinedAt: joinedAt,
-          deletedAt: deletedAt,
+          leftAt: leftAt,
         );
 
   /// Returns a shallow copy of this [ClubMember]
@@ -155,65 +213,114 @@ class _ClubMemberImpl extends ClubMember {
   @override
   ClubMember copyWith({
     Object? id = _Undefined,
-    int? clubId,
-    String? userId,
-    int? privileges,
+    _i1.UuidValue? clubId,
+    _i1.UuidValue? userId,
+    Object? jerseyNumber = _Undefined,
+    Object? symbol = _Undefined,
+    Object? nationality = _Undefined,
+    _i2.PlayerPosition? primaryRole,
+    List<_i2.PlayerPosition>? secondaryRoles,
+    _i3.ClubPrivilege? privilege,
     DateTime? joinedAt,
-    Object? deletedAt = _Undefined,
+    Object? leftAt = _Undefined,
   }) {
     return ClubMember(
-      id: id is int? ? id : this.id,
+      id: id is _i1.UuidValue? ? id : this.id,
       clubId: clubId ?? this.clubId,
       userId: userId ?? this.userId,
-      privileges: privileges ?? this.privileges,
+      jerseyNumber: jerseyNumber is int? ? jerseyNumber : this.jerseyNumber,
+      symbol: symbol is String? ? symbol : this.symbol,
+      nationality: nationality is String? ? nationality : this.nationality,
+      primaryRole: primaryRole ?? this.primaryRole,
+      secondaryRoles:
+          secondaryRoles ?? this.secondaryRoles.map((e0) => e0).toList(),
+      privilege: privilege ?? this.privilege,
       joinedAt: joinedAt ?? this.joinedAt,
-      deletedAt: deletedAt is DateTime? ? deletedAt : this.deletedAt,
+      leftAt: leftAt is DateTime? ? leftAt : this.leftAt,
     );
   }
 }
 
-class ClubMemberTable extends _i1.Table<int?> {
-  ClubMemberTable({super.tableRelation}) : super(tableName: 'club_member') {
-    clubId = _i1.ColumnInt(
+class ClubMemberTable extends _i1.Table<_i1.UuidValue?> {
+  ClubMemberTable({super.tableRelation}) : super(tableName: 'club_members') {
+    clubId = _i1.ColumnUuid(
       'clubId',
       this,
     );
-    userId = _i1.ColumnString(
+    userId = _i1.ColumnUuid(
       'userId',
       this,
     );
-    privileges = _i1.ColumnInt(
-      'privileges',
+    jerseyNumber = _i1.ColumnInt(
+      'jerseyNumber',
       this,
+    );
+    symbol = _i1.ColumnString(
+      'symbol',
+      this,
+    );
+    nationality = _i1.ColumnString(
+      'nationality',
+      this,
+    );
+    primaryRole = _i1.ColumnEnum(
+      'primaryRole',
+      this,
+      _i1.EnumSerialization.byIndex,
+    );
+    secondaryRoles = _i1.ColumnSerializable(
+      'secondaryRoles',
+      this,
+    );
+    privilege = _i1.ColumnEnum(
+      'privilege',
+      this,
+      _i1.EnumSerialization.byIndex,
     );
     joinedAt = _i1.ColumnDateTime(
       'joinedAt',
       this,
+      hasDefault: true,
     );
-    deletedAt = _i1.ColumnDateTime(
-      'deletedAt',
+    leftAt = _i1.ColumnDateTime(
+      'leftAt',
       this,
     );
   }
 
-  late final _i1.ColumnInt clubId;
+  late final _i1.ColumnUuid clubId;
 
-  late final _i1.ColumnString userId;
+  late final _i1.ColumnUuid userId;
 
-  late final _i1.ColumnInt privileges;
+  late final _i1.ColumnInt jerseyNumber;
+
+  late final _i1.ColumnString symbol;
+
+  late final _i1.ColumnString nationality;
+
+  late final _i1.ColumnEnum<_i2.PlayerPosition> primaryRole;
+
+  late final _i1.ColumnSerializable secondaryRoles;
+
+  late final _i1.ColumnEnum<_i3.ClubPrivilege> privilege;
 
   late final _i1.ColumnDateTime joinedAt;
 
-  late final _i1.ColumnDateTime deletedAt;
+  late final _i1.ColumnDateTime leftAt;
 
   @override
   List<_i1.Column> get columns => [
         id,
         clubId,
         userId,
-        privileges,
+        jerseyNumber,
+        symbol,
+        nationality,
+        primaryRole,
+        secondaryRoles,
+        privilege,
         joinedAt,
-        deletedAt,
+        leftAt,
       ];
 }
 
@@ -224,7 +331,7 @@ class ClubMemberInclude extends _i1.IncludeObject {
   Map<String, _i1.Include?> get includes => {};
 
   @override
-  _i1.Table<int?> get table => ClubMember.t;
+  _i1.Table<_i1.UuidValue?> get table => ClubMember.t;
 }
 
 class ClubMemberIncludeList extends _i1.IncludeList {
@@ -244,7 +351,7 @@ class ClubMemberIncludeList extends _i1.IncludeList {
   Map<String, _i1.Include?> get includes => include?.includes ?? {};
 
   @override
-  _i1.Table<int?> get table => ClubMember.t;
+  _i1.Table<_i1.UuidValue?> get table => ClubMember.t;
 }
 
 class ClubMemberRepository {
@@ -332,7 +439,7 @@ class ClubMemberRepository {
   /// Finds a single [ClubMember] by its [id] or null if no such row exists.
   Future<ClubMember?> findById(
     _i1.Session session,
-    int id, {
+    _i1.UuidValue id, {
     _i1.Transaction? transaction,
   }) async {
     return session.db.findById<ClubMember>(

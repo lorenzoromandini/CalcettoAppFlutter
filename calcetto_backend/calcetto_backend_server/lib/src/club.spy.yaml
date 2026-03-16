@@ -1,11 +1,14 @@
 class: Club
-table: club
-
+table: clubs
 fields:
-  id: int?
+  id: UuidValue?, defaultPersist=random_v7
   name: String
-  description: String
-  imageUrl: String
-  createdAt: DateTime
-  updatedAt: DateTime
-  deletedAt: DateTime
+  description: String?
+  imageUrl: String?
+  createdBy: UuidValue, relation(parent=users)
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+  deletedAt: DateTime?
+indexes:
+  clubs_created_by_idx:
+    fields: createdBy

@@ -1,0 +1,16 @@
+class: MatchParticipant
+table: match_participants
+fields:
+  id: UuidValue?, defaultPersist=random_v7
+  matchId: UuidValue, relation(parent=matches)
+  clubMemberId: UuidValue, relation(parent=club_members)
+  teamSide: MatchTeamSide
+  position: PlayerPosition?
+indexes:
+  match_participants_match_id_idx:
+    fields: matchId
+  match_participants_club_member_id_idx:
+    fields: clubMemberId
+  match_participants_unique:
+    fields: matchId, clubMemberId
+    unique: true

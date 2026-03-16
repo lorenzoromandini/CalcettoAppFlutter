@@ -34,13 +34,9 @@ class DioClubsRemoteDataSource implements ClubsRemoteDataSource {
   @override
   Future<List<ClubModel>> getClubs() async {
     try {
-      print('REMOTE DATASOURCE: Fetching clubs...');
       final response = await _dio.post('/clubs/getClubs');
-      print('REMOTE DATASOURCE: Response status: ${response.statusCode}');
-      print('REMOTE DATASOURCE: Response data: ${response.data}');
 
       if (response.data == null || response.data is! List) {
-        print('REMOTE DATASOURCE: Empty clubs list');
         return [];
       }
 
@@ -48,10 +44,8 @@ class DioClubsRemoteDataSource implements ClubsRemoteDataSource {
       final clubs = data
           .map((e) => ClubModel.fromJson(e as Map<String, dynamic>))
           .toList();
-      print('REMOTE DATASOURCE: Parsed ${clubs.length} clubs');
       return clubs;
     } catch (e) {
-      print('REMOTE DATASOURCE ERROR: $e');
       rethrow;
     }
   }
@@ -60,28 +54,38 @@ class DioClubsRemoteDataSource implements ClubsRemoteDataSource {
   Future<ClubModel> getClubById(String id) async {
     final response = await _dio.post(
       '/clubs/getClubById',
-      data: {'id': int.tryParse(id)},
+      data: {'id': id},
     );
     return ClubModel.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
   Future<List<MemberModel>> getClubMembers(String clubId) async {
-    final response = await _dio.post(
-      '/clubs/getClubMembers',
-      data: {'clubId': int.tryParse(clubId)},
-    );
-    final data = response.data as List;
-    return data
-        .map((e) => MemberModel.fromJson(e as Map<String, dynamic>))
-        .toList();
+    try {
+      final response = await _dio.post(
+        '/clubs/getClubMembers',
+        data: {'clubIdStr': clubId},
+      );
+
+      if (response.data == null || response.data is! List) {
+        throw Exception('Invalid response format');
+      }
+
+      final data = response.data as List;
+      final members = data
+          .map((e) => MemberModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+      return members;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
   Future<String> generateInviteCode(String clubId) async {
     final response = await _dio.post(
       '/clubs/generateInviteCode',
-      data: {'clubId': int.tryParse(clubId)},
+      data: {'clubId': clubId},
     );
     return response.data['code'] as String;
   }
@@ -90,7 +94,7 @@ class DioClubsRemoteDataSource implements ClubsRemoteDataSource {
   Future<void> deleteClub(String clubId) async {
     await _dio.delete(
       '/clubs/deleteClub',
-      data: {'clubId': int.tryParse(clubId)},
+      data: {'clubId': clubId},
     );
   }
 }

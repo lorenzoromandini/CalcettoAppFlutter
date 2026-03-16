@@ -9,6 +9,7 @@ import '../providers/clubs_list_provider.dart';
 import '../providers/active_club_provider.dart';
 import '../widgets/clubs_list_skeleton.dart';
 import '../widgets/club_list_item.dart';
+import '../widgets/club_switcher.dart';
 import 'club_detail_screen.dart';
 
 /// Clubs list screen displaying user's club memberships.
@@ -43,14 +44,6 @@ class _ClubsListScreenState extends ConsumerState<ClubsListScreen> {
     final activeClubAsync = ref.watch(activeClubProvider);
     final isOffline = ref.watch(isOfflineProvider);
 
-    // Debug logging
-    clubsAsync.when(
-      loading: () => debugPrint('CLUBS DEBUG: Loading state'),
-      error: (e, s) => debugPrint('CLUBS DEBUG: Error - $e'),
-      data: (clubs) =>
-          debugPrint('CLUBS DEBUG: Data received - ${clubs.length} clubs'),
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Clubs'),
@@ -76,6 +69,9 @@ class _ClubsListScreenState extends ConsumerState<ClubsListScreen> {
         children: [
           // Offline indicator banner
           const OfflineIndicator(),
+          // Club switcher
+          const ClubSwitcher(),
+          const Divider(height: 1),
           // Main content
           Expanded(
             child: clubsAsync.when(
