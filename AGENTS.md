@@ -208,6 +208,8 @@ Three privilege levels exist, managed via `ClubPrivilege` enum:
 - **MANAGER**
 - **MEMBER**
 
+There is one and only one OWNER per club.
+
 ### Permission Matrix
 
 | Operation | OWNER | MANAGER | MEMBER |
