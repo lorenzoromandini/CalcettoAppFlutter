@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="web/logo.png" alt="Calcetto App Flutter Logo" width="128" height="128">
+  <img src="assets/logo.png" alt="Calcetto App Flutter Logo" width="128" height="128">
 </p>
 
 <h1 align="center">Calcetto App Flutter</h1>
