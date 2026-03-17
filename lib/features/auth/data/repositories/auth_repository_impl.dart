@@ -36,10 +36,20 @@ class AuthRepositoryImpl implements AuthRepository {
       final responseData =
           await _apiClient.login(email: email, password: password);
 
+      // Check if login was successful
+      final success = responseData['success'] as bool? ?? false;
+      if (!success) {
+        final error =
+            responseData['error'] as String? ?? 'Invalid email or password';
+        return FailureResult(AuthFailure(error));
+      }
+
       // Create user object from API response
-      // Next.js returns: {success: bool, token: String, user: Map}
-      final userData = Map<String, dynamic>.from(
-          responseData['user'] as Map<String, dynamic>);
+      // Backend returns: {success: bool, token: String, user: Map}
+      final userData = responseData['user'] as Map<String, dynamic>?;
+      if (userData == null) {
+        return FailureResult(const AuthFailure('Invalid email or password'));
+      }
       final token = responseData['token'] as String?;
 
       // Create UserModel

@@ -64,7 +64,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               children: [
                 const SizedBox(height: 48),
                 Image.asset(
-                  'logo.png',
+                  'assets/logo.png',
                   height: 120,
                   width: 120,
                   errorBuilder: (_, __, ___) =>

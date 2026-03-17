@@ -1,37 +1,121 @@
 import 'package:flutter/material.dart';
-import 'package:calcetto_app/features/clubs/domain/entities/club.dart';
-import 'package:calcetto_app/features/clubs/domain/entities/club_privilege.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../clubs/domain/entities/club.dart';
+import '../../../clubs/domain/entities/club_privilege.dart';
+import '../../../clubs/presentation/providers/active_club_provider.dart';
+import '../../../clubs/presentation/providers/clubs_list_provider.dart';
 import '../../../clubs/presentation/widgets/role_icon.dart';
 
-/// Active club header widget showing current club context.
+/// Active club header widget showing current club context with dropdown.
 ///
 /// Features:
 /// - Club logo (40px, circular)
 /// - Club name (titleMedium, bold)
 /// - User's role with role icon
-/// - Chevron icon for switching (tap to open switcher)
+/// - Dropdown menu button to switch clubs
 /// - Material 3 card style
-///
-/// Tappable to open club switcher or navigate to clubs list.
-class ActiveClubHeader extends StatelessWidget {
+class ActiveClubHeader extends ConsumerWidget {
   final Club club;
-  final VoidCallback? onTap;
 
   const ActiveClubHeader({
     super.key,
     required this.club,
-    this.onTap,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final clubsAsync = ref.watch(clubsListProvider);
 
     return Card(
       margin: const EdgeInsets.all(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+      child: PopupMenuButton<Club>(
+        offset: const Offset(0, 60),
+        onSelected: (selectedClub) {
+          ref.read(activeClubProvider.notifier).setActiveClub(selectedClub.id);
+        },
+        itemBuilder: (context) {
+          return clubsAsync.when(
+            data: (clubs) {
+              if (clubs.isEmpty) {
+                return [
+                  const PopupMenuItem<Club>(
+                    enabled: false,
+                    child: Text('Nessun club disponibile'),
+                  ),
+                ];
+              }
+              return clubs.map((c) {
+                final isActive = c.id == club.id;
+                return PopupMenuItem<Club>(
+                  value: c,
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.sports_soccer,
+                        size: 20,
+                        color: isActive ? theme.colorScheme.primary : null,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              c.name,
+                              style: TextStyle(
+                                fontWeight: isActive
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color:
+                                    isActive ? theme.colorScheme.primary : null,
+                              ),
+                            ),
+                            Text(
+                              _getPrivilegeName(c.userPrivilege),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isActive)
+                        Icon(
+                          Icons.check,
+                          color: theme.colorScheme.primary,
+                          size: 20,
+                        ),
+                    ],
+                  ),
+                );
+              }).toList();
+            },
+            loading: () => [
+              const PopupMenuItem<Club>(
+                enabled: false,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    SizedBox(width: 12),
+                    Text('Caricamento...'),
+                  ],
+                ),
+              ),
+            ],
+            error: (_, __) => [
+              const PopupMenuItem<Club>(
+                enabled: false,
+                child: Text('Errore caricamento'),
+              ),
+            ],
+          );
+        },
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -88,9 +172,9 @@ class ActiveClubHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              // Chevron
+              // Dropdown arrow
               Icon(
-                Icons.chevron_right,
+                Icons.arrow_drop_down,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ],
@@ -103,11 +187,11 @@ class ActiveClubHeader extends StatelessWidget {
   String _getPrivilegeName(ClubPrivilege privilege) {
     switch (privilege) {
       case ClubPrivilege.OWNER:
-        return 'Owner';
+        return 'Proprietario';
       case ClubPrivilege.MANAGER:
         return 'Manager';
       case ClubPrivilege.MEMBER:
-        return 'Member';
+        return 'Membro';
     }
   }
 }

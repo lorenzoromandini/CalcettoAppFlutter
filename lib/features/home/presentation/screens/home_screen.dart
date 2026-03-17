@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/widgets/offline_indicator.dart';
 import '../../../clubs/presentation/providers/active_club_provider.dart';
+import '../../../clubs/presentation/providers/clubs_list_provider.dart';
 import '../../../clubs/domain/entities/club.dart';
 import '../../../clubs/domain/entities/club_privilege.dart';
 import '../providers/navigation_provider.dart';
@@ -29,9 +30,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize active club from cache
+    // Initialize active club from cache and fetch clubs list
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(activeClubProvider.notifier).initialize();
+      ref.read(clubsListProvider.notifier).fetchClubs();
     });
   }
 
@@ -79,7 +81,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         SliverToBoxAdapter(
           child: ActiveClubHeader(
             club: club,
-            onTap: _openClubSwitcher,
           ),
         ),
 

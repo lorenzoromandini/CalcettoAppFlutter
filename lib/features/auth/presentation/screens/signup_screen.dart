@@ -80,7 +80,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               children: [
                 const SizedBox(height: 24),
                 Image.asset(
-                  'logo.png',
+                  'assets/logo.png',
                   height: 100,
                   width: 100,
                   errorBuilder: (_, __, ___) =>
