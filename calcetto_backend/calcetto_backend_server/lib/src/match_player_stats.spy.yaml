@@ -1,0 +1,22 @@
+class: MatchPlayerStats
+table: match_player_stats
+fields:
+  id: UuidValue?, defaultPersist=random_v7
+  matchId: UuidValue, relation(parent=matches)
+  clubMemberId: UuidValue, relation(parent=club_members)
+  goalsOpen: int, default=0
+  goalsPenalty: int, default=0
+  assists: int, default=0
+  ownGoals: int, default=0
+  penaltiesMissed: int, default=0
+  penaltiesSaved: int, default=0
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+indexes:
+  match_player_stats_match_id_idx:
+    fields: matchId
+  match_player_stats_club_member_id_idx:
+    fields: clubMemberId
+  match_player_stats_unique:
+    fields: matchId, clubMemberId
+    unique: true

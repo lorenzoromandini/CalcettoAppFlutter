@@ -41,6 +41,104 @@ Never run migrations when fixing logic, validation or UI issues.
 
 ---
 
+## Protected Files - DO NOT MODIFY
+
+**The following files and directories are PROTECTED and must NEVER be modified by agents unless explicitly instructed by the developer:**
+
+1. **`AGENTS.md`** - This file itself (configuration and guidelines)
+2. **`schema.yaml`** - Database schema definition at project root
+3. **`calcetto_backend/**/*.spy.yaml`** - All Serverpod model definition files
+4. **`ratings_algorithms/`** - All files in the ratings algorithms directory
+
+**Rule:** Only modify these files when the developer explicitly says "modify AGENTS.md", "update schema.yaml", "change the spy.yaml files", or specifically names the file to edit. Never assume you should edit these files based on context or implied requirements.
+
+---
+
+## Frontend Development - Backend Reference
+
+**When working on the Flutter frontend, ALWAYS refer to the authoritative Serverpod YAML files:**
+
+- Location: `calcetto_backend/calcetto_backend_server/lib/src/*.spy.yaml`
+- These files define the **source of truth** for:
+  - Model fields and types
+  - Enums and their values
+  - Database constraints and relations
+  - API contracts
+
+**Before implementing any frontend feature:**
+1. Read the relevant `*.spy.yaml` files to understand the data model
+2. Check enums in `*_enum.spy.yaml` files for valid values
+3. Verify field types and nullability
+4. Understand relations between entities
+
+**Example:** When building a match creation screen, read:
+- `match.spy.yaml` - Match fields and constraints
+- `match_mode.spy.yaml` - Available match modes
+- `match_status.spy.yaml` - Match status values
+- `match_participant.spy.yaml` - How players join matches
+
+---
+
+## Data Seeding Specifications
+
+When seeding test data for development or testing:
+
+### Password Hashing
+
+**Format:** Store passwords as `salt:hash` where:
+- `salt` - Random 16+ character salt
+- `hash` - bcrypt/argon2 hash of `salt + password`
+- Separator: colon (`:`)
+
+**Example:**
+```
+# For password "password123" with salt "a1b2c3d4e5f6g7h8"
+Stored value: "a1b2c3d4e5f6g7h8:$2b$10$xxxxxxxx..."
+```
+
+**Rules:**
+- Each user must have a **unique salt** (even with same password)
+- Never store plain text passwords
+- Never reuse salts across users
+- Use cryptographically secure random salt generation
+
+### UUID Generation
+
+- Use UUID v7 for all primary keys
+- Format: `xxxxxxxx-xxxx-7xxx-yxxx-xxxxxxxxxxxx`
+- Serverpod auto-generates these with `defaultPersist=random_v7`
+
+### DateTime Fields
+
+- Store all timestamps in **UTC**
+- Format: ISO 8601 (`2026-03-17T10:30:00Z`)
+- Use `DateTime.now().toUtc()` for current time
+
+### Test Data Guidelines
+
+1. **Users:** Create diverse test users with realistic names/emails
+2. **Clubs:** Create multiple clubs with different configurations
+3. **Matches:** Include matches in various statuses (scheduled, live, finished, completed)
+4. **Ratings:** Include ratings with different values to test the algorithm
+5. **Foreign Keys:** Always ensure referential integrity
+
+### Seeding Script Structure
+
+```dart
+// Example seeding pattern
+Future<void> seedTestData(Session session) async {
+  // 1. Create users with hashed passwords
+  // 2. Create clubs with owners
+  // 3. Create club memberships
+  // 4. Create matches
+  // 5. Create participants
+  // 6. Create goals and stats
+  // 7. Create ratings
+}
+```
+
+---
+
 ## Architecture Layers
 
 ```

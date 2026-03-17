@@ -16,30 +16,29 @@ import 'club.dart' as _i4;
 import 'club_invite.dart' as _i5;
 import 'club_member.dart' as _i6;
 import 'club_privilege.dart' as _i7;
-import 'goal.dart' as _i8;
-import 'match.dart' as _i9;
-import 'match_mode.dart' as _i10;
-import 'match_participant.dart' as _i11;
+import 'match.dart' as _i8;
+import 'match_mode.dart' as _i9;
+import 'match_participant.dart' as _i10;
+import 'match_player_stats.dart' as _i11;
 import 'match_status.dart' as _i12;
 import 'match_team_side.dart' as _i13;
 import 'player_position.dart' as _i14;
 import 'player_rating.dart' as _i15;
 import 'user.dart' as _i16;
-import 'package:calcetto_backend_server/src/generated/goal.dart' as _i17;
-import 'package:calcetto_backend_server/src/generated/match.dart' as _i18;
+import 'package:calcetto_backend_server/src/generated/match.dart' as _i17;
 import 'package:calcetto_backend_server/src/generated/match_participant.dart'
-    as _i19;
+    as _i18;
 import 'package:calcetto_backend_server/src/generated/player_rating.dart'
-    as _i20;
+    as _i19;
 export 'auth_response.dart';
 export 'club.dart';
 export 'club_invite.dart';
 export 'club_member.dart';
 export 'club_privilege.dart';
-export 'goal.dart';
 export 'match.dart';
 export 'match_mode.dart';
 export 'match_participant.dart';
+export 'match_player_stats.dart';
 export 'match_status.dart';
 export 'match_team_side.dart';
 export 'player_position.dart';
@@ -422,139 +421,6 @@ class Protocol extends _i1.SerializationManagerServer {
       managed: true,
     ),
     _i2.TableDefinition(
-      name: 'goals',
-      dartName: 'Goal',
-      schema: 'public',
-      module: 'calcetto_backend',
-      columns: [
-        _i2.ColumnDefinition(
-          name: 'id',
-          columnType: _i2.ColumnType.uuid,
-          isNullable: false,
-          dartType: 'UuidValue?',
-          columnDefault: 'gen_random_uuid_v7()',
-        ),
-        _i2.ColumnDefinition(
-          name: 'matchId',
-          columnType: _i2.ColumnType.uuid,
-          isNullable: false,
-          dartType: 'UuidValue',
-        ),
-        _i2.ColumnDefinition(
-          name: 'scorerId',
-          columnType: _i2.ColumnType.uuid,
-          isNullable: false,
-          dartType: 'UuidValue',
-        ),
-        _i2.ColumnDefinition(
-          name: 'assisterId',
-          columnType: _i2.ColumnType.uuid,
-          isNullable: true,
-          dartType: 'UuidValue?',
-        ),
-        _i2.ColumnDefinition(
-          name: 'isOwnGoal',
-          columnType: _i2.ColumnType.boolean,
-          isNullable: false,
-          dartType: 'bool',
-        ),
-        _i2.ColumnDefinition(
-          name: 'createdAt',
-          columnType: _i2.ColumnType.timestampWithoutTimeZone,
-          isNullable: false,
-          dartType: 'DateTime',
-          columnDefault: 'CURRENT_TIMESTAMP',
-        ),
-      ],
-      foreignKeys: [
-        _i2.ForeignKeyDefinition(
-          constraintName: 'goals_fk_0',
-          columns: ['matchId'],
-          referenceTable: 'matches',
-          referenceTableSchema: 'public',
-          referenceColumns: ['id'],
-          onUpdate: _i2.ForeignKeyAction.noAction,
-          onDelete: _i2.ForeignKeyAction.noAction,
-          matchType: null,
-        ),
-        _i2.ForeignKeyDefinition(
-          constraintName: 'goals_fk_1',
-          columns: ['scorerId'],
-          referenceTable: 'club_members',
-          referenceTableSchema: 'public',
-          referenceColumns: ['id'],
-          onUpdate: _i2.ForeignKeyAction.noAction,
-          onDelete: _i2.ForeignKeyAction.noAction,
-          matchType: null,
-        ),
-        _i2.ForeignKeyDefinition(
-          constraintName: 'goals_fk_2',
-          columns: ['assisterId'],
-          referenceTable: 'club_members',
-          referenceTableSchema: 'public',
-          referenceColumns: ['id'],
-          onUpdate: _i2.ForeignKeyAction.noAction,
-          onDelete: _i2.ForeignKeyAction.noAction,
-          matchType: null,
-        ),
-      ],
-      indexes: [
-        _i2.IndexDefinition(
-          indexName: 'goals_pkey',
-          tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'id',
-            )
-          ],
-          type: 'btree',
-          isUnique: true,
-          isPrimary: true,
-        ),
-        _i2.IndexDefinition(
-          indexName: 'goals_match_id_idx',
-          tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'matchId',
-            )
-          ],
-          type: 'btree',
-          isUnique: false,
-          isPrimary: false,
-        ),
-        _i2.IndexDefinition(
-          indexName: 'goals_scorer_id_idx',
-          tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'scorerId',
-            )
-          ],
-          type: 'btree',
-          isUnique: false,
-          isPrimary: false,
-        ),
-        _i2.IndexDefinition(
-          indexName: 'goals_assister_id_idx',
-          tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'assisterId',
-            )
-          ],
-          type: 'btree',
-          isUnique: false,
-          isPrimary: false,
-        ),
-      ],
-      managed: true,
-    ),
-    _i2.TableDefinition(
       name: 'match_participants',
       dartName: 'MatchParticipant',
       schema: 'public',
@@ -656,6 +522,170 @@ class Protocol extends _i1.SerializationManagerServer {
         ),
         _i2.IndexDefinition(
           indexName: 'match_participants_unique',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'matchId',
+            ),
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'clubMemberId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'match_player_stats',
+      dartName: 'MatchPlayerStats',
+      schema: 'public',
+      module: 'calcetto_backend',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue?',
+          columnDefault: 'gen_random_uuid_v7()',
+        ),
+        _i2.ColumnDefinition(
+          name: 'matchId',
+          columnType: _i2.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _i2.ColumnDefinition(
+          name: 'clubMemberId',
+          columnType: _i2.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _i2.ColumnDefinition(
+          name: 'goalsOpen',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _i2.ColumnDefinition(
+          name: 'goalsPenalty',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _i2.ColumnDefinition(
+          name: 'assists',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _i2.ColumnDefinition(
+          name: 'ownGoals',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _i2.ColumnDefinition(
+          name: 'penaltiesMissed',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _i2.ColumnDefinition(
+          name: 'penaltiesSaved',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'CURRENT_TIMESTAMP',
+        ),
+        _i2.ColumnDefinition(
+          name: 'updatedAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'CURRENT_TIMESTAMP',
+        ),
+      ],
+      foreignKeys: [
+        _i2.ForeignKeyDefinition(
+          constraintName: 'match_player_stats_fk_0',
+          columns: ['matchId'],
+          referenceTable: 'matches',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+        _i2.ForeignKeyDefinition(
+          constraintName: 'match_player_stats_fk_1',
+          columns: ['clubMemberId'],
+          referenceTable: 'club_members',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'match_player_stats_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'match_player_stats_match_id_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'matchId',
+            )
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'match_player_stats_club_member_id_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'clubMemberId',
+            )
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'match_player_stats_unique',
           tableSpace: null,
           elements: [
             _i2.IndexElementDefinition(
@@ -898,6 +928,32 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'double',
         ),
         _i2.ColumnDefinition(
+          name: 'ratingPreCaps',
+          columnType: _i2.ColumnType.doublePrecision,
+          isNullable: true,
+          dartType: 'double?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'bonusMinusMalus',
+          columnType: _i2.ColumnType.doublePrecision,
+          isNullable: true,
+          dartType: 'double?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'mvp',
+          columnType: _i2.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+          columnDefault: 'false',
+        ),
+        _i2.ColumnDefinition(
+          name: 'mention',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _i2.ColumnDefinition(
           name: 'comment',
           columnType: _i2.ColumnType.text,
           isNullable: true,
@@ -1125,17 +1181,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i7.ClubPrivilege) {
       return _i7.ClubPrivilege.fromJson(data) as T;
     }
-    if (t == _i8.Goal) {
-      return _i8.Goal.fromJson(data) as T;
+    if (t == _i8.Match) {
+      return _i8.Match.fromJson(data) as T;
     }
-    if (t == _i9.Match) {
-      return _i9.Match.fromJson(data) as T;
+    if (t == _i9.MatchMode) {
+      return _i9.MatchMode.fromJson(data) as T;
     }
-    if (t == _i10.MatchMode) {
-      return _i10.MatchMode.fromJson(data) as T;
+    if (t == _i10.MatchParticipant) {
+      return _i10.MatchParticipant.fromJson(data) as T;
     }
-    if (t == _i11.MatchParticipant) {
-      return _i11.MatchParticipant.fromJson(data) as T;
+    if (t == _i11.MatchPlayerStats) {
+      return _i11.MatchPlayerStats.fromJson(data) as T;
     }
     if (t == _i12.MatchStatus) {
       return _i12.MatchStatus.fromJson(data) as T;
@@ -1167,17 +1223,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i7.ClubPrivilege?>()) {
       return (data != null ? _i7.ClubPrivilege.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i8.Goal?>()) {
-      return (data != null ? _i8.Goal.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i8.Match?>()) {
+      return (data != null ? _i8.Match.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i9.Match?>()) {
-      return (data != null ? _i9.Match.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i9.MatchMode?>()) {
+      return (data != null ? _i9.MatchMode.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i10.MatchMode?>()) {
-      return (data != null ? _i10.MatchMode.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i10.MatchParticipant?>()) {
+      return (data != null ? _i10.MatchParticipant.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i11.MatchParticipant?>()) {
-      return (data != null ? _i11.MatchParticipant.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i11.MatchPlayerStats?>()) {
+      return (data != null ? _i11.MatchPlayerStats.fromJson(data) : null) as T;
     }
     if (t == _i1.getType<_i12.MatchStatus?>()) {
       return (data != null ? _i12.MatchStatus.fromJson(data) : null) as T;
@@ -1214,21 +1270,18 @@ class Protocol extends _i1.SerializationManagerServer {
               MapEntry(deserialize<String>(k), deserialize<dynamic>(v)))
           : null) as T;
     }
-    if (t == List<_i17.Goal>) {
-      return (data as List).map((e) => deserialize<_i17.Goal>(e)).toList() as T;
-    }
-    if (t == List<_i18.Match>) {
-      return (data as List).map((e) => deserialize<_i18.Match>(e)).toList()
+    if (t == List<_i17.Match>) {
+      return (data as List).map((e) => deserialize<_i17.Match>(e)).toList()
           as T;
     }
-    if (t == List<_i19.MatchParticipant>) {
+    if (t == List<_i18.MatchParticipant>) {
       return (data as List)
-          .map((e) => deserialize<_i19.MatchParticipant>(e))
+          .map((e) => deserialize<_i18.MatchParticipant>(e))
           .toList() as T;
     }
-    if (t == List<_i20.PlayerRating>) {
+    if (t == List<_i19.PlayerRating>) {
       return (data as List)
-          .map((e) => deserialize<_i20.PlayerRating>(e))
+          .map((e) => deserialize<_i19.PlayerRating>(e))
           .toList() as T;
     }
     try {
@@ -1256,17 +1309,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i7.ClubPrivilege) {
       return 'ClubPrivilege';
     }
-    if (data is _i8.Goal) {
-      return 'Goal';
-    }
-    if (data is _i9.Match) {
+    if (data is _i8.Match) {
       return 'Match';
     }
-    if (data is _i10.MatchMode) {
+    if (data is _i9.MatchMode) {
       return 'MatchMode';
     }
-    if (data is _i11.MatchParticipant) {
+    if (data is _i10.MatchParticipant) {
       return 'MatchParticipant';
+    }
+    if (data is _i11.MatchPlayerStats) {
+      return 'MatchPlayerStats';
     }
     if (data is _i12.MatchStatus) {
       return 'MatchStatus';
@@ -1311,17 +1364,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'ClubPrivilege') {
       return deserialize<_i7.ClubPrivilege>(data['data']);
     }
-    if (dataClassName == 'Goal') {
-      return deserialize<_i8.Goal>(data['data']);
-    }
     if (dataClassName == 'Match') {
-      return deserialize<_i9.Match>(data['data']);
+      return deserialize<_i8.Match>(data['data']);
     }
     if (dataClassName == 'MatchMode') {
-      return deserialize<_i10.MatchMode>(data['data']);
+      return deserialize<_i9.MatchMode>(data['data']);
     }
     if (dataClassName == 'MatchParticipant') {
-      return deserialize<_i11.MatchParticipant>(data['data']);
+      return deserialize<_i10.MatchParticipant>(data['data']);
+    }
+    if (dataClassName == 'MatchPlayerStats') {
+      return deserialize<_i11.MatchPlayerStats>(data['data']);
     }
     if (dataClassName == 'MatchStatus') {
       return deserialize<_i12.MatchStatus>(data['data']);
@@ -1360,12 +1413,12 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i5.ClubInvite.t;
       case _i6.ClubMember:
         return _i6.ClubMember.t;
-      case _i8.Goal:
-        return _i8.Goal.t;
-      case _i9.Match:
-        return _i9.Match.t;
-      case _i11.MatchParticipant:
-        return _i11.MatchParticipant.t;
+      case _i8.Match:
+        return _i8.Match.t;
+      case _i10.MatchParticipant:
+        return _i10.MatchParticipant.t;
+      case _i11.MatchPlayerStats:
+        return _i11.MatchPlayerStats.t;
       case _i15.PlayerRating:
         return _i15.PlayerRating.t;
       case _i16.User:

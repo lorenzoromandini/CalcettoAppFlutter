@@ -9,11 +9,6 @@ clubs:
   - generateInviteCode:
   - deleteClub:
   - createClub:
-goals:
-  - getMatchGoals:
-  - addGoal:
-  - removeGoal:
-  - getPlayerStats:
 matches:
   - getClubMatches:
   - getMatchById:

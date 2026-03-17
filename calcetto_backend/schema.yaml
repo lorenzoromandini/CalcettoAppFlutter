@@ -1,0 +1,434 @@
+-- =============================================================================
+-- Schema for Football Organizer App (Serverpod + PostgreSQL)
+-- Final version – March 2026 – with all indexes
+-- =============================================================================
+
+version: 2.0
+
+context:
+  match_format:
+    type: string
+    value: "8v8"
+
+enums:
+
+  PlayerPosition:
+    type: enum
+    values: [GK, DEF, MID, ST]
+
+  ClubPrivilege:
+    type: enum
+    values: [OWNER, MANAGER, MEMBER]
+
+  MatchMode:
+    type: enum
+    values: [v5, v8, v11]
+
+  MatchStatus:
+    type: enum
+    values: [scheduled, live, finished, completed, cancelled]
+
+  MatchTeamSide:
+    type: enum
+    values: [home, away]
+
+entities:
+
+  User:
+    table: users
+    fields:
+
+      id:
+        type: uuid
+        primary_key: true
+
+      email:
+        type: string
+        required: true
+        unique: true
+
+      first_name:
+        type: string
+        required: true
+
+      last_name:
+        type: string
+        required: true
+
+      nickname:
+        type: string
+        nullable: true
+
+      image_url:
+        type: string
+        nullable: true
+
+      password:
+        type: string
+        required: true
+
+      created_at:
+        type: datetime
+        default: now
+
+      updated_at:
+        type: datetime
+        default: now
+
+      last_login:
+        type: datetime
+        nullable: true
+
+  Club:
+    table: clubs
+    fields:
+
+      id:
+        type: uuid
+        primary_key: true
+
+      name:
+        type: string
+        required: true
+
+      description:
+        type: string
+        nullable: true
+
+      image_url:
+        type: string
+        nullable: true
+
+      created_by:
+        type: relation
+        target: User
+        nullable: true
+
+      created_at:
+        type: datetime
+        default: now
+
+      updated_at:
+        type: datetime
+        default: now
+
+      deleted_at:
+        type: datetime
+        nullable: true
+
+  ClubMember:
+    table: club_members
+    fields:
+
+      id:
+        type: uuid
+        primary_key: true
+
+      club:
+        type: relation
+        target: Club
+        required: true
+
+      user:
+        type: relation
+        target: User
+        required: true
+
+      jersey_number:
+        type: int
+        nullable: true
+        constraints:
+          min: 1
+          max: 99
+
+      symbol:
+        type: string
+        nullable: true
+
+      nationality:
+        type: string
+        nullable: true
+
+      primary_role:
+        type: enum
+        enum: PlayerPosition
+        required: true
+
+      secondary_roles:
+        type: array
+        items:
+          type: enum
+          enum: PlayerPosition
+        default: []
+
+      privilege:
+        type: enum
+        enum: ClubPrivilege
+        required: true
+
+      joined_at:
+        type: datetime
+        default: now
+
+      left_at:
+        type: datetime
+        nullable: true
+
+    constraints:
+      - type: unique
+        fields: [club, user]
+
+  ClubInvite:
+    table: club_invites
+    fields:
+
+      id:
+        type: uuid
+        primary_key: true
+
+      club:
+        type: relation
+        target: Club
+        required: true
+
+      created_by:
+        type: relation
+        target: User
+        nullable: true
+
+      token:
+        type: string
+        required: true
+        unique: true
+
+      expires_at:
+        type: datetime
+        required: true
+
+      created_at:
+        type: datetime
+        default: now
+
+  Match:
+    table: matches
+    fields:
+
+      id:
+        type: uuid
+        primary_key: true
+
+      club:
+        type: relation
+        target: Club
+        required: true
+
+      scheduled_at:
+        type: datetime
+        required: true
+
+      location:
+        type: string
+        nullable: true
+
+      mode:
+        type: enum
+        enum: MatchMode
+        required: true
+
+      status:
+        type: enum
+        enum: MatchStatus
+        required: true
+
+      home_score:
+        type: int
+        default: 0
+
+      away_score:
+        type: int
+        default: 0
+
+      notes:
+        type: string
+        nullable: true
+
+      created_by:
+        type: relation
+        target: User
+        nullable: true
+
+      score_finalized_by:
+        type: relation
+        target: User
+        nullable: true
+
+      ratings_completed_by:
+        type: relation
+        target: User
+        nullable: true
+
+      created_at:
+        type: datetime
+        default: now
+
+      updated_at:
+        type: datetime
+        default: now
+
+  MatchParticipant:
+    table: match_participants
+    fields:
+
+      id:
+        type: uuid
+        primary_key: true
+
+      match:
+        type: relation
+        target: Match
+        required: true
+
+      club_member:
+        type: relation
+        target: ClubMember
+        required: true
+
+      team_side:
+        type: enum
+        enum: MatchTeamSide
+        required: true
+
+      position:
+        type: enum
+        enum: PlayerPosition
+        nullable: true
+
+    constraints:
+      - type: unique
+        fields: [match, club_member]
+
+  MatchPlayerStats:
+    table: match_player_stats
+    fields:
+
+      id:
+        type: uuid
+        primary_key: true
+
+      match:
+        type: relation
+        target: Match
+        required: true
+
+      club_member:
+        type: relation
+        target: ClubMember
+        required: true
+
+      goals_open:
+        type: int
+        default: 0
+        constraints:
+          min: 0
+
+      goals_penalty:
+        type: int
+        default: 0
+        constraints:
+          min: 0
+
+      assists:
+        type: int
+        default: 0
+        constraints:
+          min: 0
+
+      own_goals:
+        type: int
+        default: 0
+        constraints:
+          min: 0
+
+      penalties_missed:
+        type: int
+        default: 0
+        constraints:
+          min: 0
+
+      penalties_saved:
+        type: int
+        default: 0
+        constraints:
+          min: 0
+
+      created_at:
+        type: datetime
+        default: now
+
+      updated_at:
+        type: datetime
+        default: now
+
+    constraints:
+      - type: unique
+        fields: [match, club_member]
+
+  PlayerRating:
+    table: player_ratings
+    fields:
+
+      id:
+        type: uuid
+        primary_key: true
+
+      match:
+        type: relation
+        target: Match
+        required: true
+
+      club_member:
+        type: relation
+        target: ClubMember
+        required: true
+
+      rating:
+        type: float
+        required: true
+        constraints:
+          min: 3
+          max: 10
+          step: 0.25
+
+      rating_pre_caps:
+        type: float
+        nullable: true
+
+      bonus_minus_malus:
+        type: float
+        nullable: true
+
+      mvp:
+        type: boolean
+        default: false
+
+      mention:
+        type: int
+        default: 0
+        constraints:
+          allowed: [-1, 0, 1]
+
+      comment:
+        type: string
+        nullable: true
+
+      created_at:
+        type: datetime
+        default: now
+
+      updated_at:
+        type: datetime
+        default: now
+
+    constraints:
+      - type: unique
+        fields: [match, club_member]

@@ -238,8 +238,8 @@ The Flutter app connects to the Serverpod backend with this schema:
 - `ClubInvite` - Invite tokens (id, clubId, createdBy, token, expiresAt, createdAt)
 - `Match` - Scheduled matches (id, clubId, scheduledAt, location, mode, status, homeScore, awayScore, notes, createdBy, scoreFinalizedBy, ratingsCompletedBy, createdAt, updatedAt)
 - `MatchParticipant` - Players in matches (id, matchId, clubMemberId, teamSide, position)
-- `Goal` - Match goals (id, matchId, scorerId, assisterId, isOwnGoal, createdAt)
-- `PlayerRating` - Performance ratings (id, matchId, clubMemberId, rating, comment, createdAt, updatedAt)
+- `MatchPlayerStats` - Player statistics per match (id, matchId, clubMemberId, goalsOpen, goalsPenalty, assists, ownGoals, penaltiesMissed, penaltiesSaved, createdAt, updatedAt)
+- `PlayerRating` - Performance ratings (id, matchId, clubMemberId, rating, ratingPreCaps, bonusMinusMalus, mvp, mention, comment, createdAt, updatedAt)
 
 **Enums:**
 - `PlayerPosition` - GK, DEF, MID, ST
@@ -431,7 +431,7 @@ Expand: `Servers` → `Calcetto DB` → `Schemas` → `public` → `Tables`
 - `club_invites` - Invite tokens
 - `matches` - Scheduled matches
 - `match_participants` - Players in matches
-- `goals` - Match goals
+- `match_player_stats` - Player statistics per match
 - `player_ratings` - Performance ratings
 
 ---

@@ -16,12 +16,11 @@ import 'package:serverpod/serverpod.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:calcetto_backend_server/src/generated/user.dart' as _i4;
 import 'package:calcetto_backend_server/src/generated/club.dart' as _i5;
-import 'package:calcetto_backend_server/src/generated/goal.dart' as _i6;
-import 'package:calcetto_backend_server/src/generated/match.dart' as _i7;
+import 'package:calcetto_backend_server/src/generated/match.dart' as _i6;
 import 'package:calcetto_backend_server/src/generated/match_participant.dart'
-    as _i8;
+    as _i7;
 import 'package:calcetto_backend_server/src/generated/player_rating.dart'
-    as _i9;
+    as _i8;
 import 'package:calcetto_backend_server/src/generated/protocol.dart';
 import 'package:calcetto_backend_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -112,8 +111,6 @@ class TestEndpoints {
 
   late final _ClubsEndpoint clubs;
 
-  late final _GoalsEndpoint goals;
-
   late final _MatchesEndpoint matches;
 
   late final _RatingsEndpoint ratings;
@@ -131,10 +128,6 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     clubs = _ClubsEndpoint(
-      endpoints,
-      serializationManager,
-    );
-    goals = _GoalsEndpoint(
       endpoints,
       serializationManager,
     );
@@ -450,142 +443,6 @@ class _ClubsEndpoint {
   }
 }
 
-class _GoalsEndpoint {
-  _GoalsEndpoint(
-    this._endpointDispatch,
-    this._serializationManager,
-  );
-
-  final _i2.EndpointDispatch _endpointDispatch;
-
-  final _i2.SerializationManager _serializationManager;
-
-  _i3.Future<List<_i6.Goal>> getMatchGoals(
-    _i1.TestSessionBuilder sessionBuilder,
-    String matchIdStr,
-  ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-        endpoint: 'goals',
-        method: 'getMatchGoals',
-      );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'goals',
-          methodName: 'getMatchGoals',
-          parameters: _i1.testObjectToJson({'matchIdStr': matchIdStr}),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue = await (_localCallContext.method.call(
-          _localUniqueSession,
-          _localCallContext.arguments,
-        ) as _i3.Future<List<_i6.Goal>>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _i3.Future<_i6.Goal> addGoal(
-    _i1.TestSessionBuilder sessionBuilder,
-    String matchIdStr,
-    String scorerIdStr,
-    String? assisterIdStr,
-    bool isOwnGoal,
-  ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-        endpoint: 'goals',
-        method: 'addGoal',
-      );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'goals',
-          methodName: 'addGoal',
-          parameters: _i1.testObjectToJson({
-            'matchIdStr': matchIdStr,
-            'scorerIdStr': scorerIdStr,
-            'assisterIdStr': assisterIdStr,
-            'isOwnGoal': isOwnGoal,
-          }),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue = await (_localCallContext.method.call(
-          _localUniqueSession,
-          _localCallContext.arguments,
-        ) as _i3.Future<_i6.Goal>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _i3.Future<void> removeGoal(
-    _i1.TestSessionBuilder sessionBuilder,
-    String goalIdStr,
-  ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-        endpoint: 'goals',
-        method: 'removeGoal',
-      );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'goals',
-          methodName: 'removeGoal',
-          parameters: _i1.testObjectToJson({'goalIdStr': goalIdStr}),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue = await (_localCallContext.method.call(
-          _localUniqueSession,
-          _localCallContext.arguments,
-        ) as _i3.Future<void>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _i3.Future<Map<String, dynamic>> getPlayerStats(
-    _i1.TestSessionBuilder sessionBuilder,
-    String clubMemberIdStr,
-  ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-        endpoint: 'goals',
-        method: 'getPlayerStats',
-      );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'goals',
-          methodName: 'getPlayerStats',
-          parameters:
-              _i1.testObjectToJson({'clubMemberIdStr': clubMemberIdStr}),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue = await (_localCallContext.method.call(
-          _localUniqueSession,
-          _localCallContext.arguments,
-        ) as _i3.Future<Map<String, dynamic>>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-}
-
 class _MatchesEndpoint {
   _MatchesEndpoint(
     this._endpointDispatch,
@@ -596,7 +453,7 @@ class _MatchesEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i7.Match>> getClubMatches(
+  _i3.Future<List<_i6.Match>> getClubMatches(
     _i1.TestSessionBuilder sessionBuilder,
     String clubIdStr, {
     String? status,
@@ -621,7 +478,7 @@ class _MatchesEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<List<_i7.Match>>);
+        ) as _i3.Future<List<_i6.Match>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -629,7 +486,7 @@ class _MatchesEndpoint {
     });
   }
 
-  _i3.Future<_i7.Match?> getMatchById(
+  _i3.Future<_i6.Match?> getMatchById(
     _i1.TestSessionBuilder sessionBuilder,
     String matchIdStr,
   ) async {
@@ -650,7 +507,7 @@ class _MatchesEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i7.Match?>);
+        ) as _i3.Future<_i6.Match?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -658,7 +515,7 @@ class _MatchesEndpoint {
     });
   }
 
-  _i3.Future<_i7.Match> createMatch(
+  _i3.Future<_i6.Match> createMatch(
     _i1.TestSessionBuilder sessionBuilder,
     String clubIdStr,
     DateTime scheduledAt,
@@ -687,7 +544,7 @@ class _MatchesEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i7.Match>);
+        ) as _i3.Future<_i6.Match>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -695,7 +552,7 @@ class _MatchesEndpoint {
     });
   }
 
-  _i3.Future<_i7.Match> updateMatchStatus(
+  _i3.Future<_i6.Match> updateMatchStatus(
     _i1.TestSessionBuilder sessionBuilder,
     String matchIdStr,
     String statusStr,
@@ -720,7 +577,7 @@ class _MatchesEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i7.Match>);
+        ) as _i3.Future<_i6.Match>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -728,7 +585,7 @@ class _MatchesEndpoint {
     });
   }
 
-  _i3.Future<_i7.Match> updateScore(
+  _i3.Future<_i6.Match> updateScore(
     _i1.TestSessionBuilder sessionBuilder,
     String matchIdStr,
     int homeScore,
@@ -755,7 +612,7 @@ class _MatchesEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i7.Match>);
+        ) as _i3.Future<_i6.Match>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -763,7 +620,7 @@ class _MatchesEndpoint {
     });
   }
 
-  _i3.Future<List<_i8.MatchParticipant>> getMatchParticipants(
+  _i3.Future<List<_i7.MatchParticipant>> getMatchParticipants(
     _i1.TestSessionBuilder sessionBuilder,
     String matchIdStr,
   ) async {
@@ -784,7 +641,7 @@ class _MatchesEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<List<_i8.MatchParticipant>>);
+        ) as _i3.Future<List<_i7.MatchParticipant>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -792,7 +649,7 @@ class _MatchesEndpoint {
     });
   }
 
-  _i3.Future<_i8.MatchParticipant> addParticipant(
+  _i3.Future<_i7.MatchParticipant> addParticipant(
     _i1.TestSessionBuilder sessionBuilder,
     String matchIdStr,
     String clubMemberIdStr,
@@ -821,7 +678,7 @@ class _MatchesEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i8.MatchParticipant>);
+        ) as _i3.Future<_i7.MatchParticipant>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -870,7 +727,7 @@ class _RatingsEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i9.PlayerRating>> getMatchRatings(
+  _i3.Future<List<_i8.PlayerRating>> getMatchRatings(
     _i1.TestSessionBuilder sessionBuilder,
     String matchIdStr,
   ) async {
@@ -891,7 +748,7 @@ class _RatingsEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<List<_i9.PlayerRating>>);
+        ) as _i3.Future<List<_i8.PlayerRating>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -899,7 +756,7 @@ class _RatingsEndpoint {
     });
   }
 
-  _i3.Future<_i9.PlayerRating?> getPlayerRating(
+  _i3.Future<_i8.PlayerRating?> getPlayerRating(
     _i1.TestSessionBuilder sessionBuilder,
     String matchIdStr,
     String clubMemberIdStr,
@@ -924,7 +781,7 @@ class _RatingsEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i9.PlayerRating?>);
+        ) as _i3.Future<_i8.PlayerRating?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -932,7 +789,7 @@ class _RatingsEndpoint {
     });
   }
 
-  _i3.Future<_i9.PlayerRating> ratePlayer(
+  _i3.Future<_i8.PlayerRating> ratePlayer(
     _i1.TestSessionBuilder sessionBuilder,
     String matchIdStr,
     String clubMemberIdStr,
@@ -961,7 +818,7 @@ class _RatingsEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i9.PlayerRating>);
+        ) as _i3.Future<_i8.PlayerRating>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -999,7 +856,7 @@ class _RatingsEndpoint {
     });
   }
 
-  _i3.Future<List<_i9.PlayerRating>> getRatingsByUser(
+  _i3.Future<List<_i8.PlayerRating>> getRatingsByUser(
       _i1.TestSessionBuilder sessionBuilder) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1018,7 +875,7 @@ class _RatingsEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<List<_i9.PlayerRating>>);
+        ) as _i3.Future<List<_i8.PlayerRating>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

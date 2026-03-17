@@ -1,0 +1,192 @@
+{
+  "version": "4.1",
+
+  "context": {
+    "match_format": "8v8"
+  },
+
+  "schema": {
+    "role": ["GK", "DEF", "MID", "ST"],
+    "mention": [-1, 0, 1],
+    "result": ["win", "draw", "loss"]
+  },
+
+  "constants": {
+    "BASE": 5.3,
+    "MIN": 3,
+    "MAX": 10,
+    "ROUND_STEP": 0.25
+  },
+
+  "functions": {
+    "clamp": "clamp(x, min, max)",
+    "pow": "pow(x, y)",
+    "round": "round(x)",
+    "mean": "sum(list)/len(list)"
+  },
+
+  "derived": [
+    { "name": "total_goals", "expr": "team_goals_for + team_goals_against" },
+    { "name": "margin", "expr": "team_goals_for - team_goals_against" },
+    { "name": "loss_margin", "expr": "team_goals_against - team_goals_for" },
+
+    { "name": "penalty_weight", "expr": "total_goals <= 6 ? 1.0 : 0.8" },
+
+    { "name": "G_eff", "expr": "goals_open + goals_penalty * penalty_weight" },
+
+    { "name": "goal_share", "expr": "team_goals_for > 0 ? G_eff / team_goals_for : 0" },
+
+    {
+      "name": "error_decisive",
+      "expr": "result == 'loss' && loss_margin <= 2 && (penalties_missed + own_goals) > 0"
+    },
+
+    {
+      "name": "closed_factor",
+      "expr": "clamp((8 - total_goals) / 4, 0, 1)"
+    },
+
+    {
+      "name": "bonus_minus_malus",
+      "expr": "rating_pre_caps - BASE"
+    }
+  ],
+
+  "weights": {
+    "goal_weight": {
+      "ST": 1.0,
+      "MID": 1.08,
+      "DEF": 1.2,
+      "GK": 1.5
+    },
+    "result": {
+      "win": 2.3,
+      "draw": 0,
+      "loss": -1.8
+    }
+  },
+
+  "pipeline": [
+    { "op": "set", "var": "rating", "value": "BASE" },
+
+    { "op": "add", "value": "result[result]" },
+
+    { "op": "add", "value": "goal_weight[role] * pow(goal_share, 1.2) * 3.0" },
+
+    {
+      "op": "add",
+      "value": "team_goals_for >= 5 && G_eff == 0 && (role == 'ST' || role == 'MID') ? (role == 'ST' ? -1.5 : -1.2) * (team_goals_for / 8) : 0"
+    },
+
+    {
+      "op": "sub",
+      "value": "(team_goals_against <= 5 ? 0 : (team_goals_against <= 8 ? (team_goals_against - 5) * 0.2 : 0.6 + (team_goals_against - 8) * 0.6)) * (role == 'GK' ? 1 : role == 'DEF' ? 1.1 : role == 'MID' ? 0.6 : 0.2)"
+    },
+
+    {
+      "op": "add",
+      "value": "team_goals_against == 0 ? (role == 'GK' ? 2.5 : role == 'DEF' ? 0.8 : 0) : 0"
+    },
+
+    {
+      "op": "add",
+      "value": "team_goals_against == 1 ? 0.9 : team_goals_against == 2 ? 0.6 : 0"
+    },
+
+    {
+      "op": "add",
+      "value": "closed_factor * (role == 'GK' ? 0.6 : role == 'DEF' ? 0.4 : role == 'MID' ? 0.2 : 0.1)"
+    },
+
+    {
+      "op": "add",
+      "value": "(margin / 5) * (role == 'GK' || role == 'DEF' ? 1 : role == 'MID' ? 0.8 : 0.4)"
+    },
+
+    {
+      "op": "add",
+      "value": "(team_goals_for - team_goals_against) / 10"
+    },
+
+    {
+      "op": "add",
+      "value": "(penalties_missed * -1.4 + own_goals * -1.1) * (error_decisive ? 1.3 : 1) * (result == 'win' ? 0.6 : 1)"
+    },
+
+    {
+      "op": "add",
+      "value": "role == 'GK' ? (result == 'win' ? 0.6 : 0) + (team_goals_against >= 6 ? 0.3 : 0) + (team_goals_against >= 9 ? 0.6 : 0) : 0"
+    },
+
+    {
+      "op": "add",
+      "value": "role == 'GK' ? penalties_saved * 0.8 : 0"
+    },
+
+    { "op": "quantize" },
+
+    { "op": "set", "var": "rating_pre_caps", "value": "rating" },
+
+    {
+      "op": "min",
+      "value": "G_eff == 0 ? (role == 'ST' ? 7.25 : role == 'MID' ? 7.5 : 10) : 10"
+    },
+
+    {
+      "op": "add",
+      "value": "mention == 1 ? 0.5 : mention == -1 ? -0.5 : 0"
+    },
+
+    {
+      "op": "min",
+      "value": "team_goals_for == 0 && result == 'loss' ? (role == 'ST' || role == 'MID' ? 6.5 : 7.0) : 10"
+    },
+
+    {
+      "op": "set",
+      "var": "rating",
+      "value": "total_goals >= 14 && rating > 8.5 ? 8.5 + (rating - 8.5) * 0.7 : rating"
+    },
+
+    {
+      "op": "normalize",
+      "target": 6.5,
+      "max_shift": 0.5,
+      "reduction_if_margin": 5,
+      "reduction_factor": 0.25
+    },
+
+    { "op": "quantize" },
+
+    { "op": "clamp", "min": 3, "max": 10 },
+
+    {
+      "op": "set",
+      "var": "rating",
+      "value": "round(rating / 0.25) * 0.25"
+    }
+  ],
+
+  "mvp": {
+    "selection": {
+      "step": "players with max rating",
+
+      "tie_breakers": [
+        {
+          "condition": "opposite_teams && result != 'draw'",
+          "rule": "prefer_winner"
+        },
+        {
+          "condition": "same_team",
+          "rule": "higher_bonus_minus_malus"
+        },
+        {
+          "condition": "opposite_teams && result == 'draw'",
+          "rule": "higher_bonus_minus_malus"
+        }
+      ],
+
+      "fallback": "manual"
+    }
+  }
+}

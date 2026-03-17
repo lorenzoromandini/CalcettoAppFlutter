@@ -13,12 +13,11 @@ import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
 import 'package:calcetto_backend_client/src/protocol/user.dart' as _i3;
 import 'package:calcetto_backend_client/src/protocol/club.dart' as _i4;
-import 'package:calcetto_backend_client/src/protocol/goal.dart' as _i5;
-import 'package:calcetto_backend_client/src/protocol/match.dart' as _i6;
+import 'package:calcetto_backend_client/src/protocol/match.dart' as _i5;
 import 'package:calcetto_backend_client/src/protocol/match_participant.dart'
-    as _i7;
-import 'package:calcetto_backend_client/src/protocol/player_rating.dart' as _i8;
-import 'protocol.dart' as _i9;
+    as _i6;
+import 'package:calcetto_backend_client/src/protocol/player_rating.dart' as _i7;
+import 'protocol.dart' as _i8;
 
 /// Authentication endpoint - handles login and signup with secure password hashing
 /// {@category Endpoint}
@@ -132,56 +131,6 @@ class EndpointClubs extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointGoals extends _i1.EndpointRef {
-  EndpointGoals(_i1.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'goals';
-
-  /// Get all goals for a match
-  _i2.Future<List<_i5.Goal>> getMatchGoals(String matchIdStr) =>
-      caller.callServerEndpoint<List<_i5.Goal>>(
-        'goals',
-        'getMatchGoals',
-        {'matchIdStr': matchIdStr},
-      );
-
-  /// Add a goal to a match
-  _i2.Future<_i5.Goal> addGoal(
-    String matchIdStr,
-    String scorerIdStr,
-    String? assisterIdStr,
-    bool isOwnGoal,
-  ) =>
-      caller.callServerEndpoint<_i5.Goal>(
-        'goals',
-        'addGoal',
-        {
-          'matchIdStr': matchIdStr,
-          'scorerIdStr': scorerIdStr,
-          'assisterIdStr': assisterIdStr,
-          'isOwnGoal': isOwnGoal,
-        },
-      );
-
-  /// Remove a goal
-  _i2.Future<void> removeGoal(String goalIdStr) =>
-      caller.callServerEndpoint<void>(
-        'goals',
-        'removeGoal',
-        {'goalIdStr': goalIdStr},
-      );
-
-  /// Get player goal statistics
-  _i2.Future<Map<String, dynamic>> getPlayerStats(String clubMemberIdStr) =>
-      caller.callServerEndpoint<Map<String, dynamic>>(
-        'goals',
-        'getPlayerStats',
-        {'clubMemberIdStr': clubMemberIdStr},
-      );
-}
-
-/// {@category Endpoint}
 class EndpointMatches extends _i1.EndpointRef {
   EndpointMatches(_i1.EndpointCaller caller) : super(caller);
 
@@ -189,11 +138,11 @@ class EndpointMatches extends _i1.EndpointRef {
   String get name => 'matches';
 
   /// Get all matches for a club
-  _i2.Future<List<_i6.Match>> getClubMatches(
+  _i2.Future<List<_i5.Match>> getClubMatches(
     String clubIdStr, {
     String? status,
   }) =>
-      caller.callServerEndpoint<List<_i6.Match>>(
+      caller.callServerEndpoint<List<_i5.Match>>(
         'matches',
         'getClubMatches',
         {
@@ -203,21 +152,21 @@ class EndpointMatches extends _i1.EndpointRef {
       );
 
   /// Get match by ID
-  _i2.Future<_i6.Match?> getMatchById(String matchIdStr) =>
-      caller.callServerEndpoint<_i6.Match?>(
+  _i2.Future<_i5.Match?> getMatchById(String matchIdStr) =>
+      caller.callServerEndpoint<_i5.Match?>(
         'matches',
         'getMatchById',
         {'matchIdStr': matchIdStr},
       );
 
   /// Create a new match
-  _i2.Future<_i6.Match> createMatch(
+  _i2.Future<_i5.Match> createMatch(
     String clubIdStr,
     DateTime scheduledAt,
     String? location,
     String modeStr,
   ) =>
-      caller.callServerEndpoint<_i6.Match>(
+      caller.callServerEndpoint<_i5.Match>(
         'matches',
         'createMatch',
         {
@@ -229,11 +178,11 @@ class EndpointMatches extends _i1.EndpointRef {
       );
 
   /// Update match status
-  _i2.Future<_i6.Match> updateMatchStatus(
+  _i2.Future<_i5.Match> updateMatchStatus(
     String matchIdStr,
     String statusStr,
   ) =>
-      caller.callServerEndpoint<_i6.Match>(
+      caller.callServerEndpoint<_i5.Match>(
         'matches',
         'updateMatchStatus',
         {
@@ -243,12 +192,12 @@ class EndpointMatches extends _i1.EndpointRef {
       );
 
   /// Update match score
-  _i2.Future<_i6.Match> updateScore(
+  _i2.Future<_i5.Match> updateScore(
     String matchIdStr,
     int homeScore,
     int awayScore,
   ) =>
-      caller.callServerEndpoint<_i6.Match>(
+      caller.callServerEndpoint<_i5.Match>(
         'matches',
         'updateScore',
         {
@@ -259,22 +208,22 @@ class EndpointMatches extends _i1.EndpointRef {
       );
 
   /// Get match participants
-  _i2.Future<List<_i7.MatchParticipant>> getMatchParticipants(
+  _i2.Future<List<_i6.MatchParticipant>> getMatchParticipants(
           String matchIdStr) =>
-      caller.callServerEndpoint<List<_i7.MatchParticipant>>(
+      caller.callServerEndpoint<List<_i6.MatchParticipant>>(
         'matches',
         'getMatchParticipants',
         {'matchIdStr': matchIdStr},
       );
 
   /// Add participant to match
-  _i2.Future<_i7.MatchParticipant> addParticipant(
+  _i2.Future<_i6.MatchParticipant> addParticipant(
     String matchIdStr,
     String clubMemberIdStr,
     String teamSideStr,
     String? positionStr,
   ) =>
-      caller.callServerEndpoint<_i7.MatchParticipant>(
+      caller.callServerEndpoint<_i6.MatchParticipant>(
         'matches',
         'addParticipant',
         {
@@ -302,19 +251,19 @@ class EndpointRatings extends _i1.EndpointRef {
   String get name => 'ratings';
 
   /// Get all ratings for a match
-  _i2.Future<List<_i8.PlayerRating>> getMatchRatings(String matchIdStr) =>
-      caller.callServerEndpoint<List<_i8.PlayerRating>>(
+  _i2.Future<List<_i7.PlayerRating>> getMatchRatings(String matchIdStr) =>
+      caller.callServerEndpoint<List<_i7.PlayerRating>>(
         'ratings',
         'getMatchRatings',
         {'matchIdStr': matchIdStr},
       );
 
   /// Get rating for a specific player in a match
-  _i2.Future<_i8.PlayerRating?> getPlayerRating(
+  _i2.Future<_i7.PlayerRating?> getPlayerRating(
     String matchIdStr,
     String clubMemberIdStr,
   ) =>
-      caller.callServerEndpoint<_i8.PlayerRating?>(
+      caller.callServerEndpoint<_i7.PlayerRating?>(
         'ratings',
         'getPlayerRating',
         {
@@ -324,13 +273,13 @@ class EndpointRatings extends _i1.EndpointRef {
       );
 
   /// Add or update a player rating
-  _i2.Future<_i8.PlayerRating> ratePlayer(
+  _i2.Future<_i7.PlayerRating> ratePlayer(
     String matchIdStr,
     String clubMemberIdStr,
     double rating,
     String? comment,
   ) =>
-      caller.callServerEndpoint<_i8.PlayerRating>(
+      caller.callServerEndpoint<_i7.PlayerRating>(
         'ratings',
         'ratePlayer',
         {
@@ -351,8 +300,8 @@ class EndpointRatings extends _i1.EndpointRef {
       );
 
   /// Get all ratings given by a user
-  _i2.Future<List<_i8.PlayerRating>> getRatingsByUser() =>
-      caller.callServerEndpoint<List<_i8.PlayerRating>>(
+  _i2.Future<List<_i7.PlayerRating>> getRatingsByUser() =>
+      caller.callServerEndpoint<List<_i7.PlayerRating>>(
         'ratings',
         'getRatingsByUser',
         {},
@@ -375,7 +324,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i9.Protocol(),
+          _i8.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
@@ -387,7 +336,6 @@ class Client extends _i1.ServerpodClientShared {
         ) {
     auth = EndpointAuth(this);
     clubs = EndpointClubs(this);
-    goals = EndpointGoals(this);
     matches = EndpointMatches(this);
     ratings = EndpointRatings(this);
   }
@@ -395,8 +343,6 @@ class Client extends _i1.ServerpodClientShared {
   late final EndpointAuth auth;
 
   late final EndpointClubs clubs;
-
-  late final EndpointGoals goals;
 
   late final EndpointMatches matches;
 
@@ -406,7 +352,6 @@ class Client extends _i1.ServerpodClientShared {
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
         'auth': auth,
         'clubs': clubs,
-        'goals': goals,
         'matches': matches,
         'ratings': ratings,
       };

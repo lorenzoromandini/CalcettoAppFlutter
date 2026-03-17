@@ -5,6 +5,10 @@ fields:
   matchId: UuidValue, relation(parent=matches)
   clubMemberId: UuidValue, relation(parent=club_members)
   rating: double
+  ratingPreCaps: double?
+  bonusMinusMalus: double?
+  mvp: bool, default=false
+  mention: int, default=0
   comment: String?
   createdAt: DateTime, default=now
   updatedAt: DateTime, default=now
