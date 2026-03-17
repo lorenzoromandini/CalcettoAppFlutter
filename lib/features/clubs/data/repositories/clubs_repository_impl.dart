@@ -177,4 +177,35 @@ class ClubsRepositoryImpl implements ClubsRepository {
       return FailureResult(ServerFailure.internalError());
     }
   }
+
+  @override
+  Future<Result<Club>> createClub({
+    required String name,
+    String? description,
+  }) async {
+    try {
+      final isOnline = await _connectivity.isOnline;
+
+      if (!isOnline) {
+        return FailureResult(NetworkFailure.noConnection());
+      }
+
+      try {
+        final club = await _remote.createClub(
+          name: name,
+          description: description,
+        );
+        await _local.cacheClubs([club]);
+        return Success(club.toEntity());
+      } on DioException catch (e) {
+        if (e.response?.statusCode != null) {
+          return FailureResult(
+              ServerFailure.fromStatusCode(e.response!.statusCode!));
+        }
+        return FailureResult(NetworkFailure.unknown());
+      }
+    } catch (_) {
+      return FailureResult(ServerFailure.internalError());
+    }
+  }
 }

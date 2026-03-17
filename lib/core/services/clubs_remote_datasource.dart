@@ -21,6 +21,12 @@ abstract class ClubsRemoteDataSource {
 
   /// Deletes a club (owner only).
   Future<void> deleteClub(String clubId);
+
+  /// Creates a new club (owner becomes the creator).
+  Future<ClubModel> createClub({
+    required String name,
+    String? description,
+  });
 }
 
 /// Dio implementation of ClubsRemoteDataSource.
@@ -96,5 +102,20 @@ class DioClubsRemoteDataSource implements ClubsRemoteDataSource {
       '/clubs/deleteClub',
       data: {'clubId': clubId},
     );
+  }
+
+  @override
+  Future<ClubModel> createClub({
+    required String name,
+    String? description,
+  }) async {
+    final response = await _dio.post(
+      '/clubs/createClub',
+      data: {
+        'name': name,
+        'description': description,
+      },
+    );
+    return ClubModel.fromJson(response.data as Map<String, dynamic>);
   }
 }

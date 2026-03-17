@@ -34,4 +34,13 @@ abstract class ClubsRepository {
   /// Requires owner privileges and network connection.
   /// Returns error if user is not owner or club has other members.
   Future<Result<void>> deleteClub(String clubId);
+
+  /// Creates a new club (owner becomes the creator).
+  ///
+  /// Requires network connection.
+  /// Returns the created club with generated ID.
+  Future<Result<Club>> createClub({
+    required String name,
+    String? description,
+  });
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/widgets/offline_indicator.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 
 /// Screen for editing user profile.
 ///
@@ -29,12 +29,18 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.initState();
     // Load current user data
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final user = ref.read(authStateProvider).value?.user;
-      if (user != null) {
-        _firstNameController.text = user.firstName;
-        _lastNameController.text = user.lastName;
-        _nicknameController.text = user.nickname ?? '';
-      }
+      final authState = ref.read(authStateProvider);
+      authState.whenOrNull(
+        authenticated: (user) {
+          // Split name into first and last name (best effort)
+          final nameParts = user.name.split(' ');
+          _firstNameController.text =
+              nameParts.isNotEmpty ? nameParts.first : '';
+          _lastNameController.text =
+              nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+          _nicknameController.text = '';
+        },
+      );
     });
   }
 
@@ -77,153 +83,166 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final user = ref.watch(authStateProvider).value?.user;
+    final authState = ref.watch(authStateProvider);
 
-    if (user == null) {
-      return const Scaffold(
+    return authState.when(
+      initial: () => const Scaffold(
         body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Modifica Profilo'),
       ),
-      body: Column(
-        children: [
-          const OfflineIndicator(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Profile Picture
-                    Center(
-                      child: Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 60,
-                            backgroundColor: theme.colorScheme.primaryContainer,
-                            backgroundImage: user.imageUrl != null
-                                ? NetworkImage(user.imageUrl!)
-                                : null,
-                            child: user.imageUrl == null
-                                ? Text(
-                                    user.firstName[0].toUpperCase(),
-                                    style: TextStyle(
-                                      fontSize: 48,
-                                      color:
-                                          theme.colorScheme.onPrimaryContainer,
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (message) => Scaffold(
+        body: Center(child: Text('Errore: $message')),
+      ),
+      authenticated: (user) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Modifica Profilo'),
+          ),
+          body: Column(
+            children: [
+              const OfflineIndicator(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Profile Picture
+                        Center(
+                          child: Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 60,
+                                backgroundColor:
+                                    theme.colorScheme.primaryContainer,
+                                backgroundImage: user.avatarUrl != null
+                                    ? NetworkImage(user.avatarUrl!)
+                                    : null,
+                                child: user.avatarUrl == null
+                                    ? Text(
+                                        user.name.isNotEmpty
+                                            ? user.name[0].toUpperCase()
+                                            : '?',
+                                        style: TextStyle(
+                                          fontSize: 48,
+                                          color: theme
+                                              .colorScheme.onPrimaryContainer,
+                                        ),
+                                      )
+                                    : null,
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: theme.colorScheme.primary,
+                                  child: IconButton(
+                                    icon:
+                                        const Icon(Icons.camera_alt, size: 20),
+                                    color: theme.colorScheme.onPrimary,
+                                    onPressed: () {
+                                      // TODO: Implement image picker
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Coming soon')),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+
+                        // Email (read-only)
+                        TextFormField(
+                          initialValue: user.email,
+                          decoration: const InputDecoration(
+                            labelText: 'Email',
+                            prefixIcon: Icon(Icons.email),
+                          ),
+                          enabled: false,
+                        ),
+                        const SizedBox(height: 16),
+
+                        // First Name
+                        TextFormField(
+                          controller: _firstNameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Nome *',
+                            prefixIcon: Icon(Icons.person),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Il nome è obbligatorio';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Last Name
+                        TextFormField(
+                          controller: _lastNameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Cognome *',
+                            prefixIcon: Icon(Icons.person_outline),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Il cognome è obbligatorio';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Nickname
+                        TextFormField(
+                          controller: _nicknameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Nickname',
+                            hintText: 'Come ti chiamano in campo?',
+                            prefixIcon: Icon(Icons.alternate_email),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+
+                        // Save Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton.icon(
+                            onPressed: _isLoading ? null : _saveProfile,
+                            icon: _isLoading
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
                                     ),
                                   )
-                                : null,
+                                : const Icon(Icons.save),
+                            label:
+                                Text(_isLoading ? 'Salvataggio...' : 'Salva'),
                           ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: CircleAvatar(
-                              radius: 20,
-                              backgroundColor: theme.colorScheme.primary,
-                              child: IconButton(
-                                icon: const Icon(Icons.camera_alt, size: 20),
-                                color: theme.colorScheme.onPrimary,
-                                onPressed: () {
-                                  // TODO: Implement image picker
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text('Coming soon')),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 32),
-
-                    // Email (read-only)
-                    TextFormField(
-                      initialValue: user.email,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email),
-                      ),
-                      enabled: false,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // First Name
-                    TextFormField(
-                      controller: _firstNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nome *',
-                        prefixIcon: Icon(Icons.person),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Il nome è obbligatorio';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Last Name
-                    TextFormField(
-                      controller: _lastNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Cognome *',
-                        prefixIcon: Icon(Icons.person_outline),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Il cognome è obbligatorio';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Nickname
-                    TextFormField(
-                      controller: _nicknameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nickname',
-                        hintText: 'Come ti chiamano in campo?',
-                        prefixIcon: Icon(Icons.alternate_email),
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Save Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: _isLoading ? null : _saveProfile,
-                        icon: _isLoading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Icon(Icons.save),
-                        label: Text(_isLoading ? 'Salvataggio...' : 'Salva'),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
