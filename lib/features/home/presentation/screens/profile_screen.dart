@@ -4,37 +4,62 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../../core/widgets/app_drawer.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
+import '../../../profile/presentation/screens/edit_profile_screen.dart';
 
 /// Profile screen showing user info.
 ///
 /// Displays user avatar, name, email.
-class ProfileScreen extends ConsumerWidget {
+/// Supports pull-to-refresh to reload user data.
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  Future<void> _refreshData() async {
+    // Refresh auth session to reload user data
+    await ref.read(authSessionProvider.notifier).refresh();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authSession = ref.watch(authSessionProvider);
     final colorScheme = Theme.of(context).colorScheme;
-    final scaffoldKey = GlobalKey<ScaffoldState>();
 
     // Check if user is authenticated
     final isAuthenticated = authSession.isAuthenticated;
 
     return Scaffold(
-      key: scaffoldKey,
+      key: _scaffoldKey,
       appBar: AppBar(
         title: const Text('Profile'),
         actions: [
           IconButton(
             icon: const Icon(Icons.menu),
-            onPressed: () => scaffoldKey.currentState?.openEndDrawer(),
+            onPressed: () => _scaffoldKey.currentState?.openEndDrawer(),
           ),
         ],
       ),
       endDrawer: const AppDrawer(),
-      body: isAuthenticated
-          ? _buildAuthenticatedContent(context, ref, authSession, colorScheme)
-          : _buildLoggedOutContent(context, ref, colorScheme),
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height -
+                AppBar().preferredSize.height -
+                MediaQuery.of(context).padding.top,
+            child: isAuthenticated
+                ? _buildAuthenticatedContent(
+                    context, ref, authSession, colorScheme)
+                : _buildLoggedOutContent(context, ref, colorScheme),
+          ),
+        ),
+      ),
     );
   }
 
@@ -77,11 +102,13 @@ class ProfileScreen extends ConsumerWidget {
                 ),
           ),
           const SizedBox(height: 48),
-          // Edit profile button (placeholder)
+          // Edit profile button
           FilledButton.icon(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Edit profile - Coming soon')),
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const EditProfileScreen(),
+                ),
               );
             },
             icon: const Icon(Icons.edit),

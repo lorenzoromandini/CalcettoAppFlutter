@@ -100,11 +100,22 @@ class AuthEndpoint extends Endpoint {
 
   /// Get current authenticated user
   Future<User?> getCurrentUser(Session session) async {
-    final userIdStr = session.authenticationKey;
+    final userIdStr = _extractUserIdFromToken(session);
     if (userIdStr == null) return null;
 
     final userId = UuidValue.fromString(userIdStr);
     return await User.db.findById(session, userId);
+  }
+
+  /// Logout current user
+  /// Returns success message
+  Future<Map<String, dynamic>> logout(Session session) async {
+    // In a real implementation, you might want to invalidate the token
+    // For now, just return success as the client will clear local storage
+    return {
+      'success': true,
+      'message': 'Logged out successfully',
+    };
   }
 
   /// Hash password using SHA-256 with salt
@@ -148,5 +159,76 @@ class AuthEndpoint extends Endpoint {
           DateTime.now().add(Duration(days: 7)).millisecondsSinceEpoch ~/ 1000,
     });
     return base64UrlEncode(utf8.encode(payload));
+  }
+
+  /// Update user profile
+  Future<Map<String, dynamic>> updateProfile(
+    Session session,
+    String firstName,
+    String lastName,
+    String? nickname,
+    String? password,
+  ) async {
+    final userIdStr = _extractUserIdFromToken(session);
+    if (userIdStr == null) {
+      return {
+        'success': false,
+        'error': 'Not authenticated',
+      };
+    }
+
+    final userId = UuidValue.fromString(userIdStr);
+    var user = await User.db.findById(session, userId);
+
+    if (user == null) {
+      return {
+        'success': false,
+        'error': 'User not found',
+      };
+    }
+
+    // Update user fields
+    user.firstName = firstName;
+    user.lastName = lastName;
+    // Update nickname - set to null if empty string
+    user.nickname = nickname?.isNotEmpty == true ? nickname : null;
+    if (password != null && password.isNotEmpty) {
+      if (password.length < 6) {
+        return {
+          'success': false,
+          'error': 'Password must be at least 6 characters',
+        };
+      }
+      user.password = _hashPassword(password);
+    }
+    user.updatedAt = DateTime.now();
+
+    await User.db.updateRow(session, user);
+
+    return {
+      'success': true,
+      'user': user.toJson(),
+    };
+  }
+
+  /// Extract user ID from JWT token
+  String? _extractUserIdFromToken(Session session) {
+    final authKey = session.authenticationKey;
+    if (authKey == null) return null;
+
+    try {
+      // Remove "bearer " prefix if present (case insensitive)
+      final token = authKey.toLowerCase().startsWith('bearer ')
+          ? authKey.substring(7)
+          : authKey;
+
+      // Decode base64 token
+      final decoded = utf8.decode(base64Url.decode(token));
+      final payload = jsonDecode(decoded) as Map<String, dynamic>;
+
+      return payload['user_id'] as String?;
+    } catch (e) {
+      return null;
+    }
   }
 }

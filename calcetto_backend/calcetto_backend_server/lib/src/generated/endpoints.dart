@@ -129,6 +129,51 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['auth'] as _i2.AuthEndpoint).getCurrentUser(session),
         ),
+        'logout': _i1.MethodConnector(
+          name: 'logout',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['auth'] as _i2.AuthEndpoint).logout(session),
+        ),
+        'updateProfile': _i1.MethodConnector(
+          name: 'updateProfile',
+          params: {
+            'firstName': _i1.ParameterDescription(
+              name: 'firstName',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'lastName': _i1.ParameterDescription(
+              name: 'lastName',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'nickname': _i1.ParameterDescription(
+              name: 'nickname',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'password': _i1.ParameterDescription(
+              name: 'password',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['auth'] as _i2.AuthEndpoint).updateProfile(
+            session,
+            params['firstName'],
+            params['lastName'],
+            params['nickname'],
+            params['password'],
+          ),
+        ),
       },
     );
     connectors['clubs'] = _i1.EndpointConnector(

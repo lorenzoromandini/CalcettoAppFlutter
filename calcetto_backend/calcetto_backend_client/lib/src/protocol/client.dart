@@ -70,6 +70,33 @@ class EndpointAuth extends _i1.EndpointRef {
         'getCurrentUser',
         {},
       );
+
+  /// Logout current user
+  /// Returns success message
+  _i2.Future<Map<String, dynamic>> logout() =>
+      caller.callServerEndpoint<Map<String, dynamic>>(
+        'auth',
+        'logout',
+        {},
+      );
+
+  /// Update user profile
+  _i2.Future<Map<String, dynamic>> updateProfile(
+    String firstName,
+    String lastName,
+    String? nickname,
+    String? password,
+  ) =>
+      caller.callServerEndpoint<Map<String, dynamic>>(
+        'auth',
+        'updateProfile',
+        {
+          'firstName': firstName,
+          'lastName': lastName,
+          'nickname': nickname,
+          'password': password,
+        },
+      );
 }
 
 /// {@category Endpoint}

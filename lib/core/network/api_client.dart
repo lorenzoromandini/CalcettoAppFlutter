@@ -107,8 +107,10 @@ class ApiClient {
   /// Returns: {user: Map} or null if not authenticated
   Future<Map<String, dynamic>?> getSession() async {
     try {
-      final response = await _dio.get('/auth/session');
-      return response.data as Map<String, dynamic>?;
+      // Serverpod endpoint is auth.getCurrentUser (POST request)
+      final response = await _dio.post('/auth/getCurrentUser');
+      if (response.data == null) return null;
+      return {'user': response.data};
     } on DioException {
       return null;
     }
@@ -121,6 +123,33 @@ class ApiClient {
       await _dio.post('/auth/logout');
     } catch (_) {
       // Ignore errors on logout
+    }
+  }
+
+  /// Update user profile
+  /// Returns: {success: bool, user: Map} on success
+  /// Throws: DioException with error message on failure
+  Future<Map<String, dynamic>> updateProfile({
+    required String firstName,
+    required String lastName,
+    String? nickname,
+    String? password,
+  }) async {
+    try {
+      final data = {
+        'firstName': firstName,
+        'lastName': lastName,
+        if (nickname != null && nickname.isNotEmpty) 'nickname': nickname,
+        if (password != null && password.isNotEmpty) 'password': password,
+      };
+
+      // Using POST to Serverpod endpoint
+      final response = await _dio.post('/auth/updateProfile', data: data);
+      return Map<String, dynamic>.from(response.data);
+    } on DioException catch (e) {
+      final errorMessage = e.response?.data?['error'] ??
+          (e.response?.data?['message'] ?? 'Profile update failed');
+      throw ApiException(_translateError(errorMessage));
     }
   }
 

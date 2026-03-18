@@ -36,3 +36,4 @@ void main() async {
 
   runApp(const ProviderScope(child: CalcettoApp()));
 }
+// Force rebuild

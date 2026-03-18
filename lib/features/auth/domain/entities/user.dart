@@ -15,11 +15,15 @@ class User {
   /// Optional avatar URL.
   final String? avatarUrl;
 
+  /// Optional nickname.
+  final String? nickname;
+
   const User({
     required this.id,
     required this.email,
     required this.name,
     this.avatarUrl,
+    this.nickname,
   });
 
   /// Returns true if the user has a profile avatar.
@@ -33,11 +37,13 @@ class User {
           id == other.id &&
           email == other.email &&
           name == other.name &&
-          avatarUrl == other.avatarUrl;
+          avatarUrl == other.avatarUrl &&
+          nickname == other.nickname;
 
   @override
-  int get hashCode => Object.hash(id, email, name, avatarUrl);
+  int get hashCode => Object.hash(id, email, name, avatarUrl, nickname);
 
   @override
-  String toString() => 'User(id: $id, email: $email, name: $name)';
+  String toString() =>
+      'User(id: $id, email: $email, name: $name, nickname: $nickname)';
 }

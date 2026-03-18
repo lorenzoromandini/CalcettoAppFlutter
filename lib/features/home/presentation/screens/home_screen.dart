@@ -74,109 +74,118 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Future<void> _refreshData() async {
+    await ref.read(activeClubProvider.notifier).initialize();
+    await ref.read(clubsListProvider.notifier).fetchClubs();
+  }
+
   Widget _buildClubContent(Club club) {
-    return CustomScrollView(
-      slivers: [
-        // Active club header
-        SliverToBoxAdapter(
-          child: ActiveClubHeader(
-            club: club,
+    return RefreshIndicator(
+      onRefresh: _refreshData,
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          // Active club header
+          SliverToBoxAdapter(
+            child: ActiveClubHeader(
+              club: club,
+            ),
           ),
-        ),
 
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 16),
-        ),
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 16),
+          ),
 
-        // Quick stats section
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'Quick Stats',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+          // Quick stats section
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Quick Stats',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: _buildQuickStats(club),
+          ),
+
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 24),
+          ),
+
+          // Upcoming matches section
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Upcoming Matches',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
+                  TextButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Matches coming in Phase 3')),
+                      );
+                    },
+                    child: const Text('View All'),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        SliverToBoxAdapter(
-          child: _buildQuickStats(club),
-        ),
+          SliverToBoxAdapter(
+            child: _buildUpcomingMatchesPlaceholder(),
+          ),
 
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 24),
-        ),
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 24),
+          ),
 
-        // Upcoming matches section
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Upcoming Matches',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Matches coming in Phase 3')),
-                    );
-                  },
-                  child: const Text('View All'),
-                ),
-              ],
+          // Recent activity section
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Recent Activity',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Activity feed coming soon')),
+                      );
+                    },
+                    child: const Text('View All'),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        SliverToBoxAdapter(
-          child: _buildUpcomingMatchesPlaceholder(),
-        ),
-
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 24),
-        ),
-
-        // Recent activity section
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Recent Activity',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Activity feed coming soon')),
-                    );
-                  },
-                  child: const Text('View All'),
-                ),
-              ],
-            ),
+          SliverToBoxAdapter(
+            child: _buildActivityPlaceholder(),
           ),
-        ),
-        SliverToBoxAdapter(
-          child: _buildActivityPlaceholder(),
-        ),
 
-        // Bottom padding for navigation bar
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 80),
-        ),
-      ],
+          // Bottom padding for navigation bar
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 80),
+          ),
+        ],
+      ),
     );
   }
 

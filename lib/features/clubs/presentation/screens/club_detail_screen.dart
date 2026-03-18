@@ -12,6 +12,7 @@ import 'package:calcetto_app/features/clubs/domain/repositories/clubs_repository
 import 'package:calcetto_app/core/di/injection.dart';
 import '../../../../core/providers/offline_status_provider.dart';
 import '../../../../core/widgets/offline_indicator.dart';
+import '../../presentation/providers/active_club_provider.dart';
 
 /// Club detail screen with tabs for Info, Members, and Matches
 class ClubDetailScreen extends ConsumerStatefulWidget {
@@ -54,6 +55,11 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
 
   bool _isOffline(WidgetRef ref) {
     return ref.watch(isOfflineProvider);
+  }
+
+  Future<void> _refreshData() async {
+    // Refresh active club data
+    await ref.read(activeClubProvider.notifier).initialize();
   }
 
   Future<void> _handleShare() async {
@@ -220,12 +226,21 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                // Info tab
-                ClubInfoTab(club: widget.club),
-                // Members tab
-                ClubMembersTab(clubId: widget.club.id),
-                // Matches tab (placeholder for Phase 3)
-                _buildMatchesPlaceholder(),
+                // Info tab with pull-to-refresh
+                RefreshIndicator(
+                  onRefresh: _refreshData,
+                  child: ClubInfoTab(club: widget.club),
+                ),
+                // Members tab with pull-to-refresh
+                RefreshIndicator(
+                  onRefresh: _refreshData,
+                  child: ClubMembersTab(clubId: widget.club.id),
+                ),
+                // Matches tab with pull-to-refresh (placeholder for Phase 3)
+                RefreshIndicator(
+                  onRefresh: _refreshData,
+                  child: _buildMatchesPlaceholder(),
+                ),
               ],
             ),
           ),

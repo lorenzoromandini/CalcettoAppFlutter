@@ -18,10 +18,16 @@ abstract class AuthRepository {
   /// Clears stored tokens and cached user data.
   Future<Result<void>> logout();
 
-  /// Retrieves the currently authenticated user.
+  /// Retrieves the currently authenticated user from local cache.
   ///
   /// Returns [User] if authenticated, or null if not logged in.
   Future<Result<User?>> getCurrentUser();
+
+  /// Fetches the current user from the server (not from cache).
+  ///
+  /// Returns [User] if authenticated, or null if not logged in.
+  /// Use this when you need fresh data from the server.
+  Future<Result<User?>> fetchCurrentUserFromServer();
 
   /// Checks if a user is currently authenticated.
   ///
@@ -37,5 +43,16 @@ abstract class AuthRepository {
     required String lastName,
     String? nickname,
     required String password,
+  });
+
+  /// Updates the current user's profile information.
+  ///
+  /// Returns the updated [User] entity on success.
+  /// Password is optional - if null or empty, it won't be updated.
+  Future<Result<User>> updateProfile({
+    required String firstName,
+    required String lastName,
+    String? nickname,
+    String? password,
   });
 }

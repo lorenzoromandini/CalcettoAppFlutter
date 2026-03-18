@@ -15,6 +15,7 @@ class UserModel {
     required this.name,
     this.avatarUrl,
     this.token,
+    this.nickname,
   });
 
   /// Unique user identifier.
@@ -28,6 +29,9 @@ class UserModel {
 
   /// Optional avatar URL.
   final String? avatarUrl;
+
+  /// Optional nickname.
+  final String? nickname;
 
   /// JWT token received from authentication response.
   /// Not part of the domain entity - data layer only.
@@ -46,6 +50,7 @@ class UserModel {
         email: user.email,
         name: user.name,
         avatarUrl: user.avatarUrl,
+        nickname: user.nickname,
       );
 
   /// Converts this model to a domain User entity.
@@ -54,5 +59,6 @@ class UserModel {
         email: email,
         name: name,
         avatarUrl: avatarUrl,
+        nickname: nickname,
       );
 }

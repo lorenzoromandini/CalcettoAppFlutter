@@ -57,9 +57,11 @@ class AuthRepositoryImpl implements AuthRepository {
         id: userData['id']?.toString() ??
             DateTime.now().millisecondsSinceEpoch.toString(),
         email: userData['email'] as String? ?? email,
-        name: userData['firstName'] as String? ?? 'User',
+        name: '${userData['firstName'] ?? ''} ${userData['lastName'] ?? ''}'
+            .trim(),
         avatarUrl: userData['image'] as String?,
         token: token,
+        nickname: userData['nickname'] as String?,
       );
 
       // Store token if present
@@ -116,6 +118,42 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Result<User?>> fetchCurrentUserFromServer() async {
+    try {
+      // Fetch fresh user data from the server
+      final responseData = await _apiClient.getSession();
+
+      if (responseData == null || responseData['user'] == null) {
+        return const Success(null);
+      }
+
+      final userData = Map<String, dynamic>.from(
+          responseData['user'] as Map<String, dynamic>);
+
+      final user = UserModel(
+        id: userData['id']?.toString() ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
+        email: userData['email'] as String? ?? '',
+        name: '${userData['firstName'] ?? ''} ${userData['lastName'] ?? ''}'
+            .trim(),
+        avatarUrl: userData['image'] as String?,
+        nickname: userData['nickname'] as String?,
+      );
+
+      // Update cached user
+      await _localDataSource.cacheUser(user);
+
+      return Success(user.toEntity());
+    } on ApiException catch (e) {
+      return FailureResult(AuthFailure(e.message));
+    } on DioException catch (e) {
+      return FailureResult(ServerFailure('Network error: ${e.message}'));
+    } catch (e) {
+      return FailureResult(ServerFailure('Unexpected error: $e'));
+    }
+  }
+
+  @override
   Future<Result<bool>> isAuthenticated() async {
     try {
       final token = await _authStorageService.getToken();
@@ -151,9 +189,12 @@ class AuthRepositoryImpl implements AuthRepository {
         id: userData['id']?.toString() ??
             DateTime.now().millisecondsSinceEpoch.toString(),
         email: userData['email'] as String? ?? email,
-        name: userData['firstName'] as String? ?? firstName,
+        name:
+            '${userData['firstName'] ?? firstName} ${userData['lastName'] ?? lastName}'
+                .trim(),
         avatarUrl: userData['image'] as String?,
         token: token,
+        nickname: userData['nickname'] as String?,
       );
 
       if (token != null) {
@@ -162,6 +203,46 @@ class AuthRepositoryImpl implements AuthRepository {
 
       await _localDataSource.cacheUser(user);
       await _authStorageService.storeCredentials(email, password);
+
+      return Success(user.toEntity());
+    } on ApiException catch (e) {
+      return FailureResult(AuthFailure(e.message));
+    } on DioException catch (e) {
+      return FailureResult(ServerFailure('Network error: ${e.message}'));
+    } catch (e) {
+      return FailureResult(ServerFailure('Unexpected error: $e'));
+    }
+  }
+
+  @override
+  Future<Result<User>> updateProfile({
+    required String firstName,
+    required String lastName,
+    String? nickname,
+    String? password,
+  }) async {
+    try {
+      final responseData = await _apiClient.updateProfile(
+        firstName: firstName,
+        lastName: lastName,
+        nickname: nickname,
+        password: password,
+      );
+
+      final userData = Map<String, dynamic>.from(
+          responseData['user'] as Map<String, dynamic>);
+
+      final user = UserModel(
+        id: userData['id']?.toString() ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
+        email: userData['email'] as String? ?? '',
+        name: '$firstName $lastName',
+        avatarUrl: userData['image'] as String?,
+        nickname: userData['nickname'] as String?,
+      );
+
+      // Update cached user
+      await _localDataSource.cacheUser(user);
 
       return Success(user.toEntity());
     } on ApiException catch (e) {

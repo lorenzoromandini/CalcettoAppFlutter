@@ -316,4 +316,31 @@ class AuthSessionNotifier extends StateNotifier<AuthSessionState> {
       user: null,
     );
   }
+
+  /// Public method to refresh auth status (for pull-to-refresh)
+  Future<void> refresh() async {
+    await _checkAuthStatus();
+  }
+
+  /// Refresh user data from server (not from cache)
+  Future<void> refreshFromServer() async {
+    state = state.copyWith(isLoading: true);
+    final result = await _repository.fetchCurrentUserFromServer();
+    result.fold(
+      (failure) {
+        // Keep current state on error
+        state = state.copyWith(isLoading: false);
+      },
+      (user) {
+        if (user != null) {
+          state = state.copyWith(
+            user: user,
+            isLoading: false,
+          );
+        } else {
+          state = state.copyWith(isLoading: false);
+        }
+      },
+    );
+  }
 }
