@@ -1,251 +1,293 @@
-# Player Rating Algorithm — Full Specification (v4.1)
+# Player Rating Algorithm — Natural Language Description
 
 ## Overview
 
-This system computes a deterministic rating for players in 8v8 high-scoring matches.
+This system evaluates player performance by combining individual actions, team context, match dynamics, and role expectations.
 
-- Range: 3 to 10  
-- Step: 0.25  
-
-The model is continuous, role-aware, and context-aware.
-
----
-
-## Inputs
-
-Each player has:
-
-- role ∈ {GK, DEF, MID, ST}  
-- goals_open  
-- goals_penalty  
-- team_goals_for  
-- team_goals_against  
-- result ∈ {win, draw, loss}  
-- penalties_missed  
-- own_goals  
-- penalties_saved  
-- mention ∈ {-1, 0, 1}  
+The rating is not a simple sum of events. Each contribution is interpreted relative to:
+- how the match unfolded
+- how difficult the scenario was
+- what is expected from the player’s role
 
 ---
 
-## Constants
+## Core Evaluation Logic
 
-BASE = 5.3  
-MIN = 3  
-MAX = 10  
-ROUND_STEP = 0.25  
+Each player starts from a neutral baseline. The rating is then adjusted through a set of interacting components.
 
----
+### 1. Match Outcome Context
 
-## Derived Variables
+- Winning increases ratings.
+- Losing decreases ratings.
+- Draws are neutral.
 
-total_goals = team_goals_for + team_goals_against  
-margin = team_goals_for - team_goals_against  
-loss_margin = team_goals_against - team_goals_for  
-
-penalty_weight = 1.0 if total_goals ≤ 6, else 0.8  
-
-G_eff = goals_open + goals_penalty × penalty_weight  
-
-goal_share = G_eff / team_goals_for (0 if team_goals_for = 0)  
-
-error_decisive =  
-- result = loss  
-- loss_margin ≤ 2  
-- at least one error  
-
-closed_factor = clamp((8 − total_goals)/4, 0, 1)
+However, this is modulated by context:
+- Large victories amplify positive effects.
+- Heavy losses amplify negative effects.
+- Close matches make individual actions more impactful.
 
 ---
 
-## Weights
+### 2. Offensive Contribution (Goals)
 
-Result:
-- win: +2.3  
-- draw: 0  
-- loss: −1.8  
+Goal evaluation depends on three dimensions:
 
-Goal weights:
-- ST: 1.0  
-- MID: 1.08  
-- DEF: 1.2  
-- GK: 1.5  
+#### a. Quantity and Type
+- Open-play goals are more valuable than penalties in high-scoring matches.
+- In low-scoring matches, penalties retain higher importance.
 
-Miss penalty:
-- ST: −1.5  
-- MID: −1.2  
+#### b. Share of Team Output
+- Scoring a large portion of the team’s goals increases impact.
+- Scoring in already high-scoring teams yields less relative benefit.
 
----
-
-## Components
-
-### Goals
-
-goal_component = role_weight × (goal_share^1.2) × 3.0  
+#### c. Role Expectations
+- Attackers are expected to score → stricter evaluation.
+- Midfielders receive moderate extra credit.
+- Defenders and goalkeepers receive strong bonuses for scoring.
 
 ---
 
-### Miss Penalty
+### 3. Failure to Score (Attacking Roles Only)
 
-Applied if:
-- team scored ≥ 5  
-- player scored 0  
-- role is ST or MID  
+Applied only in specific scenarios:
+- Team scores many goals
+- Player scores none
+- Player is attacker or midfielder
 
-Scaled by team goals.
+Effect:
+- Considered underperformance
+- Reduces rating proportionally to how many goals the team scored
 
----
-
-### Conceded Goals
-
-Piecewise function:
-
-- ≤5 → 0  
-- 6–8 → linear increase  
-- >8 → stronger increase  
-
-Scaled by role.
+Not applied in:
+- Low-scoring matches
+- Difficult or defensive games
 
 ---
 
-### Clean / Near Clean
+### 4. Defensive Performance (Goals Conceded)
 
-- 0 conceded → strong bonus (GK highest)  
-- 1 conceded → +0.9  
-- 2 conceded → +0.6  
+Goals conceded are evaluated non-linearly:
 
----
+- Few goals conceded → little or no penalty
+- Moderate goals conceded → increasing penalty
+- Many goals conceded → strong penalty
 
-### Closed Match Bonus
+Role impact:
+- Stronger for goalkeepers and defenders
+- Reduced for midfielders and attackers
 
-Scaled by closed_factor:
-
-- GK highest  
-- then DEF  
-- then MID  
-- then ST  
+Context adjustment:
+- In very high-scoring matches, penalties are softened
 
 ---
 
-### Margin
+### 5. Clean Sheet and Near-Clean Performance
 
-Scaled by margin and role.
+Defensive success yields bonuses:
 
----
+- No goals conceded → strong bonus (especially for GK)
+- One or two goals conceded → moderate bonus
 
-### Team Bonus
-
-(team_goals_for − team_goals_against) / 10  
-
----
-
-### Errors
-
-- Missed penalties: −1.4 each  
-- Own goals: −1.1 each  
-
-Amplified if decisive.  
-Reduced if player wins.
+This rewards overall defensive solidity even if not perfect.
 
 ---
 
-### Goalkeeper Bonuses
+### 6. Match Type (Closed vs Open Games)
 
-- +0.6 for win  
-- +0.3 if conceded ≥ 6  
-- +0.6 if conceded ≥ 9  
+The system distinguishes between:
 
----
+#### Closed Matches (low total goals)
+- More tactical and difficult
+- Defensive performance is highly rewarded
+- Goalkeepers and defenders benefit most
 
-### Penalty Saves
-
-+0.8 per save (GK only)
-
----
-
-## Caps
-
-### No Goal (Soft)
-
-If player scores 0:
-
-- ST ≤ 7.25  
-- MID ≤ 7.5  
+#### Open Matches (high total goals)
+- More chaotic
+- Defensive contributions are less emphasized
+- Offensive contributions are relatively less decisive per goal
 
 ---
 
-### Mention
+### 7. Goal Difference and Team Performance
 
-- +0.5 (positive)  
-- −0.5 (negative)  
+Two related effects:
 
-Applied after soft cap.
+#### a. Margin of Victory/Defeat
+- Larger margins increase rating adjustments
+- Strong wins → additional boost
+- Heavy losses → additional penalty
+
+#### b. Team Performance Component
+- Players benefit when their team outscores the opponent
+- Players are penalized when the opposite happens
+
+This ensures alignment between individual ratings and team success.
 
 ---
 
-### Team Scored 0 (Hard)
+### 8. Errors and Negative Events
 
-If team loses and scores 0:
+Tracked explicitly:
 
-- ST/MID ≤ 6.5  
-- DEF/GK ≤ 7.0  
+- Missed penalties
+- Own goals
+
+Effects:
+- Always reduce rating
+- Stronger penalty if:
+  - Match is close
+  - Team loses
+  - Error is decisive
+
+Mitigation:
+- If the team wins, penalties are partially reduced
 
 ---
 
-## Extreme Matches
+## Role-Based Evaluation
 
-If total goals ≥ 14:
+### Goalkeeper (GK)
 
-Ratings above 8.5 are compressed.
+Key drivers:
+- Goals conceded (primary responsibility)
+- Clean sheet bonuses (highest among roles)
+- Match difficulty (closed matches heavily rewarded)
+
+Additional adjustments:
+- Bonus for winning
+- Compensation in high-concession matches (not all goals are attributable)
+- Strong reward for penalty saves
+
+---
+
+### Defenders (DEF)
+
+Key drivers:
+- Defensive solidity (goals conceded)
+- Clean/near-clean bonuses
+- Performance in closed matches
+
+Additional traits:
+- Strong reward for scoring
+- More tolerant than attackers for lack of goals
+
+---
+
+### Midfielders (MID)
+
+Balanced evaluation:
+
+- Offensive contribution (goals)
+- Defensive context (partially considered)
+- Match control (implicit via team performance)
+
+Special rules:
+- Penalized if team scores many goals and player scores none
+- Moderate bonus for scoring compared to attackers
+
+---
+
+### Attackers (ST)
+
+Primary focus:
+- Goal scoring
+- Share of team offensive output
+
+Strict evaluation:
+- Strong penalty if:
+  - Team scores many goals
+  - Player scores none
+
+Less emphasis on:
+- Defensive contribution
+- Goals conceded
+
+---
+
+## Special Constraints and Caps
+
+### 1. No-Goal Cap (Attackers and Midfielders)
+
+If a player scores zero:
+- Maximum rating is limited
+
+Purpose:
+- Prevent high ratings without fulfilling offensive role
+
+---
+
+### 2. Team Failed to Score (Loss Only)
+
+If team:
+- Scores zero
+- Loses the match
+
+Then:
+- All players have a rating ceiling
+- Stricter for attacking roles
+
+---
+
+### 3. Subjective Mentions
+
+Optional adjustment:
+- Positive mention → small increase
+- Negative mention → small decrease
+
+Applied after all other computations.
+
+---
+
+### 4. Extreme Matches (Very High Scoring)
+
+If match is extremely high-scoring:
+- Top ratings are compressed
+
+Purpose:
+- Prevent inflation due to chaotic conditions
 
 ---
 
 ## Normalization
 
-Target average: 6.5  
-
-Shift limited to ±0.5  
-
-Reduced if margin ≥ 5  
-
----
-
-## Numerical Stability
-
-Quantization applied during computation.
+After all adjustments:
+- Ratings are shifted so the match average stays consistent
+- Adjustment is limited to avoid distortion
+- Reduced effect in very unbalanced matches
 
 ---
 
-## Final Steps
+## Finalization
 
-1. Clamp to [3, 10]  
-2. Round to nearest 0.25  
+The final rating:
+- Is bounded within a fixed range
+- Is discretized into fixed steps
 
 ---
 
 ## MVP Selection
 
-1. Select highest rating  
+The best player is determined by:
+
+1. Highest rating
 
 Tie-breakers:
+- Prefer players from the winning team
+- Compare net positive vs negative contributions
+- In draws, prioritize overall contribution balance
 
-- Opposite teams → winner preferred  
-- Same team → higher bonus-minus-malus  
-- Draw → higher bonus-minus-malus  
-
-Fallback: manual decision  
-
----
-
-## Properties
-
-- Deterministic  
-- Continuous  
-- Role-aware  
-- Robust to edge cases  
+If still tied:
+- Manual decision
 
 ---
 
-## Status
+## Summary
 
-This specification is complete and sufficient for exact implementation.
+The system evaluates performance as a combination of:
+
+- Individual contribution (goals, saves, errors)
+- Team outcome and dominance
+- Match difficulty and structure
+- Role-specific expectations
+
+Each rating emerges from the interaction of these factors rather than isolated statistics.
