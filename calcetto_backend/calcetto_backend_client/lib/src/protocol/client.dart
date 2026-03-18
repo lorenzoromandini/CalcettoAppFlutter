@@ -155,6 +155,38 @@ class EndpointClubs extends _i1.EndpointRef {
           'imageUrl': imageUrl,
         },
       );
+
+  /// Join a club using an invite code.
+  ///
+  /// Validates the invite code and adds the user as a member.
+  /// Codes are reusable and expire after 7 days.
+  _i2.Future<Map<String, dynamic>> joinClub(String? inviteCode) =>
+      caller.callServerEndpoint<Map<String, dynamic>>(
+        'clubs',
+        'joinClub',
+        {'inviteCode': inviteCode},
+      );
+
+  /// Get all deleted clubs for the current user.
+  ///
+  /// Returns clubs that have been soft-deleted within the last 30 days
+  /// where the user is an owner or manager.
+  _i2.Future<List<Map<String, dynamic>>> getDeletedClubs() =>
+      caller.callServerEndpoint<List<Map<String, dynamic>>>(
+        'clubs',
+        'getDeletedClubs',
+        {},
+      );
+
+  /// Recover a deleted club.
+  ///
+  /// Clears the deletedAt timestamp to restore the club.
+  _i2.Future<Map<String, dynamic>> recoverClub(String? clubIdStr) =>
+      caller.callServerEndpoint<Map<String, dynamic>>(
+        'clubs',
+        'recoverClub',
+        {'clubIdStr': clubIdStr},
+      );
 }
 
 /// {@category Endpoint}

@@ -4,6 +4,8 @@ import '../../../../core/widgets/offline_indicator.dart';
 import '../../../clubs/domain/entities/club.dart';
 import '../../../clubs/domain/entities/club_privilege.dart';
 import '../../../clubs/presentation/providers/clubs_list_provider.dart';
+import '../../../clubs/presentation/providers/active_club_provider.dart';
+import '../widgets/delete_club_dialog.dart';
 
 /// Screen for editing club information.
 ///
@@ -68,48 +70,38 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
   }
 
   Future<void> _deleteClub() async {
-    final confirmed = await showDialog<bool>(
+    final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Elimina Club'),
-        content: const Text(
-          'Sei sicuro di voler eliminare questo club? Questa azione non può essere annullata.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Annulla'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: const Text('Elimina'),
-          ),
-        ],
+      builder: (context) => DeleteClubDialog(
+        clubId: widget.club.id,
+        clubName: widget.club.name,
       ),
     );
 
-    if (confirmed != true) return;
+    if (result == true) {
+      // Clear active club first to prevent "failed to load" error
+      await ref.read(activeClubProvider.notifier).clearActiveClub();
 
-    setState(() => _isLoading = true);
+      // Refresh clubs list
+      await ref.read(clubsListProvider.notifier).refresh();
 
-    try {
-      await ref.read(clubsListProvider.notifier).deleteClub(widget.club.id);
+      // Get updated clubs list
+      final clubsAsync = ref.read(clubsListProvider);
+      final clubs = clubsAsync.value;
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Club eliminato con successo')),
-        );
-        Navigator.of(context).popUntil((route) => route.isFirst);
+      if (clubs != null && clubs.isNotEmpty) {
+        // Filter out the deleted club and set first available
+        final availableClubs =
+            clubs.where((c) => c.id != widget.club.id).toList();
+        if (availableClubs.isNotEmpty) {
+          await ref
+              .read(activeClubProvider.notifier)
+              .setActiveClub(availableClubs.first.id);
+        }
       }
-    } catch (e) {
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Errore: $e')),
-        );
-        setState(() => _isLoading = false);
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     }
   }
@@ -134,15 +126,6 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Modifica Club'),
-        actions: [
-          if (isOwner)
-            IconButton(
-              icon: const Icon(Icons.delete_forever),
-              onPressed: _isLoading ? null : _deleteClub,
-              tooltip: 'Elimina club',
-              color: theme.colorScheme.error,
-            ),
-        ],
       ),
       body: Column(
         children: [
@@ -197,6 +180,15 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                     ),
                     const SizedBox(height: 32),
 
+                    // Section Header
+                    Text(
+                      'Informazioni Club',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
                     // Club Name
                     TextFormField(
                       controller: _nameController,
@@ -216,15 +208,17 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Description
+                    // Description - aligned with crossAxisAlignment.start
                     TextFormField(
                       controller: _descriptionController,
                       decoration: const InputDecoration(
                         labelText: 'Descrizione',
                         prefixIcon: Icon(Icons.description),
+                        alignLabelWithHint: true,
                       ),
                       maxLines: 3,
                       maxLength: 200,
+                      textAlignVertical: TextAlignVertical.top,
                     ),
                     const SizedBox(height: 32),
 

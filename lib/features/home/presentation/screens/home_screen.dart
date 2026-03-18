@@ -150,36 +150,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: SizedBox(height: 24),
           ),
 
-          // Recent activity section
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Recent Activity',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Activity feed coming soon')),
-                      );
-                    },
-                    child: const Text('View All'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: _buildActivityPlaceholder(),
-          ),
-
           // Bottom padding for navigation bar
           const SliverToBoxAdapter(
             child: SizedBox(height: 80),

@@ -27,6 +27,7 @@ mixin _$Club {
   ClubPrivilege get userPrivilege => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
+  DateTime? get deletedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Club to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -49,7 +50,8 @@ abstract class $ClubCopyWith<$Res> {
       int memberCount,
       ClubPrivilege userPrivilege,
       String? description,
-      DateTime createdAt});
+      DateTime createdAt,
+      DateTime? deletedAt});
 }
 
 /// @nodoc
@@ -74,6 +76,7 @@ class _$ClubCopyWithImpl<$Res, $Val extends Club>
     Object? userPrivilege = null,
     Object? description = freezed,
     Object? createdAt = null,
+    Object? deletedAt = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -104,6 +107,10 @@ class _$ClubCopyWithImpl<$Res, $Val extends Club>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 }
@@ -122,7 +129,8 @@ abstract class _$$ClubImplCopyWith<$Res> implements $ClubCopyWith<$Res> {
       int memberCount,
       ClubPrivilege userPrivilege,
       String? description,
-      DateTime createdAt});
+      DateTime createdAt,
+      DateTime? deletedAt});
 }
 
 /// @nodoc
@@ -144,6 +152,7 @@ class __$$ClubImplCopyWithImpl<$Res>
     Object? userPrivilege = null,
     Object? description = freezed,
     Object? createdAt = null,
+    Object? deletedAt = freezed,
   }) {
     return _then(_$ClubImpl(
       id: null == id
@@ -174,6 +183,10 @@ class __$$ClubImplCopyWithImpl<$Res>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -188,7 +201,8 @@ class _$ClubImpl implements _Club {
       required this.memberCount,
       required this.userPrivilege,
       this.description,
-      required this.createdAt});
+      required this.createdAt,
+      this.deletedAt});
 
   factory _$ClubImpl.fromJson(Map<String, dynamic> json) =>
       _$$ClubImplFromJson(json);
@@ -207,10 +221,12 @@ class _$ClubImpl implements _Club {
   final String? description;
   @override
   final DateTime createdAt;
+  @override
+  final DateTime? deletedAt;
 
   @override
   String toString() {
-    return 'Club(id: $id, name: $name, logoUrl: $logoUrl, memberCount: $memberCount, userPrivilege: $userPrivilege, description: $description, createdAt: $createdAt)';
+    return 'Club(id: $id, name: $name, logoUrl: $logoUrl, memberCount: $memberCount, userPrivilege: $userPrivilege, description: $description, createdAt: $createdAt, deletedAt: $deletedAt)';
   }
 
   @override
@@ -228,13 +244,15 @@ class _$ClubImpl implements _Club {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.deletedAt, deletedAt) ||
+                other.deletedAt == deletedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, name, logoUrl, memberCount,
-      userPrivilege, description, createdAt);
+      userPrivilege, description, createdAt, deletedAt);
 
   /// Create a copy of Club
   /// with the given fields replaced by the non-null parameter values.
@@ -260,7 +278,8 @@ abstract class _Club implements Club {
       required final int memberCount,
       required final ClubPrivilege userPrivilege,
       final String? description,
-      required final DateTime createdAt}) = _$ClubImpl;
+      required final DateTime createdAt,
+      final DateTime? deletedAt}) = _$ClubImpl;
 
   factory _Club.fromJson(Map<String, dynamic> json) = _$ClubImpl.fromJson;
 
@@ -278,6 +297,8 @@ abstract class _Club implements Club {
   String? get description;
   @override
   DateTime get createdAt;
+  @override
+  DateTime? get deletedAt;
 
   /// Create a copy of Club
   /// with the given fields replaced by the non-null parameter values.

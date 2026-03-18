@@ -25,6 +25,10 @@ Calcetto App Flutter is a mobile application for managing casual football (calce
 - **Match Scheduling** - Schedule and manage matches
 - **Player Statistics** - Track player performance
 - **Offline Support** - Local caching with Hive
+- **Club Recovery** - Soft delete with 30-day recovery period
+- **Invitation System** - Generate shareable invite links (7-day expiration, reusable)
+- **WhatsApp Integration** - Direct sharing to WhatsApp
+- **Member Profiles** - View detailed member information with stats
 
 ---
 
@@ -122,8 +126,33 @@ calcetto_backend/
 
 **Club Roles**
 - ✅ Owner privileges → Can delete club, manage members
+- ✅ Owner only → Can edit club info
 - ⏳ Manager privileges → Can create matches, manage formations (Phase 3)
 - ⏳ Member privileges → Can join matches, view only (Phase 3)
+
+**Club Deletion & Recovery**
+- ✅ Delete club (Owner) → Soft delete, hidden from all members
+- ✅ Delete affects all members → Everyone loses access
+- ✅ Recover club → Restores for all members with data intact
+- ✅ Recovery period → 30 days to recover
+- ✅ Recovery UI → Access from Profile → "Club Eliminati"
+
+**Invitation System**
+- ✅ Generate invite link → Creates reusable link
+- ✅ Link expiration → 7 days from generation
+- ✅ Share via WhatsApp → Opens WhatsApp with pre-filled message
+- ✅ Copy link → Clipboard integration
+- ✅ Join via link → New members can join club
+
+**Member Management**
+- ✅ View members → FIFA-style cards in grid
+- ✅ Tap member card → Opens detailed member profile
+- ✅ Member profile → Shows stats, join date, privilege
+
+**Club Header**
+- ✅ Share button (left) → Generate invite codes
+- ✅ Edit button (right, Owner only) → Edit club details
+- ✅ No delete button in header → Moved to edit screen
 
 ### ✅ General UI (Implemented & Tested)
 

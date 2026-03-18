@@ -5,6 +5,7 @@ import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../../core/widgets/app_drawer.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
 import '../../../profile/presentation/screens/edit_profile_screen.dart';
+import '../../../clubs/presentation/screens/deleted_clubs_screen.dart';
 
 /// Profile screen showing user info.
 ///
@@ -113,6 +114,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             },
             icon: const Icon(Icons.edit),
             label: const Text('Edit Profile'),
+          ),
+          const SizedBox(height: 16),
+          // Deleted clubs button
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const DeletedClubsScreen(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.restore_from_trash),
+            label: const Text('Club Eliminati'),
           ),
         ],
       ),

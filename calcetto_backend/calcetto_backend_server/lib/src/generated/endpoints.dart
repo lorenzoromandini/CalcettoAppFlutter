@@ -291,6 +291,52 @@ class Endpoints extends _i1.EndpointDispatch {
             params['imageUrl'],
           ),
         ),
+        'joinClub': _i1.MethodConnector(
+          name: 'joinClub',
+          params: {
+            'inviteCode': _i1.ParameterDescription(
+              name: 'inviteCode',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['clubs'] as _i3.ClubsEndpoint).joinClub(
+            session,
+            params['inviteCode'],
+          ),
+        ),
+        'getDeletedClubs': _i1.MethodConnector(
+          name: 'getDeletedClubs',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['clubs'] as _i3.ClubsEndpoint)
+                  .getDeletedClubs(session),
+        ),
+        'recoverClub': _i1.MethodConnector(
+          name: 'recoverClub',
+          params: {
+            'clubIdStr': _i1.ParameterDescription(
+              name: 'clubIdStr',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['clubs'] as _i3.ClubsEndpoint).recoverClub(
+            session,
+            params['clubIdStr'],
+          ),
+        ),
       },
     );
     connectors['matches'] = _i1.EndpointConnector(

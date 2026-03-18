@@ -14,6 +14,9 @@ _$ClubImpl _$$ClubImplFromJson(Map<String, dynamic> json) => _$ClubImpl(
       userPrivilege: $enumDecode(_$ClubPrivilegeEnumMap, json['userPrivilege']),
       description: json['description'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
+      deletedAt: json['deletedAt'] == null
+          ? null
+          : DateTime.parse(json['deletedAt'] as String),
     );
 
 Map<String, dynamic> _$$ClubImplToJson(_$ClubImpl instance) =>
@@ -25,6 +28,7 @@ Map<String, dynamic> _$$ClubImplToJson(_$ClubImpl instance) =>
       'userPrivilege': _$ClubPrivilegeEnumMap[instance.userPrivilege]!,
       'description': instance.description,
       'createdAt': instance.createdAt.toIso8601String(),
+      'deletedAt': instance.deletedAt?.toIso8601String(),
     };
 
 const _$ClubPrivilegeEnumMap = {

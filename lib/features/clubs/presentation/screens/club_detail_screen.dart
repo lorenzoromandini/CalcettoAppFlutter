@@ -5,6 +5,7 @@ import 'package:calcetto_app/features/clubs/domain/entities/club.dart';
 import 'package:calcetto_app/features/clubs/domain/entities/club_privilege.dart';
 import 'package:calcetto_app/features/clubs/presentation/widgets/club_info_tab.dart';
 import 'package:calcetto_app/features/clubs/presentation/screens/club_members_screen.dart';
+import 'package:calcetto_app/features/clubs/presentation/screens/edit_club_screen.dart';
 import 'package:calcetto_app/features/clubs/presentation/widgets/invite_code_generator.dart';
 import 'package:calcetto_app/features/clubs/presentation/widgets/delete_club_dialog.dart';
 import 'package:calcetto_app/features/clubs/presentation/providers/club_members_provider.dart';
@@ -30,13 +31,11 @@ class ClubDetailScreen extends ConsumerStatefulWidget {
 class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  late ClubsRepository _clubsRepository;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _clubsRepository = ref.read(clubsRepositoryProvider);
   }
 
   @override
@@ -65,40 +64,72 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
   Future<void> _handleShare() async {
     if (!_isAdmin) return;
 
-    // Generate invite code
-    final result = await _clubsRepository.generateInviteCode(widget.club.id);
-
-    result.fold(
-      (error) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to generate invite code: $error'),
-              backgroundColor: Colors.red,
+    // Show centered semi-transparent invite dialog
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black54,
+      builder: (context) => Center(
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.85,
+            constraints: const BoxConstraints(maxWidth: 400),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.95),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
             ),
-          );
-        }
-      },
-      (code) async {
-        // Share the invite code
-        await Share.share(
-          'Join my football club! Use invite code: $code',
-          subject: 'Club Invitation',
-          sharePositionOrigin: _getSharePositionOrigin(),
-        );
-      },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.person_add,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Invita Membri',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.close),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                ),
+                // Content
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: InviteCodeGenerator(
+                    clubId: widget.club.id,
+                    userPrivilege: widget.club.userPrivilege,
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
-  }
-
-  Rect? _getSharePositionOrigin() {
-    final context = this.context;
-    final renderBox = context.findRenderObject() as RenderBox?;
-    if (renderBox != null) {
-      final size = renderBox.size;
-      final offset = renderBox.localToGlobal(Offset.zero);
-      return Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height / 3);
-    }
-    return null;
   }
 
   @override
@@ -107,6 +138,30 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
 
     return Scaffold(
       appBar: AppBar(
+        leading: _isAdmin
+            ? Consumer(
+                builder: (context, ref, _) {
+                  final isOffline = _isOffline(ref);
+                  return Tooltip(
+                    message: isOffline
+                        ? 'Requires internet connection'
+                        : 'Share invite code',
+                    child: IgnorePointer(
+                      ignoring: isOffline,
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 200),
+                        opacity: isOffline ? 0.5 : 1.0,
+                        child: IconButton(
+                          icon: const Icon(Icons.share),
+                          onPressed: isOffline ? null : _handleShare,
+                          tooltip: 'Share invite code',
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              )
+            : null,
         title: Text(
           widget.club.name,
           style: theme.textTheme.titleLarge?.copyWith(
@@ -114,87 +169,18 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
           ),
         ),
         actions: [
-          if (_isAdmin)
-            Consumer(
-              builder: (context, ref, _) {
-                final isOffline = _isOffline(ref);
-                return Tooltip(
-                  message: isOffline
-                      ? 'Requires internet connection'
-                      : 'Share invite code',
-                  child: IgnorePointer(
-                    ignoring: isOffline,
-                    child: AnimatedOpacity(
-                      duration: const Duration(milliseconds: 200),
-                      opacity: isOffline ? 0.5 : 1.0,
-                      child: IconButton(
-                        icon: const Icon(Icons.share),
-                        onPressed: isOffline ? null : _handleShare,
-                        tooltip: 'Share invite code',
-                      ),
-                    ),
+          if (_isOwner)
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => EditClubScreen(club: widget.club),
                   ),
                 );
               },
+              tooltip: 'Modifica club',
             ),
-          PopupMenuButton<String>(
-            onSelected: (value) async {
-              if (value == 'delete' && _isOwner) {
-                final result = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => DeleteClubDialog(
-                    clubId: widget.club.id,
-                    clubName: widget.club.name,
-                  ),
-                );
-
-                if (result == true && mounted) {
-                  // Navigate back to clubs list
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Club "${widget.club.name}" eliminato'),
-                      backgroundColor: theme.colorScheme.primary,
-                    ),
-                  );
-                }
-              }
-              // Future: edit club
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'edit',
-                enabled: false,
-                child: Row(
-                  children: [
-                    Icon(Icons.edit, color: Colors.grey),
-                    SizedBox(width: 8),
-                    Text('Modifica club (prossimamente)',
-                        style: TextStyle(color: Colors.grey)),
-                  ],
-                ),
-              ),
-              if (_isOwner) ...[
-                const PopupMenuDivider(),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.delete_forever,
-                        color: Colors.red,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Elimina club',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
         ],
         bottom: TabBar(
           controller: _tabController,

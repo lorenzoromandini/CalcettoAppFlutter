@@ -45,7 +45,8 @@ class ClubsEndpoint extends Endpoint {
 
     for (var membership in memberships) {
       final club = await Club.db.findById(session, membership.clubId);
-      if (club != null) {
+      // Skip deleted clubs (soft delete)
+      if (club != null && club.deletedAt == null) {
         // Count members
         final memberCount = await ClubMember.db.count(
           session,
@@ -81,7 +82,8 @@ class ClubsEndpoint extends Endpoint {
     final userId = UuidValue.fromString(userIdStr);
 
     final club = await Club.db.findById(session, clubId);
-    if (club == null) return null;
+    // Return null if club doesn't exist or is deleted (soft delete)
+    if (club == null || club.deletedAt != null) return null;
 
     // Get user's membership to determine privilege
     final membership = await ClubMember.db.findFirstRow(
@@ -190,9 +192,15 @@ class ClubsEndpoint extends Endpoint {
       throw Exception('Permessi insufficienti');
     }
 
+    // Generate code with 7-day expiration
+    final now = DateTime.now();
+    final expiration = now.add(const Duration(days: 7));
+
     return {
-      'code': 'INV_${clubIdStr}_${DateTime.now().millisecondsSinceEpoch}',
-      'clubId': clubIdStr
+      'code':
+          'INV_${clubIdStr}_${now.millisecondsSinceEpoch}_${expiration.millisecondsSinceEpoch}',
+      'clubId': clubIdStr,
+      'expiresAt': expiration.toIso8601String(),
     };
   }
 
@@ -257,5 +265,220 @@ class ClubsEndpoint extends Endpoint {
     await ClubMember.db.insertRow(session, membership);
 
     return createdClub;
+  }
+
+  /// Join a club using an invite code.
+  ///
+  /// Validates the invite code and adds the user as a member.
+  /// Codes are reusable and expire after 7 days.
+  Future<Map<String, dynamic>> joinClub(
+      Session session, String? inviteCode) async {
+    if (inviteCode == null || inviteCode.isEmpty) {
+      throw Exception('Codice invito non valido');
+    }
+
+    final userIdStr = _extractUserIdFromToken(session.authenticationKey);
+    if (userIdStr == null) throw Exception('Autenticazione richiesta');
+
+    final userId = UuidValue.fromString(userIdStr);
+
+    // Parse invite code format: INV_{clubId}_{timestamp}_{expiration}
+    final parts = inviteCode.split('_');
+    if (parts.length < 4 || parts[0] != 'INV') {
+      throw Exception('Codice invito non valido');
+    }
+
+    final clubIdStr = parts[1];
+    UuidValue clubId;
+    try {
+      clubId = UuidValue.fromString(clubIdStr);
+    } catch (e) {
+      throw Exception('Codice invito non valido');
+    }
+
+    // Check expiration (7 days from generation)
+    try {
+      final expirationTimestamp = int.parse(parts[3]);
+      final expirationDate =
+          DateTime.fromMillisecondsSinceEpoch(expirationTimestamp);
+      if (DateTime.now().isAfter(expirationDate)) {
+        throw Exception('Codice invito scaduto');
+      }
+    } catch (e) {
+      throw Exception('Codice invito non valido');
+    }
+
+    // Check if club exists and is not deleted
+    final club = await Club.db.findById(session, clubId);
+    if (club == null) {
+      throw Exception('Club non trovato');
+    }
+    if (club.deletedAt != null) {
+      throw Exception('Club eliminato');
+    }
+
+    // Check if user is already a member
+    final existingMembership = await ClubMember.db.findFirstRow(
+      session,
+      where: (t) => t.clubId.equals(clubId) & t.userId.equals(userId),
+    );
+
+    if (existingMembership != null) {
+      throw Exception('Sei già membro di questo club');
+    }
+
+    // Add user as a member with MEMBER privilege
+    final membership = ClubMember(
+      clubId: clubId,
+      userId: userId,
+      privilege: ClubPrivilege.MEMBER,
+      primaryRole: PlayerPosition.MID,
+      secondaryRoles: [],
+      joinedAt: DateTime.now(),
+    );
+
+    await ClubMember.db.insertRow(session, membership);
+
+    // Return club info
+    final memberCount = await ClubMember.db.count(
+      session,
+      where: (t) => t.clubId.equals(clubId),
+    );
+
+    return {
+      'id': club.id?.toString(),
+      'name': club.name,
+      'description': club.description,
+      'imageUrl': club.imageUrl,
+      'memberCount': memberCount,
+      'privilege': ClubPrivilege.MEMBER.index,
+    };
+  }
+
+  /// Get all deleted clubs for the current user.
+  ///
+  /// Returns clubs that have been soft-deleted within the last 30 days
+  /// where the user is an owner or manager.
+  Future<List<Map<String, dynamic>>> getDeletedClubs(Session session) async {
+    final userIdStr = _extractUserIdFromToken(session.authenticationKey);
+    if (userIdStr == null) {
+      print('getDeletedClubs: userId null');
+      return [];
+    }
+
+    print('getDeletedClubs: userId=$userIdStr');
+
+    final userId = UuidValue.fromString(userIdStr);
+
+    // Get all memberships where user is owner or manager
+    final memberships = await ClubMember.db.find(
+      session,
+      where: (t) =>
+          t.userId.equals(userId) &
+          (t.privilege.equals(ClubPrivilege.OWNER) |
+              t.privilege.equals(ClubPrivilege.MANAGER)),
+    );
+
+    print('getDeletedClubs: found ${memberships.length} memberships');
+
+    if (memberships.isEmpty) return [];
+
+    final result = <Map<String, dynamic>>[];
+
+    for (var membership in memberships) {
+      final club = await Club.db.findById(session, membership.clubId);
+      // Include only deleted clubs (soft delete) within 30 days
+      if (club != null && club.deletedAt != null) {
+        // Check if within 30 days
+        final recoveryDeadline = club.deletedAt!.add(const Duration(days: 30));
+        if (DateTime.now().isBefore(recoveryDeadline)) {
+          final memberCount = await ClubMember.db.count(
+            session,
+            where: (t) => t.clubId.equals(club.id!),
+          );
+
+          result.add({
+            'id': club.id?.toString(),
+            'name': club.name,
+            'description': club.description,
+            'imageUrl': club.imageUrl,
+            'createdBy': club.createdBy?.toString(),
+            'createdAt': club.createdAt?.toIso8601String(),
+            'updatedAt': club.updatedAt?.toIso8601String(),
+            'deletedAt': club.deletedAt?.toIso8601String(),
+            'memberCount': memberCount,
+            'privilege': membership.privilege.index,
+          });
+        }
+      }
+    }
+
+    print('getDeletedClubs: returning ${result.length} deleted clubs');
+    return result;
+  }
+
+  /// Recover a deleted club.
+  ///
+  /// Clears the deletedAt timestamp to restore the club.
+  Future<Map<String, dynamic>> recoverClub(
+      Session session, String? clubIdStr) async {
+    if (clubIdStr == null) throw Exception('Club ID non valido');
+
+    final userIdStr = _extractUserIdFromToken(session.authenticationKey);
+    if (userIdStr == null) throw Exception('Autenticazione richiesta');
+
+    final clubId = UuidValue.fromString(clubIdStr);
+    final userId = UuidValue.fromString(userIdStr);
+
+    // Check if user is owner or manager of the club
+    final membership = await ClubMember.db.findFirstRow(
+      session,
+      where: (t) => t.clubId.equals(clubId) & t.userId.equals(userId),
+    );
+
+    if (membership == null) {
+      throw Exception('Non sei membro di questo club');
+    }
+
+    if (membership.privilege != ClubPrivilege.OWNER &&
+        membership.privilege != ClubPrivilege.MANAGER) {
+      throw Exception(
+          'Solo il proprietario o il manager possono ripristinare il club');
+    }
+
+    // Get the club
+    final club = await Club.db.findById(session, clubId);
+    if (club == null) {
+      throw Exception('Club non trovato');
+    }
+
+    if (club.deletedAt == null) {
+      throw Exception('Il club non è eliminato');
+    }
+
+    // Check if within recovery period (30 days)
+    final recoveryDeadline = club.deletedAt!.add(const Duration(days: 30));
+    if (DateTime.now().isAfter(recoveryDeadline)) {
+      throw Exception('Periodo di recupero scaduto');
+    }
+
+    // Recover the club by clearing deletedAt
+    club.deletedAt = null;
+    await Club.db.updateRow(session, club);
+
+    // Return club info
+    final memberCount = await ClubMember.db.count(
+      session,
+      where: (t) => t.clubId.equals(clubId),
+    );
+
+    return {
+      'id': club.id?.toString(),
+      'name': club.name,
+      'description': club.description,
+      'imageUrl': club.imageUrl,
+      'memberCount': memberCount,
+      'privilege': membership.privilege.index,
+    };
   }
 }

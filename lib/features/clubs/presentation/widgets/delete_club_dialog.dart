@@ -94,7 +94,7 @@ class _DeleteClubDialogState extends ConsumerState<DeleteClubDialog> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Questa azione è permanente. Tutti i dati del club saranno eliminati.',
+            'Il club sarà nascosto ma potrai ripristinarlo entro 30 giorni.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.error,
             ),

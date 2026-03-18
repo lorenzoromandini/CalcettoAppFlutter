@@ -36,6 +36,9 @@ class ClubModel {
   @HiveField(7)
   final DateTime? cachedAt;
 
+  @HiveField(8)
+  final DateTime? deletedAt;
+
   ClubModel({
     required this.id,
     required this.name,
@@ -45,6 +48,7 @@ class ClubModel {
     this.description,
     required this.createdAt,
     this.cachedAt,
+    this.deletedAt,
   });
 
   /// Creates a ClubModel from a Club entity.
@@ -56,6 +60,7 @@ class ClubModel {
         userPrivilege: entity.userPrivilege,
         description: entity.description,
         createdAt: entity.createdAt,
+        deletedAt: entity.deletedAt,
       );
 
   /// Converts this ClubModel to its entity representation.
@@ -67,6 +72,7 @@ class ClubModel {
         userPrivilege: userPrivilege,
         description: description,
         createdAt: createdAt,
+        deletedAt: deletedAt,
       );
 
   /// Creates a ClubModel from a JSON map.
@@ -85,6 +91,9 @@ class ClubModel {
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
           : DateTime.now(),
+      deletedAt: json['deletedAt'] != null
+          ? DateTime.parse(json['deletedAt'] as String)
+          : null,
     );
   }
 
@@ -112,6 +121,7 @@ class ClubModel {
         'description': description,
         'createdAt': createdAt.toIso8601String(),
         'cachedAt': cachedAt?.toIso8601String(),
+        'deletedAt': deletedAt?.toIso8601String(),
       };
 
   /// Creates a ClubModel with cache timestamp.

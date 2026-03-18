@@ -58,16 +58,24 @@ class ClubsRepositoryImpl implements ClubsRepository {
   }
 
   @override
-  Future<Result<Club>> getClubById(String id) async {
+  Future<Result<Club?>> getClubById(String id) async {
     try {
       final isOnline = await _connectivity.isOnline;
 
       if (isOnline) {
         try {
           final club = await _remote.getClubById(id);
+          // If club is null (deleted), return null success
+          if (club == null) {
+            return const Success(null);
+          }
           await _local.cacheClubs([club]);
           return Success(club.toEntity());
-        } on DioException {
+        } on DioException catch (e) {
+          // Check if it's a 404 (not found/deleted)
+          if (e.response?.statusCode == 404) {
+            return const Success(null);
+          }
           final cached = await _local.getCachedClubs();
           if (cached != null) {
             try {
@@ -195,6 +203,80 @@ class ClubsRepositoryImpl implements ClubsRepository {
           name: name,
           description: description,
         );
+        await _local.cacheClubs([club]);
+        return Success(club.toEntity());
+      } on DioException catch (e) {
+        if (e.response?.statusCode != null) {
+          return FailureResult(
+              ServerFailure.fromStatusCode(e.response!.statusCode!));
+        }
+        return FailureResult(NetworkFailure.unknown());
+      }
+    } catch (_) {
+      return FailureResult(ServerFailure.internalError());
+    }
+  }
+
+  @override
+  Future<Result<Club>> joinClub(String inviteCode) async {
+    try {
+      final isOnline = await _connectivity.isOnline;
+
+      if (!isOnline) {
+        return FailureResult(NetworkFailure.noConnection());
+      }
+
+      try {
+        final club = await _remote.joinClub(inviteCode);
+        await _local.cacheClubs([club]);
+        return Success(club.toEntity());
+      } on DioException catch (e) {
+        if (e.response?.statusCode != null) {
+          return FailureResult(
+              ServerFailure.fromStatusCode(e.response!.statusCode!));
+        }
+        return FailureResult(NetworkFailure.unknown());
+      }
+    } catch (_) {
+      return FailureResult(ServerFailure.internalError());
+    }
+  }
+
+  @override
+  Future<Result<List<Club>>> getDeletedClubs() async {
+    try {
+      final isOnline = await _connectivity.isOnline;
+
+      if (isOnline) {
+        try {
+          final clubs = await _remote.getDeletedClubs();
+          return Success(clubs.map((c) => c.toEntity()).toList());
+        } on DioException catch (e) {
+          if (e.response?.statusCode != null) {
+            return FailureResult(
+                ServerFailure.fromStatusCode(e.response!.statusCode!));
+          }
+          return FailureResult(NetworkFailure.unknown());
+        }
+      } else {
+        return FailureResult(NetworkFailure.noConnection());
+      }
+    } catch (_) {
+      return FailureResult(ServerFailure.internalError());
+    }
+  }
+
+  @override
+  Future<Result<Club>> recoverClub(String clubId) async {
+    try {
+      final isOnline = await _connectivity.isOnline;
+
+      if (!isOnline) {
+        return FailureResult(NetworkFailure.noConnection());
+      }
+
+      try {
+        final club = await _remote.recoverClub(clubId);
         await _local.cacheClubs([club]);
         return Success(club.toEntity());
       } on DioException catch (e) {

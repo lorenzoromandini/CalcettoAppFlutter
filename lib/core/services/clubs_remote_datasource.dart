@@ -27,6 +27,15 @@ abstract class ClubsRemoteDataSource {
     required String name,
     String? description,
   });
+
+  /// Join a club using an invite code.
+  Future<ClubModel> joinClub(String inviteCode);
+
+  /// Get deleted clubs for recovery.
+  Future<List<ClubModel>> getDeletedClubs();
+
+  /// Recover a deleted club.
+  Future<ClubModel> recoverClub(String clubId);
 }
 
 /// Dio implementation of ClubsRemoteDataSource.
@@ -91,16 +100,16 @@ class DioClubsRemoteDataSource implements ClubsRemoteDataSource {
   Future<String> generateInviteCode(String clubId) async {
     final response = await _dio.post(
       '/clubs/generateInviteCode',
-      data: {'clubId': clubId},
+      data: {'clubIdStr': clubId},
     );
     return response.data['code'] as String;
   }
 
   @override
   Future<void> deleteClub(String clubId) async {
-    await _dio.delete(
+    await _dio.post(
       '/clubs/deleteClub',
-      data: {'clubId': clubId},
+      data: {'clubIdStr': clubId},
     );
   }
 
@@ -115,6 +124,43 @@ class DioClubsRemoteDataSource implements ClubsRemoteDataSource {
         'name': name,
         'description': description,
       },
+    );
+    return ClubModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<ClubModel> joinClub(String inviteCode) async {
+    final response = await _dio.post(
+      '/clubs/joinClub',
+      data: {'inviteCode': inviteCode},
+    );
+    return ClubModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<List<ClubModel>> getDeletedClubs() async {
+    try {
+      final response = await _dio.post('/clubs/getDeletedClubs');
+
+      if (response.data == null || response.data is! List) {
+        return [];
+      }
+
+      final data = response.data as List;
+      final clubs = data
+          .map((e) => ClubModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+      return clubs;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<ClubModel> recoverClub(String clubId) async {
+    final response = await _dio.post(
+      '/clubs/recoverClub',
+      data: {'clubIdStr': clubId},
     );
     return ClubModel.fromJson(response.data as Map<String, dynamic>);
   }

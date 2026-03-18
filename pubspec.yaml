@@ -54,6 +54,12 @@ dependencies:
   
   # Invite code sharing
   share_plus: ^12.0.1
+  
+  # URL launcher for opening WhatsApp
+  url_launcher: ^6.2.5
+  
+  # SVG support for icons
+  flutter_svg: ^2.0.9
 
 dev_dependencies:
   flutter_test:
@@ -85,6 +91,7 @@ flutter:
     - assets/privileges/
     - assets/roles/
     - assets/card-spaces.json
+    - assets/icons/whatsapp.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

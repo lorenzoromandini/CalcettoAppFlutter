@@ -19,6 +19,7 @@ class Club with _$Club {
     required ClubPrivilege userPrivilege,
     String? description,
     required DateTime createdAt,
+    DateTime? deletedAt,
   }) = _Club;
 
   /// Creates a Club from a JSON map (for deserialization).

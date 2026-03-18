@@ -1,7 +1,7 @@
+import 'dart:js' as js;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:calcetto_app/features/clubs/domain/entities/club_privilege.dart';
 import 'package:calcetto_app/features/clubs/presentation/providers/invite_code_provider.dart';
 import '../../../../core/providers/offline_status_provider.dart';
@@ -10,10 +10,8 @@ import '../../../../core/providers/offline_status_provider.dart';
 ///
 /// Features:
 /// - Admin-only visibility (OWNER or MANAGER)
-/// - Generate 8-char alphanumeric codes
-/// - Share via native share sheet
-/// - Copy to clipboard
-/// - One-time use warning
+/// - Generate invite codes
+/// - Show popup with link, copy button, and WhatsApp share
 class InviteCodeGenerator extends ConsumerWidget {
   final String clubId;
   final ClubPrivilege userPrivilege;
@@ -124,8 +122,6 @@ class InviteCodeGenerator extends ConsumerWidget {
 
   Widget _buildNotGeneratedState(
       BuildContext context, InviteCodeNotifier notifier, bool isOffline) {
-    final theme = Theme.of(context);
-
     return FilledButton.icon(
       onPressed: isOffline
           ? null
@@ -133,7 +129,7 @@ class InviteCodeGenerator extends ConsumerWidget {
               notifier.generate(clubId, userPrivilege);
             },
       icon: const Icon(Icons.add_link),
-      label: const Text('Generate Invite Code'),
+      label: const Text('Genera Link Invito'),
       style: FilledButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       ),
@@ -143,6 +139,7 @@ class InviteCodeGenerator extends ConsumerWidget {
   Widget _buildGeneratedState(
       BuildContext context, String code, InviteCodeNotifier notifier) {
     final theme = Theme.of(context);
+    final inviteLink = 'http://localhost:8083/join?code=$code';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -157,9 +154,9 @@ class InviteCodeGenerator extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Code display
+          // Link field with copy and WhatsApp buttons
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(8),
@@ -169,99 +166,64 @@ class InviteCodeGenerator extends ConsumerWidget {
               ),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  _formatCode(code),
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'monospace',
-                    letterSpacing: 4,
+                Expanded(
+                  child: Text(
+                    inviteLink,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontFamily: 'monospace',
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 16),
+                // Copy button
                 IconButton(
                   onPressed: () {
-                    Clipboard.setData(ClipboardData(text: code));
+                    Clipboard.setData(ClipboardData(text: inviteLink));
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Code copied to clipboard'),
+                        content: Text('Link copiato!'),
                         duration: Duration(seconds: 2),
                       ),
                     );
                   },
                   icon: const Icon(Icons.copy),
-                  tooltip: 'Copy to clipboard',
+                  tooltip: 'Copia link',
+                ),
+                // WhatsApp button
+                GestureDetector(
+                  onTap: () => _openWhatsApp(context, inviteLink),
+                  child: Container(
+                    width: 28,
+                    height: 28,
+                    margin: const EdgeInsets.only(left: 8),
+                    child: Image.asset(
+                      'assets/icons/whatsapp.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 16),
-          // Action buttons
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: () => _shareCode(context, code),
-                  icon: const Icon(Icons.share),
-                  label: const Text('Condividi'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: code.isNotEmpty
-                      ? () => _shareWhatsApp(context, code)
-                      : null,
-                  icon: const Icon(Icons.chat),
-                  label: const Text('WhatsApp'),
-                ),
-              ),
-            ],
+          // Generate new code button
+          OutlinedButton.icon(
+            onPressed: notifier.clear,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Genera nuovo link'),
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              OutlinedButton.icon(
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: code));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Codice copiato!'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.copy),
-                label: const Text('Copia codice'),
-              ),
-              if (code.isNotEmpty) ...[
-                const SizedBox(width: 12),
-                OutlinedButton.icon(
-                  onPressed: notifier.clear,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Nuovo'),
-                ),
-              ],
-            ],
-          ),
-          const SizedBox(height: 12),
-          // Security notes
+          // Info notes
           Text(
-            '⚠️ This code can only be used once',
+            '✓ Questo link può essere usato da più persone',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.error,
+              color: theme.colorScheme.primary,
               fontWeight: FontWeight.w600,
             ),
           ),
           Text(
-            'Share privately with trusted people',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
-            ),
-          ),
-          Text(
-            'Expires: Never',
+            '⏰ Scade tra 7 giorni',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.7),
             ),
@@ -292,7 +254,7 @@ class InviteCodeGenerator extends ConsumerWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Failed to generate code',
+                  'Errore nella generazione',
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: theme.colorScheme.onErrorContainer,
                     fontWeight: FontWeight.bold,
@@ -314,74 +276,20 @@ class InviteCodeGenerator extends ConsumerWidget {
               notifier.generate(clubId, userPrivilege);
             },
             icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
+            label: const Text('Riprova'),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _shareCode(BuildContext context, String code) async {
-    final renderBox = context.findRenderObject() as RenderBox?;
-
-    // Create invite link (web URL format)
-    final inviteLink = 'https://calcetto.app/join?code=$code';
-
-    // Share with share_plus (includes WhatsApp, etc.)
-    await Share.share(
-      'Unisciti al nostro club di calcetto! Usa questo link: $inviteLink\nOppure codice: $code',
-      subject: 'Invito al Calcio a 5',
-      sharePositionOrigin: _getSharePositionOrigin(renderBox),
-    );
-  }
-
-  Future<void> _shareWhatsApp(BuildContext context, String code) async {
-    final inviteLink = 'https://calcetto.app/join?code=$code';
-    final message =
-        'Unisciti al nostro club di calcetto! Usa questo link: $inviteLink';
-
-    // WhatsApp URL scheme
+  void _openWhatsApp(BuildContext context, String inviteLink) {
+    final message = 'Unisciti al nostro club di calcetto! $inviteLink';
     final whatsappUrl = 'https://wa.me/?text=${Uri.encodeComponent(message)}';
 
-    try {
-      // Try to launch WhatsApp
-      await Share.share(
-        message,
-        subject: 'Invito al Calcio a 5',
-      );
-    } catch (e) {
-      // Fallback: copy to clipboard
-      await Clipboard.setData(ClipboardData(text: inviteLink));
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Link copiato! Incolla su WhatsApp'),
-            action: SnackBarAction(
-              label: 'Apri WA',
-              onPressed: () {
-                // Would need url_launcher package for direct WhatsApp
-              },
-            ),
-          ),
-        );
-      }
-    }
-  }
-
-  Rect? _getSharePositionOrigin(RenderBox? renderBox) {
-    if (renderBox != null) {
-      final size = renderBox.size;
-      final offset = renderBox.localToGlobal(Offset.zero);
-      return Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height / 3);
-    }
-    return null;
-  }
-
-  String _formatCode(String code) {
-    // Format as XXXX-XXXX for better readability
-    if (code.length == 8) {
-      return '${code.substring(0, 4)}-${code.substring(4)}';
-    }
-    return code.toUpperCase();
+    // Open WhatsApp URL in new tab (works on mobile and desktop)
+    // On mobile, this opens the WhatsApp app
+    // On desktop, this opens WhatsApp Web
+    js.context.callMethod('open', [whatsappUrl, '_blank']);
   }
 }

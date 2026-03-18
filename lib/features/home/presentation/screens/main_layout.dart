@@ -32,9 +32,13 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
           activeClubAsync.when(
             loading: () => const _LoadingPlaceholder('Caricamento club...'),
             error: (_, __) => const ClubsListScreen(),
-            data: (club) => club != null
-                ? ClubDetailScreen(club: club)
-                : const ClubsListScreen(),
+            data: (club) {
+              // If club is deleted or null, show clubs list
+              if (club == null || club.deletedAt != null) {
+                return const ClubsListScreen();
+              }
+              return ClubDetailScreen(club: club);
+            },
           ),
           _Placeholder('Matches', Icons.sports_soccer),
           const ProfileScreen()

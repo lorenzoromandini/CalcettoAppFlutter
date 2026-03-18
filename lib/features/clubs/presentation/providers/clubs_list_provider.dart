@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/di/injection.dart';
 import '../../domain/entities/club.dart';
+import 'active_club_provider.dart';
 
 /// Riverpod provider for fetching and managing the clubs list.
 ///
@@ -90,13 +91,24 @@ class ClubsList extends Notifier<AsyncValue<List<Club>>> {
     result.fold(
       (failure) => throw Exception('Failed to delete club: $failure'),
       (_) async {
-        // Clear active club if it was the deleted one
+        // Refresh the list first to get updated clubs
+        await refresh();
+
+        // Check if deleted club was active
         final activeClub = ref.read(activeClubProvider).value;
         if (activeClub?.id == clubId) {
-          await ref.read(activeClubProvider.notifier).clearActiveClub();
+          // Get updated clubs list
+          final clubs = state.value;
+          if (clubs != null && clubs.isNotEmpty) {
+            // Set first available club as active
+            await ref
+                .read(activeClubProvider.notifier)
+                .setActiveClub(clubs.first.id);
+          } else {
+            // No clubs left, clear active
+            await ref.read(activeClubProvider.notifier).clearActiveClub();
+          }
         }
-        // Refresh the list
-        await refresh();
       },
     );
   }

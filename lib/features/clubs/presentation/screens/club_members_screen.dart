@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calcetto_app/features/clubs/presentation/providers/club_members_provider.dart';
 import 'package:calcetto_app/features/clubs/presentation/widgets/member_card.dart';
 import 'package:calcetto_app/features/clubs/presentation/widgets/members_grid_skeleton.dart';
+import 'package:calcetto_app/features/clubs/presentation/screens/member_detail_screen.dart';
 
 /// Members tab displaying club members in a grid of FIFA-style cards.
 class ClubMembersTab extends ConsumerWidget {
@@ -104,7 +105,12 @@ class ClubMembersTab extends ConsumerWidget {
             return MemberCard(
               member: member,
               onTap: () {
-                // Future: Navigate to member profile
+                // Navigate to member detail screen
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => MemberDetailScreen(member: member),
+                  ),
+                );
               },
             );
           },

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../widgets/logout_button.dart';
 import '../../../auth/presentation/providers/biometric_provider.dart';
+import '../../../clubs/presentation/screens/deleted_clubs_screen.dart';
 
 /// Settings screen with account and app preferences.
 ///
@@ -101,6 +102,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
           const LogoutButton(),
+          const Divider(),
+          // Clubs section
+          const ListTile(
+            title: Text(
+              'Club',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.restore_from_trash),
+            title: const Text('Club Eliminati'),
+            subtitle:
+                const Text('Recupera club eliminati negli ultimi 30 giorni'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const DeletedClubsScreen(),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );

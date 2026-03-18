@@ -17,7 +17,8 @@ abstract class ClubsRepository {
   /// Fetches a single club by ID.
   ///
   /// Checks cache first, fetches remote if stale/missing and online.
-  Future<Result<Club>> getClubById(String id);
+  /// Returns null if club is deleted or not found.
+  Future<Result<Club?>> getClubById(String id);
 
   /// Fetches members of a specific club.
   ///
@@ -43,4 +44,22 @@ abstract class ClubsRepository {
     required String name,
     String? description,
   });
+
+  /// Join a club using an invite code.
+  ///
+  /// Validates the code and adds user as a member.
+  /// Returns the joined club.
+  Future<Result<Club>> joinClub(String inviteCode);
+
+  /// Get deleted clubs for recovery.
+  ///
+  /// Returns clubs that have been soft-deleted within the last 30 days
+  /// where the user is an owner or manager.
+  Future<Result<List<Club>>> getDeletedClubs();
+
+  /// Recover a deleted club.
+  ///
+  /// Clears the deletedAt timestamp to restore the club.
+  /// Only owner or manager can recover.
+  Future<Result<Club>> recoverClub(String clubId);
 }
