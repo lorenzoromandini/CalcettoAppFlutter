@@ -49,10 +49,10 @@ class AuthEndpoint extends Endpoint {
   Future<Map<String, dynamic>> signup(
     Session session,
     String email,
-    String password,
     String firstName,
     String lastName,
     String? nickname,
+    String password,
     String? imageUrl,
   ) async {
     var existingUsers = await User.db.find(

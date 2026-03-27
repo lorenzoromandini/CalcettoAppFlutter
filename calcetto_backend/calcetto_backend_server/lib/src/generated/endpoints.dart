@@ -80,11 +80,6 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
-            'password': _i1.ParameterDescription(
-              name: 'password',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
             'firstName': _i1.ParameterDescription(
               name: 'firstName',
               type: _i1.getType<String>(),
@@ -100,6 +95,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String?>(),
               nullable: true,
             ),
+            'password': _i1.ParameterDescription(
+              name: 'password',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
             'imageUrl': _i1.ParameterDescription(
               name: 'imageUrl',
               type: _i1.getType<String?>(),
@@ -113,10 +113,10 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['auth'] as _i2.AuthEndpoint).signup(
             session,
             params['email'],
-            params['password'],
             params['firstName'],
             params['lastName'],
             params['nickname'],
+            params['password'],
             params['imageUrl'],
           ),
         ),
